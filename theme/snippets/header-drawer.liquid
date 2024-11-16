@@ -1,0 +1,474 @@
+{% comment %}
+  Renders a header drawer menu for mobile and desktop.
+
+  Usage:
+  {% render 'header-drawer' %}
+{% endcomment %}
+
+<header-drawer
+  x-data="{ activeItem: [0,0] }"
+  data-breakpoint="{% if section.settings.menu_type_desktop == 'drawer' %}desktop{% else %}tablet{% endif %}"
+>
+  <details id="Details-menu-drawer-container" class="menu-drawer-container">
+    <summary
+      x-on:click="() => activeItem = [0,0]"
+      class="header__icon header__icon--menu header__icon--summary link focus-inset"
+      aria-label="{{ 'sections.header.menu' | t }}"
+    >
+      <span>
+        {% render 'icon-hamburger' %}
+        {% render 'icon-close' %}
+      </span>
+    </summary>
+    <div
+      id="menu-drawer"
+      class="gradient menu-drawer motion-reduce color-{{ section.settings.menu_color_scheme }}"
+    >
+      <div class="menu-drawer__inner-container">
+        <div class="menu-drawer__navigation-container">
+          <nav class="menu-drawer__navigation relative">
+            <ul
+              class="menu-drawer__menu has-submenu list-menu  "
+              role="list"
+            >
+              {%- for link in section.settings.menu.links -%}
+                {% assign mega_menu = false %}
+                {% assign order = forloop.index | append: "" %}
+                {% for block in section.blocks %}
+                  {% assign block_order = block.settings.order | append: "" %}
+                  {% assign firstLayerIndex = forloop.index %}
+                  {% if block_order == order %}
+                    {% assign mega_menu = true %}
+                    {% if block.type == 'menu1' %}
+                      <li class="">
+                        <div
+                          x-on:click="() => activeItem = [{{ firstLayerIndex }},0]"
+                          class="px-4 pe-6 py-6 flex items-center justify-between"
+                        >
+                          <p
+                            class="!text-3xl  "
+                          >
+                            {{ link.title }}
+                          </p>
+                          <div class="rtl:rotate-180">
+                            {% render 'icon-arrow' %}
+                          </div>
+                        </div>
+                        <div
+                          x-show="activeItem[0] == {{ firstLayerIndex }}"
+                          class="start-0 top-0 bg-white pt-12 absolute  z-[1] w-full h-full"
+                          x-transition:enter="transition transform duration-200 "
+                          x-transition:leave="transition transform duration-200 "
+                          x-transition:enter-start="opacity-0 translate-x-full rtl:-translate-x-full "
+                          x-transition:enter-end="opacity-100 translate-x-0 "
+                          x-transition:leave-start="opacity-100 translate-x-0 "
+                          x-transition:leave-end="opacity-0 translate-x-full rtl:-translate-x-full "
+                        >
+                          <ul>
+                            <li class="bg-gray-50">
+                              <div
+                                x-on:click=" () => activeItem = [0,0]"
+                                class="px-4 pe-6 py-6 flex items-center gap-4"
+                              >
+                                <div class="rotate-180 rtl:rotate-0">
+                                  {% render 'icon-arrow' %}
+                                </div>
+                                <p
+                                  class="!text-3xl  "
+                                >
+                                  {{ link.title }}
+                                </p>
+                              </div>
+                            </li>
+                            {% for child_link in block.settings.linklist.links -%}
+                              {% assign secondLayerIndex = forloop.index %}
+                              <li>
+                                <div
+                                  x-on:click="() => activeItem = [activeItem[0], {{ secondLayerIndex }}]"
+                                  class="px-4 pe-6 py-6 flex items-center justify-between"
+                                >
+                                  <p
+                                    class="!text-3xl  "
+                                  >
+                                    {{ child_link.title }}
+                                  </p>
+                                  <div class="rtl:rotate-180">
+                                    {% render 'icon-arrow' %}
+                                  </div>
+                                </div>
+                                <div
+                                  x-show="activeItem[1] == {{ secondLayerIndex }}"
+                                  class="start-0 top-0 bg-white pt-12 z-[3] w-full absolute h-full"
+                                  x-transition:enter="transition transform duration-200"
+                                  x-transition:enter-start="opacity-0 translate-x-full rtl:-translate-x-full"
+                                  x-transition:enter-end="opacity-100 translate-x-0"
+                                  x-transition:leave="transition transform duration-200"
+                                  x-transition:leave-start="opacity-100 translate-x-0"
+                                  x-transition:leave-end="opacity-0 translate-x-full rtl:-translate-x-full"
+                                >
+                                  <ul class="">
+                                    <li class="bg-gray-50">
+                                      <div
+                                        x-on:click="() => activeItem = [activeItem[0],0]"
+                                        class="px-4 pe-6 py-6 flex items-center  gap-4"
+                                      >
+                                        <div class="rotate-180 rtl:rotate-0">
+                                          {% render 'icon-arrow' %}
+                                        </div>
+                                        <p
+                                          class="!text-3xl  "
+                                        >
+                                          {{ child_link.title }}
+                                        </p>
+                                      </div>
+                                    </li>
+                                    <div class="mt-2 z-10 grid-layout grid-cols-2 gap-3 px-4 bg-white pb-6">
+                                      {% for sub_child_link in child_link.links %}
+                                        <li
+                                          class=""
+                                        >
+                                          <a
+                                            draggable="false"
+                                            href="{{ sub_child_link.url }}"
+                                          >
+                                            <div class="rounded-md duration-300">
+                                              {% assign isImageExists = false %}
+                                              {% assign imageUrl = sub_child_link.title
+                                                | split: '|'
+                                                | slice: 1
+                                                | join: ''
+                                              %}
+                                              {% assign title = sub_child_link.title
+                                                | split: '|'
+                                                | slice: 0
+                                                | join: ' '
+                                                | link_to: sub_child_link.url
+                                              %}
+                                              {% if imageUrl.size > 2 %}
+                                                {% assign isImageExists = true %}
+                                                <img
+                                                  draggable="false"
+                                                  src="{{ imageUrl }}"
+                                                  alt="Outerwear Image"
+                                                  width="150px"
+                                                  height="150px"
+                                                  class="min-w-[150px] min-h-[150px] rounded-md mx-auto"
+                                                >
+                                              {% endif %}
+                                              {% if isImageExists == false %}
+                                                <div class="min-w-[150px] min-h-[150px] flex items-center justify-center bg-gray-50 rounded-md">
+                                                  150x150
+                                                </div>
+                                              {% endif %}
+                                              <p class="text-center mt-2 px-2">
+                                                {{ title }}
+                                              </p>
+                                            </div>
+                                          </a>
+                                        </li>
+                                      {% endfor %}
+                                    </div>
+                                  </ul>
+                                </div>
+                              </li>
+                            {% endfor %}
+                          </ul>
+                        </div>
+                      </li>
+                    {% else %}
+                      <div>Type3</div>
+                    {% endif %}
+                  {% endif %}
+                {% endfor %}
+                {% if mega_menu == false %}
+                  <li>
+                    <div class="px-4 py-6 flex items-center justify-between">
+                      <p class="font-medium  !text-3xl  ">
+                        {{ link.title | link_to: link.url }}
+                      </p>
+                    </div>
+                  </li>
+                {% endif %}
+              {%- endfor -%}
+            </ul>
+          </nav>
+          <div
+            x-show="activeItem[0] === 0 && activeItem[1] === 0 "
+            class="menu-drawer__utility-links"
+          >
+            {%- if shop.customer_accounts_enabled -%}
+              <a
+                href="{%- if customer -%}{{ routes.account_url }}{%- else -%}{{ routes.account_login_url }}{%- endif -%}"
+                class="menu-drawer__account link focus-inset h5 medium-hide large-up-hide"
+              >
+                {% render 'icon-account' %}
+                {%- liquid
+                  if customer
+                    echo 'customer.account_fallback' | t
+                  else
+                    echo 'customer.log_in' | t
+                  endif
+                -%}
+              </a>
+            {%- endif -%}
+            {%- if localization.available_countries
+              or localization.available_languages
+            -%}
+              <div class="menu-drawer__localization header-localization">
+                {% comment %} {%- if localization.available_countries
+                  and localization.available_countries.size > 1
+                -%}
+                  <noscript>
+                    {%- form 'localization',
+                      id: 'HeaderCountryMobileFormNoScriptDrawer',
+                      class: 'localization-form'
+                    -%}
+                      <div class="localization-form__select">
+                        <h2
+                          class="visually-hidden"
+                          id="HeaderCountryMobileLabelNoScriptDrawer"
+                        >
+                          {{ 'localization.country_label' | t }}
+                        </h2>
+                        <select
+                          class="localization-selector link"
+                          name="country_code"
+                          aria-labelledby="HeaderCountryMobileLabelNoScriptDrawer"
+                        >
+                          {%- for country in localization.available_countries -%}
+                            <option
+                              value="{{ country.iso_code }}"
+                              {%- if country.iso_code
+                                  == localization.country.iso_code
+                              %}
+                                selected
+                              {% endif %}
+                            >
+                              {{ country.name }} (
+                              {{- country.currency.iso_code }}
+                              {{ country.currency.symbol }})
+                            </option>
+                          {%- endfor -%}
+                        </select>
+                        {% render 'icon-caret' %}
+                      </div>
+                      <button class="button button--tertiary">
+                        {{ 'localization.update_country' | t }}
+                      </button>
+                    {%- endform -%}
+                  </noscript>
+
+                  <localization-form class="no-js-hidden">
+                    {%- form 'localization',
+                      id: 'HeaderCountryMobileForm',
+                      class: 'localization-form'
+                    -%}
+                      <div>
+                        <h2
+                          class="visually-hidden"
+                          id="HeaderCountryMobileLabel"
+                        >
+                          {{ 'localization.country_label' | t }}
+                        </h2>
+                        {%- render 'country-localization',
+                          localPosition: 'HeaderCountryMobile'
+                        -%}
+                      </div>
+                    {%- endform -%}
+                  </localization-form>
+                {% endif %} {% endcomment %}
+
+                {%- if localization.available_languages
+                  and localization.available_languages.size > 1
+                -%}
+                  <noscript>
+                    {%- form 'localization',
+                      id: 'HeaderLanguageMobileFormNoScriptDrawer',
+                      class: 'localization-form'
+                    -%}
+                      <div class="localization-form__select">
+                        <h2
+                          class="visually-hidden"
+                          id="HeaderLanguageMobileLabelNoScriptDrawer"
+                        >
+                          {{ 'localization.language_label' | t }}
+                        </h2>
+                        <select
+                          class="localization-selector link"
+                          name="locale_code"
+                          aria-labelledby="HeaderLanguageMobileLabelNoScriptDrawer"
+                        >
+                          {%- for language in localization.available_languages -%}
+                            <option
+                              value="{{ language.iso_code }}"
+                              lang="{{ language.iso_code }}"
+                              {%- if language.iso_code
+                                  == localization.language.iso_code
+                              %}
+                                selected
+                              {% endif %}
+                            >
+                              {{ language.endonym_name | capitalize }}
+                            </option>
+                          {%- endfor -%}
+                        </select>
+                        {% render 'icon-caret' %}
+                      </div>
+                      <button class="button button--tertiary">
+                        {{ 'localization.update_language' | t }}
+                      </button>
+                    {%- endform -%}
+                  </noscript>
+
+                  <localization-form class="no-js-hidden">
+                    {%- form 'localization',
+                      id: 'HeaderLanguageMobileForm',
+                      class: 'localization-form'
+                    -%}
+                      <div>
+                        <h2
+                          class="visually-hidden"
+                          id="HeaderLanguageMobileLabel"
+                        >
+                          {{ 'localization.language_label' | t }}
+                        </h2>
+                        {%- render 'language-localization',
+                          localPosition: 'HeaderLanguageMobile'
+                        -%}
+                      </div>
+                    {%- endform -%}
+                  </localization-form>
+                {%- endif -%}
+              </div>
+            {%- endif -%}
+            {%- if section.settings.enable_theme_selector -%}
+              <div class="flex items-center gap-4 mb-2">
+                <p>Theme</p>
+                {% render 'theme-switcher' %}
+              </div>
+            {%- endif -%}
+            <ul class="list list-social list-unstyled" role="list">
+              {%- if settings.social_twitter_link != blank -%}
+                <li class="list-social__item">
+                  <a
+                    href="{{ settings.social_twitter_link }}"
+                    class="list-social__link link"
+                  >
+                    {%- render 'icon-twitter' -%}
+                    <span class="visually-hidden">
+                      {{- 'general.social.links.twitter' | t -}}
+                    </span>
+                  </a>
+                </li>
+              {%- endif -%}
+              {%- if settings.social_facebook_link != blank -%}
+                <li class="list-social__item">
+                  <a
+                    href="{{ settings.social_facebook_link }}"
+                    class="list-social__link link"
+                  >
+                    {%- render 'icon-facebook' -%}
+                    <span class="visually-hidden">
+                      {{- 'general.social.links.facebook' | t -}}
+                    </span>
+                  </a>
+                </li>
+              {%- endif -%}
+              {%- if settings.social_pinterest_link != blank -%}
+                <li class="list-social__item">
+                  <a
+                    href="{{ settings.social_pinterest_link }}"
+                    class="list-social__link link"
+                  >
+                    {%- render 'icon-pinterest' -%}
+                    <span class="visually-hidden">
+                      {{- 'general.social.links.pinterest' | t -}}
+                    </span>
+                  </a>
+                </li>
+              {%- endif -%}
+              {%- if settings.social_instagram_link != blank -%}
+                <li class="list-social__item">
+                  <a
+                    href="{{ settings.social_instagram_link }}"
+                    class="list-social__link link"
+                  >
+                    {%- render 'icon-instagram' -%}
+                    <span class="visually-hidden">
+                      {{- 'general.social.links.instagram' | t -}}
+                    </span>
+                  </a>
+                </li>
+              {%- endif -%}
+              {%- if settings.social_tiktok_link != blank -%}
+                <li class="list-social__item">
+                  <a
+                    href="{{ settings.social_tiktok_link }}"
+                    class="list-social__link link"
+                  >
+                    {%- render 'icon-tiktok' -%}
+                    <span class="visually-hidden">
+                      {{- 'general.social.links.tiktok' | t -}}
+                    </span>
+                  </a>
+                </li>
+              {%- endif -%}
+              {%- if settings.social_tumblr_link != blank -%}
+                <li class="list-social__item">
+                  <a
+                    href="{{ settings.social_tumblr_link }}"
+                    class="list-social__link link"
+                  >
+                    {%- render 'icon-tumblr' -%}
+                    <span class="visually-hidden">
+                      {{- 'general.social.links.tumblr' | t -}}
+                    </span>
+                  </a>
+                </li>
+              {%- endif -%}
+              {%- if settings.social_snapchat_link != blank -%}
+                <li class="list-social__item">
+                  <a
+                    href="{{ settings.social_snapchat_link }}"
+                    class="list-social__link link"
+                  >
+                    {%- render 'icon-snapchat' -%}
+                    <span class="visually-hidden">
+                      {{- 'general.social.links.snapchat' | t -}}
+                    </span>
+                  </a>
+                </li>
+              {%- endif -%}
+              {%- if settings.social_youtube_link != blank -%}
+                <li class="list-social__item">
+                  <a
+                    href="{{ settings.social_youtube_link }}"
+                    class="list-social__link link"
+                  >
+                    {%- render 'icon-youtube' -%}
+                    <span class="visually-hidden">
+                      {{- 'general.social.links.youtube' | t -}}
+                    </span>
+                  </a>
+                </li>
+              {%- endif -%}
+              {%- if settings.social_vimeo_link != blank -%}
+                <li class="list-social__item">
+                  <a
+                    href="{{ settings.social_vimeo_link }}"
+                    class="list-social__link link"
+                  >
+                    {%- render 'icon-vimeo' -%}
+                    <span class="visually-hidden">
+                      {{- 'general.social.links.vimeo' | t -}}
+                    </span>
+                  </a>
+                </li>
+              {%- endif -%}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </details>
+</header-drawer>

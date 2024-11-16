@@ -1,0 +1,135 @@
+{% comment %}theme-check-disable ImgLazyLoading{% endcomment %}
+{{ 'component-collection-hero.css' | asset_url | stylesheet_tag }}
+
+{%- style -%}
+  @media screen and (max-width: 749px) {
+    .collection-hero--with-image .collection-hero__inner {
+      padding-bottom: calc(
+        {{settings.media_shadow_vertical_offset | at_least: 0}}px + 2rem
+      );
+    }
+  }
+{%- endstyle -%}
+
+<div class="collection-hero{% if section.settings.show_collection_image and collection.image %} collection-hero--with-image{% endif %} color-{{ section.settings.color_scheme }} gradient">
+  <div class="collection-hero__inner page-width {% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}">
+    <div class="collection-hero__text-wrapper">
+      <h1
+        x-data="{title: '{{ collection.title }}', splittedTitle : [], generatedURLs : [] }"
+        x-init="
+           const splittedTitleOrigin = title.split('/')
+           splittedTitle=splittedTitleOrigin
+           const splittedTitleFormatted = splittedTitleOrigin.map(item => item.trim().toLowerCase().split(' ').join('-'))
+           const originURL = window.location.origin
+           const pathname = window.location.pathname
+           const pathnameAfterRemoveLastPart = pathname.split('/').slice(0,-1).join('/')
+
+           function handleCreateURL(idx){
+             const newLastPartOfPathname = splittedTitleFormatted.slice(0, idx + 1).join('-')
+             const newPathname = `${pathnameAfterRemoveLastPart}/${newLastPartOfPathname}`
+             const newURL = `${originURL}${newPathname}`
+             return  newURL
+
+           }
+           const generateURLs = () => {
+             return splittedTitleOrigin.map((item,idx) => handleCreateURL(idx))
+           }
+
+          generatedURLs = generateURLs()
+        "
+        class="collection-hero__title"
+      >
+        <span class="visually-hidden">
+          {{- 'sections.collection_template.title' | t }}:
+        </span>
+        <div class="flex items-center gap-3 flex-wrap">
+          <template x-for="(item,index) in splittedTitle.slice(0,-1)">
+            <div class="flex items-center gap-3">
+              <a
+                x-show="!window.location.pathname.split('/').includes('ar')"
+                x-bind:href="generatedURLs[index]"
+              >
+                <p
+                  x-text="item"
+                  class="
+                    text-nowrap !text-3xl cursor-pointer relative font-medium hover:text-primary-200 transition-all duration-200 hover:scale-105 hover:-translate-y-[2px]  before:top-full before:start-0 before:absolute before:w-0 before:h-px before:bg-primary-100/50 before:transition-all hover:before:w-full before:duration-300
+                    after:top-full after:end-0 after:absolute after:w-0 after:h-px after:bg-primary-100/50 after:transition-all hover:after:w-full after:duration-300
+                  "
+                ></p>
+              </a>
+              <p
+                x-text="item"
+                x-show="window.location.pathname.split('/').includes('ar')"
+                class="!text-3xl font-medium"
+              ></p>
+              <span>/</span>
+            </div>
+          </template>
+          <p
+            x-text="splittedTitle.slice(-1)[0]"
+            class="!text-3xl"
+          ></p>
+        </div>
+      </h1>
+
+      {%- if section.settings.show_collection_description -%}
+        <div class="collection-hero__description rte">
+          {{ collection.description }}
+        </div>
+      {%- endif -%}
+    </div>
+
+    {%- if section.settings.show_collection_image and collection.image -%}
+      <div class="collection-hero__image-container media gradient">
+        <img
+          srcset="
+            {%- if collection.image.width >= 165 -%}{{ collection.image | image_url: width: 165 }} 165w,{%- endif -%}
+            {%- if collection.image.width >= 360 -%}{{ collection.image | image_url: width: 360 }} 360w,{%- endif -%}
+            {%- if collection.image.width >= 535 -%}{{ collection.image | image_url: width: 535 }} 535w,{%- endif -%}
+            {%- if collection.image.width >= 750 -%}{{ collection.image | image_url: width: 750 }} 750w,{%- endif -%}
+            {%- if collection.image.width >= 1070 -%}{{ collection.image | image_url: width: 1070 }} 1070w,{%- endif -%}
+            {%- if collection.image.width >= 1500 -%}{{ collection.image | image_url: width: 1500 }} 1500w,{%- endif -%}
+            {{ collection.image | image_url }} {{ collection.image.width }}w
+          "
+          src="{{ collection.image | image_url: width: 750 }}"
+          sizes="(min-width: {{ settings.page_width }}px) {{ settings.page_width | minus: 100 | divided_by: 2 }}px, (min-width: 750px) calc(50vw - 130px), calc(50vw - 55px)"
+          alt="{{ collection.image.alt | escape }}"
+          width="{{ collection.image.width }}"
+          height="{{ collection.image.height }}"
+        >
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "t:sections.main-collection-banner.name",
+  "class": "section",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "t:sections.main-collection-banner.settings.paragraph.content"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_collection_description",
+      "default": true,
+      "label": "t:sections.main-collection-banner.settings.show_collection_description.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_collection_image",
+      "default": false,
+      "label": "t:sections.main-collection-banner.settings.show_collection_image.label",
+      "info": "t:sections.main-collection-banner.settings.show_collection_image.info"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:sections.all.colors.label",
+      "default": "scheme-1"
+    }
+  ]
+}
+{% endschema %}

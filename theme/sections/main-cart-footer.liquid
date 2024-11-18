@@ -17,12 +17,91 @@
   }
 {%- endstyle -%}
 
+<script>
+  const redeemPoints = ({ customerId }) => {
+    return fetch(
+      `https://7ee7-151-253-243-195.ngrok-free.app/redeemPoints/${customerId}`,
+      {
+        method: 'GET', // or 'POST', 'PUT', etc., depending on the API
+        headers: {
+          'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': '1',
+        },
+      }
+    )
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`)
+        }
+        return response.json() // Parse JSON response
+      })
+      .then((data) => {
+        return data
+      })
+  }
+</script>
+
 <div
   class="gradient color-{{ section.settings.color_scheme }}{% if cart == empty %} is-empty{% endif %}"
   id="main-cart-footer"
   data-id="{{ section.id }}"
+  x-data="
+    {
+      errorMessage:'',
+      isLoading: false,
+      customerId: {{customer.id}},
+      messageToShow: '',
+      customerPoints : {{- customer.metafields.custom.points -}}
+    }
+  "
 >
   <div class="page-width">
+    <div class="py-2">
+      <p class="text-[2rem]">
+        Your total points are:
+        <span
+          x-text="customerPoints"
+          class="text-[2.2rem] font-semibold rounded-md px-2 py-1"
+        >
+        </span>
+      </p>
+      <div
+        x-show="messageToShow"
+        x-html="messageToShow"
+      ></div>
+      <p x-text="errorMessage" class="text-red-600 text-[14px]"></p>
+      <button
+        x-on:click="
+          async () => {
+            try {
+              errorMessage=''
+              messageToShow=''
+              isLoading = true
+              const { giftCardCode } = await redeemPoints({customerId})
+              customerPoints = 0
+              messageToShow = `<p>gift card code: ${giftCardCode}</p> <p class='text-[14px] text-green-600'>copied to your clipboard</p>`
+              navigator.clipboard.writeText(giftCardCode)
+              isLoading = false
+              }catch(err) {
+              isLoading = false
+              console.log({err})
+              errorMessage = 'something went wrong, please contact us to figure it out, or try again later'
+            }
+          }
+        "
+        class="button mt-2"
+        x-bind:disabled="customerPoints === 0"
+      >
+        Redeem Points
+      </button>
+    </div>
+    <div
+      x-show="isLoading"
+      id="redeemPointsLoader"
+      class="w-screen h-screen fixed top-0 start-0 z-[1000] bg-[#12121244] flex items-center justify-center"
+    >
+      <div class="CSSloader text-transparent">1</div>
+    </div>
     <div class="cart__footer isolate section-{{ section.id }}-padding">
       {%- if settings.show_cart_note -%}
         <cart-note class="cart__note field">
@@ -46,7 +125,11 @@
               <div class="js-contents" {{ block.shopify_attributes }}>
                 <div>
                   {%- if cart.cart_level_discount_applications.size > 0 -%}
-                    <ul class="discounts list-unstyled" role="list" aria-label="{{ 'customer.order.discount' | t }}">
+                    <ul
+                      class="discounts list-unstyled"
+                      role="list"
+                      aria-label="{{ 'customer.order.discount' | t }}"
+                    >
                       {%- for discount in cart.cart_level_discount_applications -%}
                         <li class="discounts__discount discounts__discount--position">
                           {%- render 'icon-discount' -%}
@@ -59,17 +142,32 @@
                 </div>
 
                 <div class="totals">
-                  <h2 class="totals__total">{{ 'sections.cart.estimated_total' | t }}</h2>
-                  <p class="totals__total-value">{{ cart.total_price | money_with_currency }}</p>
+                  <h2 class="totals__total">
+                    {{ 'sections.cart.estimated_total' | t }}
+                  </h2>
+                  <p class="totals__total-value">
+                    {{ cart.total_price | money_with_currency }}
+                  </p>
                 </div>
 
                 <small class="tax-note caption-large rte">
-                  {%- if cart.taxes_included and shop.shipping_policy.body != blank -%}
-                    {{ 'sections.cart.taxes_included_and_shipping_policy_html' | t: link: shop.shipping_policy.url }}
+                  {%- if cart.taxes_included
+                    and shop.shipping_policy.body != blank
+                  -%}
+                    {{
+                      'sections.cart.taxes_included_and_shipping_policy_html'
+                      | t: link: shop.shipping_policy.url
+                    }}
                   {%- elsif cart.taxes_included -%}
-                    {{ 'sections.cart.taxes_included_but_shipping_at_checkout' | t }}
+                    {{
+                      'sections.cart.taxes_included_but_shipping_at_checkout'
+                      | t
+                    }}
                   {%- elsif shop.shipping_policy.body != blank -%}
-                    {{ 'sections.cart.taxes_and_shipping_policy_at_checkout_html' | t: link: shop.shipping_policy.url }}
+                    {{
+                      'sections.cart.taxes_and_shipping_policy_at_checkout_html'
+                      | t: link: shop.shipping_policy.url
+                    }}
                   {%- else -%}
                     {{ 'sections.cart.taxes_and_shipping_at_checkout' | t }}
                   {%- endif -%}
@@ -78,7 +176,11 @@
             {%- else -%}
               <div class="cart__ctas" {{ block.shopify_attributes }}>
                 <noscript>
-                  <button type="submit" class="cart__update-button button button--secondary" form="cart">
+                  <button
+                    type="submit"
+                    class="cart__update-button button button--secondary"
+                    form="cart"
+                  >
                     {{ 'sections.cart.update' | t }}
                   </button>
                 </noscript>
@@ -114,22 +216,24 @@
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     function isIE() {
-      const ua = window.navigator.userAgent;
-      const msie = ua.indexOf('MSIE ');
-      const trident = ua.indexOf('Trident/');
+      const ua = window.navigator.userAgent
+      const msie = ua.indexOf('MSIE ')
+      const trident = ua.indexOf('Trident/')
 
-      return msie > 0 || trident > 0;
+      return msie > 0 || trident > 0
     }
 
-    if (!isIE()) return;
-    const cartSubmitInput = document.createElement('input');
-    cartSubmitInput.setAttribute('name', 'checkout');
-    cartSubmitInput.setAttribute('type', 'hidden');
-    document.querySelector('#cart').appendChild(cartSubmitInput);
-    document.querySelector('#checkout').addEventListener('click', function (event) {
-      document.querySelector('#cart').submit();
-    });
-  });
+    if (!isIE()) return
+    const cartSubmitInput = document.createElement('input')
+    cartSubmitInput.setAttribute('name', 'checkout')
+    cartSubmitInput.setAttribute('type', 'hidden')
+    document.querySelector('#cart').appendChild(cartSubmitInput)
+    document
+      .querySelector('#checkout')
+      .addEventListener('click', function (event) {
+        document.querySelector('#cart').submit()
+      })
+  })
 </script>
 
 {% schema %}
@@ -181,3 +285,5 @@
   ]
 }
 {% endschema %}
+
+<script></script>

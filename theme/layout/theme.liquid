@@ -398,6 +398,29 @@
       }
     </script>
     <link rel="stylesheet" href="{{  'output.css' |  asset_url}}">
+
+    <script>
+      function getQueryParam(param) {
+        const urlParams = new URLSearchParams(window.location.search)
+        return urlParams.get(param)
+      }
+
+      function setPromoCodeWithExpiry(promoCode, expiryTimeInMinutes) {
+        const now = new Date().getTime() // Current time in milliseconds
+        const expiryTime = now + expiryTimeInMinutes * 60 * 1000 // Calculate expiry timestamp
+
+        // Save promo code and expiry time in sessionStorage
+        sessionStorage.setItem(
+          'promoCode',
+          JSON.stringify({ value: promoCode, expiresAt: expiryTime })
+        )
+      }
+
+      const promoCode = getQueryParam('promo-code')
+      if (promoCode) {
+        setPromoCodeWithExpiry(promoCode,24 * 60)
+      }
+    </script>
   </head>
 
   <body class="gradient{% if settings.animations_hover_elements != 'none' %} animate--hover-{{ settings.animations_hover_elements }}{% endif %}">
@@ -566,7 +589,7 @@
 
       {% if settings.enable-whatsapp' %}
         <a
-        title="Contact Us"
+          title="Contact Us"
           target="_blank"
           href="https://api.whatsapp.com/send?phone={{settings.whatsapp_number}}"
           class="hover:scale-110 transition-all"

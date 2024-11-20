@@ -56,7 +56,7 @@
   "
 >
   <div class="page-width">
-    {% if customer and cart.item_count != 0  %}
+    {% if customer and cart.item_count != 0 %}
       <div class="py-2">
         <p class="text-[2rem]">
           Your total points are:
@@ -104,19 +104,31 @@
     >
       <div class="CSSloader text-transparent">1</div>
     </div>
-    <div class="cart__footer isolate section-{{ section.id }}-padding">
-      {%- if settings.show_cart_note -%}
-        <cart-note class="cart__note field">
-          <label for="Cart-note">{{ 'sections.cart.note' | t }}</label>
-          <textarea
-            class="text-area field__input"
-            name="note"
+    <div class="items-end cart__footer isolate section-{{ section.id }}-padding">
+      <div class="flex flex-col gap-6">
+        <div class="">
+          <p>Promo Code</p>
+          <input
+            disabled
+            class="disabled:cursor-not-allowed disabled:bg-gray-100 w-full outline-none border border-black p-2 mt-2 rounded-md"
+            id="promo-code-field"
             form="cart"
-            id="Cart-note"
-            placeholder="{{ 'sections.cart.note' | t }}"
-          >{{ cart.note }}</textarea>
-        </cart-note>
-      {%- endif -%}
+            name="attributes[promo_code]"
+          >
+        </div>
+        {%- if settings.show_cart_note -%}
+          <cart-note class="cart__note field">
+            <label for="Cart-note">{{ 'sections.cart.note' | t }}</label>
+            <textarea
+              class="text-area field__input"
+              name="note"
+              form="cart"
+              id="Cart-note"
+              placeholder="{{ 'sections.cart.note' | t }}"
+            >{{ cart.note }}</textarea>
+          </cart-note>
+        {%- endif -%}
+      </div>
 
       <div class="cart__blocks">
         {% for block in section.blocks %}
@@ -192,9 +204,7 @@
                   id="checkout"
                   class="cart__checkout-button button"
                   name="checkout"
-                  {% if cart == empty %}
-                    disabled
-                  {% endif %}
+                  disabled
                   form="cart"
                 >
                   {{ 'sections.cart.checkout' | t }}
@@ -217,6 +227,35 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
+    function getPromoCode() {
+      const promoData = JSON.parse(sessionStorage.getItem('promoCode'))
+
+      if (!promoData) {
+        console.log('No promo code found.')
+        return null
+      }
+
+      const now = new Date().getTime() // Current time in milliseconds
+
+      if (now > promoData.expiresAt) {
+        // Promo code has expired, remove it
+        sessionStorage.removeItem('promoCode')
+        console.log('Promo code expired and has been removed.')
+        return null
+      }
+
+      console.log(`Promo code retrieved: ${promoData.value}`)
+      return promoData.value // Return the valid promo code
+    }
+    const storedPromoCode = getPromoCode()
+    const checkoutButton = document.getElementById('checkout')
+    const promoCodeField = document.getElementById('promo-code-field')
+    
+    if (storedPromoCode) {
+      promoCodeField.value = storedPromoCode
+      checkoutButton.disabled = false
+    }
+
     function isIE() {
       const ua = window.navigator.userAgent
       const msie = ua.indexOf('MSIE ')
@@ -287,5 +326,3 @@
   ]
 }
 {% endschema %}
-
-<script></script>

@@ -80,7 +80,7 @@
         "id": "enable-whatsapp",
         "label": "Enable whatsapp",
         "default": false
-      },
+      }
     ]
   },
   {
@@ -92,6 +92,16 @@
         "label": "Enable Loyalty Points",
         "default": false
       },
+      {
+        "type": "text",
+        "id": "loyalty-points-server-URL",
+        "label": "Loyalty Points Server URL",
+        "default": "https://"
+      },
+      {
+        "type": "paragraph",
+        "content": "Note that the whole API will be  'serverURL/redeemPoints/:customerId', the expected return is: {giftCardCode}"
+      }
     ]
   },
   {

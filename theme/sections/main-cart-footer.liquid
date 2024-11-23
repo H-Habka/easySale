@@ -18,9 +18,9 @@
 {%- endstyle -%}
 
 <script>
-  const redeemPoints = ({ customerId }) => {
+  function redeemPoints({ customerId }) {
     return fetch(
-      `https://7ee7-151-253-243-195.ngrok-free.app/redeemPoints/${customerId}`,
+      `{{settings['loyalty-points-server-URL']}}/redeemPoints/${customerId}`,
       {
         method: 'GET', // or 'POST', 'PUT', etc., depending on the API
         headers: {

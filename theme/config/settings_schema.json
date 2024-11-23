@@ -84,6 +84,17 @@
     ]
   },
   {
+    "name": "Loyalty Points",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "enable-loyalty-points",
+        "label": "Enable Loyalty Points",
+        "default": false
+      },
+    ]
+  },
+  {
     "name": "Color Swatches by WebSensePro",
     "settings": [
       {

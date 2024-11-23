@@ -56,46 +56,48 @@
   "
 >
   <div class="page-width">
-    {% if customer and cart.item_count != 0 %}
-      <div class="py-2">
-        <p class="text-[2rem]">
-          Your total points are:
-          <span
-            x-text="customerPoints"
-            class="text-[2.2rem] font-semibold rounded-md px-2 py-1"
-          >
-          </span>
-        </p>
-        <div
-          x-show="messageToShow"
-          x-html="messageToShow"
-        ></div>
-        <p x-text="errorMessage" class="text-red-600 text-[14px]"></p>
-        <button
-          x-on:click="
-            async () => {
-              try {
-                errorMessage=''
-                messageToShow=''
-                isLoading = true
-                const { giftCardCode } = await redeemPoints({customerId})
-                customerPoints = 0
-                messageToShow = `<p>gift card code: ${giftCardCode}</p> <p class='text-[14px] text-green-600'>copied to your clipboard</p>`
-                navigator.clipboard.writeText(giftCardCode)
-                isLoading = false
-                }catch(err) {
-                isLoading = false
-                console.log({err})
-                errorMessage = 'something went wrong, please contact us to figure it out, or try again later'
+    {% if settings['enable-loyalty-points'] %}
+      {% if customer and cart.item_count != 0 %}
+        <div class="py-2">
+          <p class="text-[2rem]">
+            Your total points are:
+            <span
+              x-text="customerPoints"
+              class="text-[2.2rem] font-semibold rounded-md px-2 py-1"
+            >
+            </span>
+          </p>
+          <div
+            x-show="messageToShow"
+            x-html="messageToShow"
+          ></div>
+          <p x-text="errorMessage" class="text-red-600 text-[14px]"></p>
+          <button
+            x-on:click="
+              async () => {
+                try {
+                  errorMessage=''
+                  messageToShow=''
+                  isLoading = true
+                  const { giftCardCode } = await redeemPoints({customerId})
+                  customerPoints = 0
+                  messageToShow = `<p>gift card code: ${giftCardCode}</p> <p class='text-[14px] text-green-600'>copied to your clipboard</p>`
+                  navigator.clipboard.writeText(giftCardCode)
+                  isLoading = false
+                  }catch(err) {
+                  isLoading = false
+                  console.log({err})
+                  errorMessage = 'something went wrong, please contact us to figure it out, or try again later'
+                }
               }
-            }
-          "
-          class="button mt-2"
-          x-bind:disabled="customerPoints === 0"
-        >
-          Redeem Points
-        </button>
-      </div>
+            "
+            class="button mt-2"
+            x-bind:disabled="customerPoints === 0"
+          >
+            Redeem Points
+          </button>
+        </div>
+      {% endif %}
     {% endif %}
     <div
       x-show="isLoading"
@@ -250,7 +252,7 @@
     const storedPromoCode = getPromoCode()
     const checkoutButton = document.getElementById('checkout')
     const promoCodeField = document.getElementById('promo-code-field')
-    
+
     if (storedPromoCode) {
       promoCodeField.value = storedPromoCode
       checkoutButton.disabled = false

@@ -51,7 +51,12 @@
       isLoading: false,
       customerId: {{customer.id}},
       messageToShow: '',
-      customerPoints : {{- customer.metafields.custom.points -}}
+      customerPoints: {{- customer.metafields.custom.points -}},
+      isPromoCodeEnabled:  {{ settings["enable-promo-code"] }},
+      isPromoCodeRequired: {{ settings["is-promo-code-required"] }},
+      isPromoCodeAutoFilled:  {{ settings["is-promo-code-auto-filled"] }},
+      isLoyaltyPointsEnabled: {{ settings['enable-loyalty-points'] }},
+      promoCodeContent: ''
     }
   "
 >
@@ -108,16 +113,25 @@
     </div>
     <div class="items-end cart__footer isolate section-{{ section.id }}-padding">
       <div class="flex flex-col gap-6">
-        <div class="">
-          <p>Promo Code</p>
-          <input
-            disabled
-            class="disabled:cursor-not-allowed disabled:bg-gray-100 w-full outline-none border border-black p-2 mt-2 rounded-md"
-            id="promo-code-field"
-            form="cart"
-            name="attributes[promo_code]"
-          >
-        </div>
+        {% if settings['enable-promo-code'] %}
+          <div class="">
+            <p>Promo Code</p>
+            <input
+              x-bind:disabled="isPromoCodeAutoFilled"
+              class="disabled:cursor-not-allowed disabled:bg-gray-100 w-full outline-none border border-black p-2 mt-2 rounded-md"
+              id="promo-code-field"
+              form="cart"
+              x-model="promoCodeContent"
+            >
+            <input
+              hidden
+              form="cart"
+              name="attributes[promo_code]"
+              :value="promoCodeContent"
+            >
+          </div>
+        {% endif %}
+
         {%- if settings.show_cart_note -%}
           <cart-note class="cart__note field">
             <label for="Cart-note">{{ 'sections.cart.note' | t }}</label>
@@ -206,7 +220,7 @@
                   id="checkout"
                   class="cart__checkout-button button"
                   name="checkout"
-                  disabled
+                  x-bind:disabled="isPromoCodeEnabled && isPromoCodeRequired && !promoCodeContent"
                   form="cart"
                 >
                   {{ 'sections.cart.checkout' | t }}
@@ -250,12 +264,9 @@
       return promoData.value // Return the valid promo code
     }
     const storedPromoCode = getPromoCode()
-    const checkoutButton = document.getElementById('checkout')
-    const promoCodeField = document.getElementById('promo-code-field')
-
+    const alpineDataContainer = document.querySelector('#main-cart-footer')
     if (storedPromoCode) {
-      promoCodeField.value = storedPromoCode
-      checkoutButton.disabled = false
+      Alpine.$data(alpineDataContainer).promoCodeContent = storedPromoCode
     }
 
     function isIE() {

@@ -34,8 +34,19 @@
           </svg>
         </button>
       </div>
-      <div id="cart-notification-product" class="cart-notification-product"></div>
-      <div class="cart-notification__links">
+      <div
+        id="cart-notification-product"
+        class="cart-notification-product"
+      ></div>
+      <div
+        x-data="
+          {
+            isPromoCodeEnabled:  {{ settings["enable-promo-code"] }},
+            isPromoCodeRequired: {{ settings["is-promo-code-required"] }}
+          }
+        "
+        class="cart-notification__links"
+      >
         <a
           href="{{ routes.cart_url }}"
           id="cart-notification-button"
@@ -43,12 +54,24 @@
         >
           {{- 'general.cart.view_empty_cart' | t -}}
         </a>
-        {% comment %} <form action="{{ routes.cart_url }}" method="post" id="cart-notification-form">
-          <button class="button button--primary button--full-width" name="checkout">
+
+        <form
+          x-bind:hidden="isPromoCodeEnabled && !(isPromoCodeEnabled && !isPromoCodeRequired)"
+          action="{{ routes.cart_url }}"
+          method="post"
+          id="cart-notification-form"
+        >
+          <button
+            class="button button--primary button--full-width"
+            name="checkout"
+          >
             {{ 'sections.cart.checkout' | t }}
           </button>
-        </form> {% endcomment %}
-        <button type="button" class="link button-label">{{ 'general.continue_shopping' | t }}</button>
+        </form>
+
+        <button type="button" class="link button-label">
+          {{ 'general.continue_shopping' | t }}
+        </button>
       </div>
     </div>
   </div>

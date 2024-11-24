@@ -105,6 +105,30 @@
     ]
   },
   {
+    "name": "Promo Code",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "enable-promo-code",
+        "label": "Enable Promo Code",
+        "default": false
+      },
+      {
+        "type": "checkbox",
+        "id": "is-promo-code-required",
+        "label": "Is Promo Code Required",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "is-promo-code-auto-filled",
+        "label": "Is Promo Code Auto Filled",
+        "default": true
+      },
+
+    ]
+  },
+  {
     "name": "Color Swatches by WebSensePro",
     "settings": [
       {

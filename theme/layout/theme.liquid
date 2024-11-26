@@ -418,7 +418,8 @@
 
       const promoCode = getQueryParam('promo-code')
       if (promoCode) {
-        setPromoCodeWithExpiry(promoCode,24 * 60)
+        setPromoCodeWithExpiry(promoCode, {{ settings["promo-code-expires-after"] }})
+        console.log(" {{settings["promo-code-expires-after"]}} ")
       }
     </script>
   </head>

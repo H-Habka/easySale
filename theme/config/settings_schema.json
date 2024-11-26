@@ -125,7 +125,12 @@
         "label": "Is Promo Code Auto Filled",
         "default": true
       },
-
+      {
+        "type": "number",
+        "id": "promo-code-expires-after",
+        "label": "Promo Code Expires After (minites)",
+        "default": 1440
+      }
     ]
   },
   {

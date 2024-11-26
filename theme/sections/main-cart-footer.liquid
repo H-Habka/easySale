@@ -46,18 +46,20 @@
   id="main-cart-footer"
   data-id="{{ section.id }}"
   x-data="
-    {
-      errorMessage:'',
-      isLoading: false,
-      customerId: {{customer.id}},
-      messageToShow: '',
-      customerPoints: {{- customer.metafields.custom.points -}},
-      isPromoCodeEnabled:  {{ settings["enable-promo-code"] }},
-      isPromoCodeRequired: {{ settings["is-promo-code-required"] }},
-      isPromoCodeAutoFilled:  {{ settings["is-promo-code-auto-filled"] }},
-      isLoyaltyPointsEnabled: {{ settings['enable-loyalty-points'] }},
-      promoCodeContent: ''
-    }
+        {
+          {% if customer and cart.item_count != 0 %}
+            customerId: {{customer.id}} ,
+            customerPoints: {{- customer.metafields.custom.points -}},
+          {% endif %}
+          errorMessage:'',
+          isLoading: false,
+          messageToShow: '',
+          isPromoCodeEnabled:  {{ settings["enable-promo-code"] }},
+          isPromoCodeRequired: {{ settings["is-promo-code-required"] }},
+          isPromoCodeAutoFilled:  {{ settings["is-promo-code-auto-filled"] }},
+          isLoyaltyPointsEnabled: {{ settings['enable-loyalty-points'] }},
+          promoCodeContent: ''
+        }
   "
 >
   <div class="page-width">

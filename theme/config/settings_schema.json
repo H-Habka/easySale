@@ -128,7 +128,7 @@
       {
         "type": "number",
         "id": "promo-code-expires-after",
-        "label": "Promo Code Expires After (minites)",
+        "label": "Promo Code Expires After (minutes)",
         "default": 1440
       }
     ]

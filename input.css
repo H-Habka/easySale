@@ -8,7 +8,7 @@ h3,
 h4,
 h5,
 h6 {
-  all: unset; /* Remove Tailwind overrides */
+  /* all: unset;  */
   font: revert; /* Revert to browser defaults */
   margin: revert; /* Revert margin to default */
 }

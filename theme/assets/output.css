@@ -767,6 +767,10 @@ video {
   margin-bottom: 1rem;
 }
 
+.mt-10 {
+  margin-top: 2.5rem;
+}
+
 .mt-2 {
   margin-top: 0.5rem;
 }
@@ -785,10 +789,6 @@ video {
 
 .mt-7 {
   margin-top: 1.75rem;
-}
-
-.mt-10 {
-  margin-top: 2.5rem;
 }
 
 .block {
@@ -1256,6 +1256,11 @@ video {
   color: rgb(22 163 74 / var(--tw-text-opacity, 1));
 }
 
+.text-red-500 {
+  --tw-text-opacity: 1;
+  color: rgb(239 68 68 / var(--tw-text-opacity, 1));
+}
+
 .text-red-600 {
   --tw-text-opacity: 1;
   color: rgb(220 38 38 / var(--tw-text-opacity, 1));
@@ -1387,8 +1392,7 @@ h3,
 h4,
 h5,
 h6 {
-  all: unset;
-  /* Remove Tailwind overrides */
+  /* all: unset;  */
   font: revert;
   /* Revert to browser defaults */
   margin: revert;

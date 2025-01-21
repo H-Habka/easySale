@@ -61,7 +61,8 @@
         placeholder="{{ 'customer.register.first_name' | t }}"
       >
       <label for="RegisterForm-FirstName">
-        {{ 'customer.register.first_name' | t }}
+        {{ 'customer.register.first_name' | t -}}
+        <span class="text-red-500">*</span>
       </label>
     </div>
     <div class="field">
@@ -77,6 +78,7 @@
       >
       <label for="RegisterForm-LastName">
         {{ 'customer.register.last_name' | t }}
+        <span class="text-red-500">*</span>
       </label>
     </div>
     <div class="field">
@@ -99,6 +101,7 @@
       >
       <label for="RegisterForm-email">
         {{ 'customer.register.email' | t }}
+        <span class="text-red-500">*</span>
       </label>
     </div>
     {%- if form.errors contains 'email' -%}
@@ -124,8 +127,16 @@
       >
       <label for="RegisterForm-password">
         {{ 'customer.register.password' | t }}
+        <span class="text-red-500">*</span>
       </label>
     </div>
+    <p class="text-[14px]">
+      <span class="font-semibold">Note:</span>
+      <span
+        >Please make sure to use a real email address so you can receive
+        notifications and codes
+      </span>
+    </p>
     {%- if form.errors contains 'password' -%}
       <span id="RegisterForm-password-error" class="form__message">
         <svg aria-hidden="true" focusable="false">

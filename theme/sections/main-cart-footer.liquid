@@ -46,20 +46,20 @@
   id="main-cart-footer"
   data-id="{{ section.id }}"
   x-data="
-        {
-          {% if customer and cart.item_count != 0 %}
-            customerId: {{customer.id}} ,
-            customerPoints: {{- customer.metafields.custom.points -}},
-          {% endif %}
-          errorMessage:'',
-          isLoading: false,
-          messageToShow: '',
-          isPromoCodeEnabled:  {{ settings["enable-promo-code"] }},
-          isPromoCodeRequired: {{ settings["is-promo-code-required"] }},
-          isPromoCodeAutoFilled:  {{ settings["is-promo-code-auto-filled"] }},
-          isLoyaltyPointsEnabled: {{ settings['enable-loyalty-points'] }},
-          promoCodeContent: ''
-        }
+    {
+      {% if customer and cart.item_count != 0 %}
+        customerId: {{customer.id}} ,
+        customerPoints: {{- customer.metafields.custom.points -}},
+      {% endif %}
+      errorMessage:'',
+      isLoading: false,
+      messageToShow: '',
+      isPromoCodeEnabled:  {{ settings["enable-promo-code"] }},
+      isPromoCodeRequired: {{ settings["is-promo-code-required"] }},
+      isPromoCodeAutoFilled:  {{ settings["is-promo-code-auto-filled"] }},
+      isLoyaltyPointsEnabled: {{ settings['enable-loyalty-points'] }},
+      promoCodeContent: ''
+    }
   "
 >
   <div class="page-width">
@@ -117,7 +117,10 @@
       <div class="flex flex-col gap-6">
         {% if settings['enable-promo-code'] %}
           <div class="">
-            <p>Promo Code</p>
+            <div class="flex items-center">
+              <p>Promo Code</p>
+              <span x-show="isPromoCodeRequired" class="text-red-500">*</span>
+            </div>
             <input
               x-bind:disabled="isPromoCodeAutoFilled"
               class="disabled:cursor-not-allowed disabled:bg-gray-100 w-full outline-none border border-black p-2 mt-2 rounded-md"
@@ -246,7 +249,7 @@
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     function getPromoCode() {
-      const promoData = JSON.parse(sessionStorage.getItem('promoCode'))
+      const promoData = JSON.parse(localStorage.getItem('promoCode'))
 
       if (!promoData) {
         console.log('No promo code found.')
@@ -257,7 +260,7 @@
 
       if (now > promoData.expiresAt) {
         // Promo code has expired, remove it
-        sessionStorage.removeItem('promoCode')
+        localStorage.removeItem('promoCode')
         console.log('Promo code expired and has been removed.')
         return null
       }

@@ -409,11 +409,17 @@
         const now = new Date().getTime() // Current time in milliseconds
         const expiryTime = now + expiryTimeInMinutes * 60 * 1000 // Calculate expiry timestamp
 
-        // Save promo code and expiry time in sessionStorage
-        sessionStorage.setItem(
+        // Save promo code and expiry time in localStorage
+        localStorage.setItem(
           'promoCode',
           JSON.stringify({ value: promoCode, expiresAt: expiryTime })
         )
+        // Remove the query string
+        const urlWithoutQuery = window.location.origin + window.location.pathname;
+
+        // Update the URL without reloading the page
+        window.history.replaceState(null, '', urlWithoutQuery);
+
       }
 
       const promoCode = getQueryParam('promo-code')

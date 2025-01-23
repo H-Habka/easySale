@@ -47,10 +47,8 @@
   data-id="{{ section.id }}"
   x-data="
     {
-      {% if customer and cart.item_count != 0 %}
-        customerId: {{customer.id}} ,
-        customerPoints: {{- customer.metafields.custom.points -}},
-      {% endif %}
+      customerId: {{customer.id | default: 'null'}} ,
+      customerPoints: {{- customer.metafields.custom.points | default: '0' -}},
       errorMessage:'',
       isLoading: false,
       messageToShow: '',

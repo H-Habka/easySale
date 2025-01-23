@@ -132,6 +132,13 @@
               name="attributes[promo_code]"
               :value="promoCodeContent"
             >
+            <p
+              x-show="isPromoCodeRequired && isPromoCodeAutoFilled"
+              class="text-[10px] "
+            >
+              This Filed should be filled automaticly when you git a url from
+              one of our sellers
+            </p>
           </div>
         {% endif %}
 

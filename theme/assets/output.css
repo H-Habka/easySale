@@ -1227,6 +1227,14 @@ video {
   font-size: 2rem;
 }
 
+.text-\[8px\] {
+  font-size: 8px;
+}
+
+.text-\[10px\] {
+  font-size: 10px;
+}
+
 .\!font-\[300\] {
   font-weight: 300 !important;
 }

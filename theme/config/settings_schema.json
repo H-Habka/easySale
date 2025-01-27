@@ -101,6 +101,16 @@
       {
         "type": "paragraph",
         "content": "Note that the whole API will be  'serverURL/redeemPoints/:customerId', the expected return is: {giftCardCode}"
+      },
+      {
+        "type": "text",
+        "id": "loyalty-points-to-AED-conversion-rate",
+        "label": "Loyalty Points to AED Conversion Rate",
+        "default": "0.4"
+      },
+      {
+        "type": "paragraph",
+        "content": "This Value will be used to convert the amount of points to AED"
       }
     ]
   },

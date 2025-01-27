@@ -56,6 +56,7 @@
       isPromoCodeRequired: {{ settings["is-promo-code-required"] }},
       isPromoCodeAutoFilled:  {{ settings["is-promo-code-auto-filled"] }},
       isLoyaltyPointsEnabled: {{ settings['enable-loyalty-points'] }},
+      loyaltyPointsConversionRate: {{ settings['loyalty-points-to-AED-conversion-rate'] }},
       promoCodeContent: ''
     }
   "
@@ -71,6 +72,12 @@
               class="text-[2.2rem] font-semibold rounded-md px-2 py-1"
             >
             </span>
+            <span x-show="customerPoints">&#8776;</span>
+            <span
+              x-show="customerPoints"
+              x-text="loyaltyPointsConversionRate * customerPoints"
+            ></span>
+            <span x-show="customerPoints">AED</span>
           </p>
           <div
             x-show="messageToShow"
@@ -86,7 +93,7 @@
                   isLoading = true
                   const { giftCardCode } = await redeemPoints({customerId})
                   customerPoints = 0
-                  messageToShow = `<p>gift card code: ${giftCardCode}</p> <p class='text-[14px] text-green-600'>copied to your clipboard</p>`
+                  messageToShow = `<p class='text-[14px] text-green-600'>Gift Card Code Has Been Sent to Your Email</p>`
                   navigator.clipboard.writeText(giftCardCode)
                   isLoading = false
                   }catch(err) {

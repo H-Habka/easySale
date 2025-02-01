@@ -14,11 +14,15 @@ if (!customElements.get('share-button')) {
         };
         this.urlToShare = this.elements.urlInput ? this.elements.urlInput.value : document.location.href;
 
+        // Access customerId from global window object
+        this.customerId = window.customerId || 'guest'; // Use 'guest' as fallback
+
         if (navigator.share) {
           this.mainDetailsToggle.setAttribute('hidden', '');
           this.elements.shareButton.classList.remove('hidden');
           this.elements.shareButton.addEventListener('click', () => {
-            navigator.share({ url: this.urlToShare, title: document.title });
+            const updatedUrl = this.appendPromoCodeToUrl(this.urlToShare);
+            navigator.share({ url: updatedUrl, title: document.title });
           });
         } else {
           this.mainDetailsToggle.addEventListener('toggle', this.toggleDetails.bind(this));
@@ -39,7 +43,8 @@ if (!customElements.get('share-button')) {
       }
 
       copyToClipboard() {
-        navigator.clipboard.writeText(this.elements.urlInput.value).then(() => {
+        const updatedUrl = this.appendPromoCodeToUrl(this.elements.urlInput.value);
+        navigator.clipboard.writeText(updatedUrl).then(() => {
           this.elements.successMessage.classList.remove('hidden');
           this.elements.successMessage.textContent = window.accessibilityStrings.shareSuccess;
           this.elements.closeButton.classList.remove('hidden');
@@ -47,9 +52,24 @@ if (!customElements.get('share-button')) {
         });
       }
 
+      appendPromoCodeToUrl(url) {
+        const promoCode = JSON.parse(localStorage.getItem('promoCode'))?.value || ''; // Get promo code from localStorage
+
+        if (promoCode) {
+          // Append promo code and customer ID to the URL
+          if (url.includes('?')) {
+            url += `&promo-code=${promoCode}_${this.customerId}`;
+          } else {
+            url += `?promo-code=${promoCode}_${this.customerId}`;
+          }
+        }
+
+        return url;
+      }
+
       updateUrl(url) {
         this.urlToShare = url;
-        this.elements.urlInput.value = url;
+        this.elements.urlInput.value = this.appendPromoCodeToUrl(url);
       }
     }
   );

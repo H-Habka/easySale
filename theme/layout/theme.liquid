@@ -400,33 +400,34 @@
     <link rel="stylesheet" href="{{  'output.css' |  asset_url}}">
 
     <script>
-      function getQueryParam(param) {
-        const urlParams = new URLSearchParams(window.location.search)
-        return urlParams.get(param)
-      }
+            function getQueryParam(param) {
+              const urlParams = new URLSearchParams(window.location.search)
+              return urlParams.get(param)
+            }
 
-      function setPromoCodeWithExpiry(promoCode, expiryTimeInMinutes) {
-        const now = new Date().getTime() // Current time in milliseconds
-        const expiryTime = now + expiryTimeInMinutes * 60 * 1000 // Calculate expiry timestamp
+        function setPromoCodeWithExpiry(promoCode, expiryTimeInMinutes) {
+          const now = new Date().getTime(); // Current time in milliseconds
+          const expiryTime = now + expiryTimeInMinutes * 60 * 1000; // Calculate expiry timestamp
 
-        // Save promo code and expiry time in localStorage
-        localStorage.setItem(
-          'promoCode',
-          JSON.stringify({ value: promoCode, expiresAt: expiryTime })
-        )
-        // Remove the query string
-        const urlWithoutQuery = window.location.origin + window.location.pathname;
+          // Save promo code and expiry time in localStorage
+          localStorage.setItem(
+              'promoCode',
+              JSON.stringify({ value: promoCode, expiresAt: expiryTime })
+          );
 
-        // Update the URL without reloading the page
-        window.history.replaceState(null, '', urlWithoutQuery);
+          // Get the current URL and remove only the "promo-code" query param
+          const url = new URL(window.location.href);
+          url.searchParams.delete('promo-code'); // Remove only the promo-code param
 
-      }
+          // Update the URL without reloading the page
+          window.history.replaceState(null, '', url.toString());
+        }
 
-      const promoCode = getQueryParam('promo-code')
-      if (promoCode) {
-        setPromoCodeWithExpiry(promoCode, {{ settings["promo-code-expires-after"] }})
-        console.log(" {{settings["promo-code-expires-after"]}} ")
-      }
+        const promoCode = getQueryParam('promo-code')
+        if (promoCode) {
+          setPromoCodeWithExpiry(promoCode, {{ settings["promo-code-expires-after"] }})
+          console.log(" {{settings["promo-code-expires-after"]}} ")
+        }
     </script>
   </head>
 

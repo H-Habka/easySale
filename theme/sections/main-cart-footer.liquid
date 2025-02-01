@@ -75,7 +75,7 @@
             <span x-show="customerPoints">&#8776;</span>
             <span
               x-show="customerPoints"
-              x-text="loyaltyPointsConversionRate * customerPoints"
+              x-text="(loyaltyPointsConversionRate * customerPoints).toFixed(2)"
             ></span>
             <span x-show="customerPoints">AED</span>
           </p>

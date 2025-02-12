@@ -1207,6 +1207,10 @@ video {
   line-height: 2rem;
 }
 
+.text-\[10px\] {
+  font-size: 10px;
+}
+
 .text-\[13px\] {
   font-size: 13px;
 }
@@ -1227,14 +1231,6 @@ video {
   font-size: 2rem;
 }
 
-.text-\[8px\] {
-  font-size: 8px;
-}
-
-.text-\[10px\] {
-  font-size: 10px;
-}
-
 .\!font-\[300\] {
   font-weight: 300 !important;
 }
@@ -1245,6 +1241,10 @@ video {
 
 .font-semibold {
   font-weight: 600;
+}
+
+.font-bold {
+  font-weight: 700;
 }
 
 .uppercase {
@@ -1276,6 +1276,11 @@ video {
 
 .text-transparent {
   color: transparent;
+}
+
+.text-\[\#01756E\] {
+  --tw-text-opacity: 1;
+  color: rgb(1 117 110 / var(--tw-text-opacity, 1));
 }
 
 .no-underline {

@@ -20,12 +20,12 @@
   class="share-button quick-add-hidden"
   {{ block.shopify_attributes }}
 >
-  <button class="share-button__button hidden">
+  <button class="share-button__button hidden  text-[#01756E] font-bold">
     {% render 'icon-share' %}
     {{ block.settings.share_label | escape }}
   </button>
   <details id="Details-{{ block.id }}-{{ section.id }}">
-    <summary class="share-button__button">
+    <summary class="share-button__button text-[#01756E] font-bold">
       {% render 'icon-share' %}
       {{ block.settings.share_label | escape }}
     </summary>

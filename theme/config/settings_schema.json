@@ -65,10 +65,6 @@
     "name": "whatsapp",
     "settings": [
       {
-        "type": "paragraph",
-        "content": "Subscribe our channel [websensepro](https://youtube.com/@websensepro?sub_confirmation=1)"
-      },
-      {
         "type": "text",
         "id": "whatsapp_number",
         "default": "971",
@@ -79,6 +75,33 @@
         "type": "checkbox",
         "id": "enable-whatsapp",
         "label": "Enable whatsapp",
+        "default": false
+      }
+    ]
+  },
+  {
+    "name": "Free Shipping",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "show the free shipping progress bar and the minimum amount to offer free shipping"
+      },
+      {
+        "type": "number",
+        "id": "free-shipping-limit",
+        "default": 100,
+        "label": "Free Shipping Limit"
+      },
+      {
+        "type": "number",
+        "id": "min-order-amount",
+        "default": 0,
+        "label": "Min Order Amount"
+      },
+      {
+        "type": "checkbox",
+        "id": "enable-free-shipping-progress",
+        "label": "Enable Free Shipping Progress",
         "default": false
       }
     ]

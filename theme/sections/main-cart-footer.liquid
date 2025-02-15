@@ -57,7 +57,9 @@
       isPromoCodeAutoFilled:  {{ settings["is-promo-code-auto-filled"] }},
       isLoyaltyPointsEnabled: {{ settings['enable-loyalty-points'] }},
       loyaltyPointsConversionRate: {{ settings['loyalty-points-to-AED-conversion-rate'] }},
-      promoCodeContent: ''
+      promoCodeContent: '',
+      minOrderAmount: {{ settings['min-order-amount'] | default: 0 }},
+      cartTotal: {{ cart.total_price | divided_by: 100 | default: 0 }},
     }
   "
 >
@@ -74,10 +76,10 @@
             </span>
             <span x-show="customerPoints">&#8776;</span>
             <span
+              class="font-semibold"
               x-show="customerPoints"
-              x-text="(loyaltyPointsConversionRate * customerPoints).toFixed(2)"
+              x-text="formatNumbers(loyaltyPointsConversionRate * customerPoints)"
             ></span>
-            <span x-show="customerPoints">AED</span>
           </p>
           <div
             x-show="messageToShow"
@@ -237,7 +239,7 @@
                   id="checkout"
                   class="cart__checkout-button button"
                   name="checkout"
-                  x-bind:disabled="isPromoCodeEnabled && isPromoCodeRequired && !promoCodeContent"
+                  x-bind:disabled="(isPromoCodeEnabled && isPromoCodeRequired && !promoCodeContent) || (cartTotal < minOrderAmount)"
                   form="cart"
                 >
                   {{ 'sections.cart.checkout' | t }}

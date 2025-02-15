@@ -52,3 +52,31 @@ h6 {
     }
   }
 }
+
+.buttonLoading {
+  background-image: repeating-linear-gradient(
+    112deg,
+    transparent,
+    transparent 0.9375rem,
+    rgba(0, 0, 0, 0.1) 0,
+    rgba(0, 0, 0, 0.1) 1.875rem
+  );
+  background-size: 300%;
+  animation-duration: 1s;
+  animation-timing-function: linear;
+  animation-delay: 0s;
+  animation-iteration-count: infinite;
+  animation-direction: normal;
+  animation-fill-mode: none;
+  animation-play-state: running;
+  animation-name: button-loading;
+}
+
+@keyframes button-loading {
+  0% {
+    background-position: -2rem 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}

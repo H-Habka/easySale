@@ -4,6 +4,15 @@ module.exports = {
   content: ["./**/*.liquid"],
   theme: {
     extend: {
+      animation: {
+        fill: "fillBar 2s ease-in-out forwards",
+      },
+      keyframes: {
+        fillBar: {
+          "0%": { width: "0%" },
+          "100%": { width: "45%" },
+        },
+      },
       screens: {
         380: "380px",
         420: "420px",

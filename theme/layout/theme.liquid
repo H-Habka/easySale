@@ -400,34 +400,46 @@
     <link rel="stylesheet" href="{{  'output.css' |  asset_url}}">
 
     <script>
-            function getQueryParam(param) {
-              const urlParams = new URLSearchParams(window.location.search)
-              return urlParams.get(param)
-            }
+      function formatNumbers(amount, currency = 'AED') {
+        const formatted = new Intl.NumberFormat('en-US', {
+          style: 'decimal',
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }).format(amount)
 
-        function setPromoCodeWithExpiry(promoCode, expiryTimeInMinutes) {
-          const now = new Date().getTime(); // Current time in milliseconds
-          const expiryTime = now + expiryTimeInMinutes * 60 * 1000; // Calculate expiry timestamp
+        return `${formatted}${currency ? ` ${currency}` : ''}`
+      }
+    </script>
 
-          // Save promo code and expiry time in localStorage
-          localStorage.setItem(
-              'promoCode',
-              JSON.stringify({ value: promoCode, expiresAt: expiryTime })
-          );
+    <script>
+          function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search)
+            return urlParams.get(param)
+          }
 
-          // Get the current URL and remove only the "promo-code" query param
-          const url = new URL(window.location.href);
-          url.searchParams.delete('promo-code'); // Remove only the promo-code param
+      function setPromoCodeWithExpiry(promoCode, expiryTimeInMinutes) {
+        const now = new Date().getTime(); // Current time in milliseconds
+        const expiryTime = now + expiryTimeInMinutes * 60 * 1000; // Calculate expiry timestamp
 
-          // Update the URL without reloading the page
-          window.history.replaceState(null, '', url.toString());
-        }
+        // Save promo code and expiry time in localStorage
+        localStorage.setItem(
+            'promoCode',
+            JSON.stringify({ value: promoCode, expiresAt: expiryTime })
+        );
 
-        const promoCode = getQueryParam('promo-code')
-        if (promoCode) {
-          setPromoCodeWithExpiry(promoCode, {{ settings["promo-code-expires-after"] }})
-          console.log(" {{settings["promo-code-expires-after"]}} ")
-        }
+        // Get the current URL and remove only the "promo-code" query param
+        const url = new URL(window.location.href);
+        url.searchParams.delete('promo-code'); // Remove only the promo-code param
+
+        // Update the URL without reloading the page
+        window.history.replaceState(null, '', url.toString());
+      }
+
+      const promoCode = getQueryParam('promo-code')
+      if (promoCode) {
+        setPromoCodeWithExpiry(promoCode, {{ settings["promo-code-expires-after"] }})
+        console.log(" {{settings["promo-code-expires-after"]}} ")
+      }
     </script>
   </head>
 

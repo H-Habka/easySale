@@ -441,6 +441,93 @@
         console.log(" {{settings["promo-code-expires-after"]}} ")
       }
     </script>
+
+    <script>
+      function getQueryParam(param) {
+        const urlParams = new URLSearchParams(window.location.search)
+        return urlParams.get(param)
+      }
+
+      function setPopupDismissTime(expiryTimeInHours) {
+        const now = new Date().getTime()
+        const expiryTime = now + expiryTimeInHours * 60 * 60 * 1000 // Convert hours to milliseconds
+        localStorage.setItem('popupDismissTime', expiryTime)
+      }
+
+      function shouldShowPopup() {
+        const dismissTime = localStorage.getItem('popupDismissTime')
+        return !dismissTime || new Date().getTime() > dismissTime
+      }
+
+      function createPopup(companyUrl) {
+        if (!companyUrl || !shouldShowPopup()) return
+
+        const popup = document.createElement('div')
+        popup.style.cssText = `
+          position: fixed;
+          bottom: 20px;
+          left: 50%;
+          transform: translateX(-50%);
+          background: #fff;
+          color: #333;
+          padding: 12px 20px;
+          border-radius: 10px;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+          font-size: 14px;
+          z-index: 1000;
+          border: 1px solid #ddd;
+        `
+
+        // Create Instagram Icon
+        const instaIcon = document.createElement('img')
+        instaIcon.src =
+          'https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png' // Official icon
+        instaIcon.alt = 'Instagram'
+        instaIcon.style.cssText = `
+          width: 18px;
+          height: 18px;
+        `
+
+        // Create Link
+        const link = document.createElement('a')
+        link.href = companyUrl
+        link.textContent = 'Visit Instagram'
+        link.target = '_blank'
+        link.style.cssText = `
+          color: #E1306C;
+          text-decoration: none;
+          font-weight: bold;
+          white-space: nowrap;
+        `
+
+        // Create Close Button
+        const closeButton = document.createElement('span')
+        closeButton.textContent = '×'
+        closeButton.style.cssText = `
+          cursor: pointer;
+          font-size: 16px;
+          margin-left: 10px;
+          color: #999;
+        `
+        closeButton.onclick = function () {
+          popup.style.display = 'none'
+          setPopupDismissTime(0.002) // Change this to 24 for 1 day
+        }
+
+        popup.appendChild(instaIcon)
+        popup.appendChild(link)
+        popup.appendChild(closeButton)
+        setTimeout(() => {
+          document.body.appendChild(popup)
+        }, 500)
+      }
+
+      const companyUrl = getQueryParam('company_url')
+      createPopup(companyUrl)
+    </script>
   </head>
 
   <body class="gradient{% if settings.animations_hover_elements != 'none' %} animate--hover-{{ settings.animations_hover_elements }}{% endif %}">

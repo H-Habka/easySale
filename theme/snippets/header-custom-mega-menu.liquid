@@ -356,10 +356,10 @@
                                 </p>
                               {% endif %}
                               {% if block.settings.show_prices == true %}
-                                <p>
+                                <p class="text-[12px] font-semibold">
                                   {{
                                     block.settings[productHandler].price
-                                    | money
+                                    | money_with_currency
                                   }}
                                 </p>
                               {% endif %}

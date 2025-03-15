@@ -33,9 +33,9 @@
             >
               {%- for link in section.settings.menu.links -%}
                 {% assign mega_menu = false %}
-                {% assign order = forloop.index | append: "" %}
+                {% assign order = forloop.index | append: '' %}
                 {% for block in section.blocks %}
-                  {% assign block_order = block.settings.order | append: "" %}
+                  {% assign block_order = block.settings.order | append: '' %}
                   {% assign firstLayerIndex = forloop.index %}
                   {% if block_order == order %}
                     {% assign mega_menu = true %}
@@ -176,14 +176,84 @@
                         </div>
                       </li>
                     {% else %}
-                      <div>Type3</div>
+                      <li
+                        x-data="{ open: false }"
+                        class="group menu-{{link.handle}} pb-2"
+                      >
+                        <div
+                          class="px-4 py-6 flex items-center justify-between"
+                        >
+                          <p
+                            @click="open = !open"
+                            x-bind:class="open ? 'text-blue-400' : '' "
+                            class="duration-300 cursor-pointer font-medium !text-3xl flex items-center justify-between w-full"
+                          >
+                            {{ link.title }}
+                            <span
+                              x-text="open ? '-' : '+'"
+                              class="ml-2 text-xl"
+                            ></span>
+                          </p>
+                        </div>
+                        <div
+                          x-show="open"
+                          x-collapse
+                          class="flex flex-col items-center justify-center"
+                        >
+                          <div class="grid-layout grid-cols-2 480:grid-cols-3 px-[10px] !gap-[10px] pb-1 menu-{{link.handle}}">
+                            {% for i in (1..6) %}
+                              {% assign productHandler = 'product_'
+                                | append: i
+                              %}
+                              {% if block.settings[productHandler].url != blank
+                              %}
+                                <a
+                                  href="{{ block.settings[productHandler].url }}"
+                                  class="group/image"
+                                >
+                                  <img
+                                    src="{{ block.settings[productHandler].media.first.image | img_url: 'large' }}"
+                                    alt="{{ block.settings[productHandler].title }}"
+                                    width="300px"
+                                    height="300px"
+                                    class="w-full aspect-square transition-all duration-200 group-hover/image:-translate-y-3 group-hover/image:shadow-[0px_7px_10px_-5px_#12121266]"
+                                  >
+                                  {% if block.settings.show_titles == true %}
+                                    <p class="mt-2 w-[150px] overflow-x-hidden text-ellipsis text-nowrap">
+                                      {{ block.settings[productHandler].title }}
+                                    </p>
+                                  {% endif %}
+                                  {% if block.settings.show_prices == true %}
+                                    <p class="text-[12px] font-semibold">
+                                      {{
+                                        block.settings[productHandler].price
+                                        | money_with_currency
+                                      }}
+                                    </p>
+                                  {% endif %}
+                                </a>
+                              {% endif %}
+                            {% endfor %}
+                          </div>
+                          {% if block.settings.liquid_code_test != blank %}
+                            <div class="mt-6">
+                              {{ block.settings.liquid_code_test }}
+                            </div>
+                          {% endif %}
+                          {% if block.settings.menu_title != blank %}
+                            <div class="mt-6 flex items-center justify-center">
+                              {{ block.settings.menu_title }}
+                            </div>
+                          {% endif %}
+                        </div>
+                      </li>
                     {% endif %}
                   {% endif %}
                 {% endfor %}
                 {% if mega_menu == false %}
                   <li>
                     <div class="px-4 py-6 flex items-center justify-between">
-                      <p class="font-medium  !text-3xl  ">
+                      <p class="font-semibold  !text-3xl  ">
                         {{ link.title | link_to: link.url }}
                       </p>
                     </div>
@@ -215,68 +285,70 @@
               or localization.available_languages
             -%}
               <div class="menu-drawer__localization header-localization">
-                {% comment %} {%- if localization.available_countries
-                  and localization.available_countries.size > 1
-                -%}
-                  <noscript>
-                    {%- form 'localization',
-                      id: 'HeaderCountryMobileFormNoScriptDrawer',
-                      class: 'localization-form'
-                    -%}
-                      <div class="localization-form__select">
-                        <h2
-                          class="visually-hidden"
-                          id="HeaderCountryMobileLabelNoScriptDrawer"
-                        >
-                          {{ 'localization.country_label' | t }}
-                        </h2>
-                        <select
-                          class="localization-selector link"
-                          name="country_code"
-                          aria-labelledby="HeaderCountryMobileLabelNoScriptDrawer"
-                        >
-                          {%- for country in localization.available_countries -%}
-                            <option
-                              value="{{ country.iso_code }}"
-                              {%- if country.iso_code
-                                  == localization.country.iso_code
-                              %}
-                                selected
-                              {% endif %}
-                            >
-                              {{ country.name }} (
-                              {{- country.currency.iso_code }}
-                              {{ country.currency.symbol }})
-                            </option>
-                          {%- endfor -%}
-                        </select>
-                        {% render 'icon-caret' %}
-                      </div>
-                      <button class="button button--tertiary">
-                        {{ 'localization.update_country' | t }}
-                      </button>
-                    {%- endform -%}
-                  </noscript>
+                {% comment %}
+                  {%- if localization.available_countries
+                    and localization.available_countries.size > 1
+                  -%}
+                    <noscript>
+                      {%- form 'localization',
+                        id: 'HeaderCountryMobileFormNoScriptDrawer',
+                        class: 'localization-form'
+                      -%}
+                        <div class="localization-form__select">
+                          <h2
+                            class="visually-hidden"
+                            id="HeaderCountryMobileLabelNoScriptDrawer"
+                          >
+                            {{ 'localization.country_label' | t }}
+                          </h2>
+                          <select
+                            class="localization-selector link"
+                            name="country_code"
+                            aria-labelledby="HeaderCountryMobileLabelNoScriptDrawer"
+                          >
+                            {%- for country in localization.available_countries -%}
+                              <option
+                                value="{{ country.iso_code }}"
+                                {%- if country.iso_code
+                                    == localization.country.iso_code
+                                %}
+                                  selected
+                                {% endif %}
+                              >
+                                {{ country.name }} (
+                                {{- country.currency.iso_code }}
+                                {{ country.currency.symbol }})
+                              </option>
+                            {%- endfor -%}
+                          </select>
+                          {% render 'icon-caret' %}
+                        </div>
+                        <button class="button button--tertiary">
+                          {{ 'localization.update_country' | t }}
+                        </button>
+                      {%- endform -%}
+                    </noscript>
 
-                  <localization-form class="no-js-hidden">
-                    {%- form 'localization',
-                      id: 'HeaderCountryMobileForm',
-                      class: 'localization-form'
-                    -%}
-                      <div>
-                        <h2
-                          class="visually-hidden"
-                          id="HeaderCountryMobileLabel"
-                        >
-                          {{ 'localization.country_label' | t }}
-                        </h2>
-                        {%- render 'country-localization',
-                          localPosition: 'HeaderCountryMobile'
-                        -%}
-                      </div>
-                    {%- endform -%}
-                  </localization-form>
-                {% endif %} {% endcomment %}
+                    <localization-form class="no-js-hidden">
+                      {%- form 'localization',
+                        id: 'HeaderCountryMobileForm',
+                        class: 'localization-form'
+                      -%}
+                        <div>
+                          <h2
+                            class="visually-hidden"
+                            id="HeaderCountryMobileLabel"
+                          >
+                            {{ 'localization.country_label' | t }}
+                          </h2>
+                          {%- render 'country-localization',
+                            localPosition: 'HeaderCountryMobile'
+                          -%}
+                        </div>
+                      {%- endform -%}
+                    </localization-form>
+                  {% endif %}
+                {% endcomment %}
 
                 {%- if localization.available_languages
                   and localization.available_languages.size > 1

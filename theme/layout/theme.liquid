@@ -46,6 +46,16 @@
       src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
       defer="defer"
     ></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        setTimeout(function () {
+          const section = document.getElementById('section_to_scroll_to')
+          if (section) {
+            section.scrollIntoView({ behavior: 'smooth' })
+          }
+        }, 2000) 
+      })
+    </script>
 
     {%- if settings.animations_reveal_on_scroll -%}
       <script src="{{ 'animations.js' | asset_url }}" defer="defer"></script>
@@ -459,7 +469,7 @@
         return !dismissTime || new Date().getTime() > dismissTime
       }
 
-      function createPopup(companyUrl) {
+      function createPopup(companyUrl, companyName) {
         if (!companyUrl || !shouldShowPopup()) return
 
         const popup = document.createElement('div')
@@ -494,7 +504,7 @@
         // Create Link
         const link = document.createElement('a')
         link.href = companyUrl
-        link.textContent = 'Visit Instagram'
+        link.textContent = `${companyName}`
         link.target = '_blank'
         link.style.cssText = `
           color: #E1306C;
@@ -526,7 +536,8 @@
       }
 
       const companyUrl = getQueryParam('company_url')
-      createPopup(companyUrl)
+      const companyName = getQueryParam('company_name')
+      createPopup(companyUrl, companyName)
     </script>
   </head>
 

@@ -1,0 +1,317 @@
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+
+  /* Custom circle sizing */
+  .circle-collection-item {
+    --mobile-size: {{ section.settings.mobile_circle_size }}px;
+    --desktop-size: {{ section.settings.desktop_circle_size }}px;
+  }
+
+  .circle-collection-item {
+    /* Existing variables */
+    --mobile-size: {{ section.settings.mobile_circle_size }}px;
+    --desktop-size: {{ section.settings.desktop_circle_size }}px;
+
+    /* New variables */
+    --title-size-mobile: {{ section.settings.title_font_size_mobile }}px;
+    --title-size-desktop: {{ section.settings.title_font_size_desktop }}px;
+    --title-weight: {{ section.settings.title_font_weight }};
+    --title-margin-top: {{ section.settings.title_margin_top }}px;
+    --text-color: {{ section.settings.text_color }};
+    }
+
+  .circle-collection-image {
+    width: var(--mobile-size);
+    height: var(--mobile-size);
+  }
+
+  @media (min-width: 750px) {
+    .circle-collection-image {
+      width: var(--desktop-size);
+      height: var(--desktop-size);
+    }
+  }
+{%- endstyle -%}
+
+<div class="color-{{ section.settings.color_scheme }} isolate gradient">
+  <div class="section-{{ section.id }}-padding">
+    <div class="page-width">
+      {%- if section.settings.title != blank -%}
+        <h2 class="{{ section.settings.heading_size }} font-bold mb-8 text-center">
+          {{ section.settings.title }}
+        </h2>
+      {%- endif -%}
+
+      <div class="flex flex-wrap justify-center gap-4 md:gap-8">
+        {%- for block in section.blocks -%}
+          {%- assign collection = collections[block.settings.collection] -%}
+          <div
+            class="circle-collection-item flex flex-col items-center mx-2"
+            {{ block.shopify_attributes }}
+          >
+            <a href="{{ collection.url }}" class="block text-center">
+              <div class="circle-collection-image relative rounded-full overflow-hidden mb-3 transition-transform duration-300 hover:scale-105 flex items-center justify-center">
+                {%- if block.settings.image != blank -%}
+                  {{
+                    block.settings.image
+                    | image_url: width: 500
+                    | image_tag:
+                      loading: 'lazy',
+                      sizes: '(min-width: 750px) var(--desktop-size), var(--mobile-size)',
+                      widths: '165, 360, 535, 750, 1070, 1500',
+                      class: 'w-full h-full object-cover'
+                  }}
+                {%- elsif collection.featured_image -%}
+                  {{
+                    collection.featured_image
+                    | image_url: width: 500
+                    | image_tag:
+                      loading: 'lazy',
+                      sizes: '(min-width: 750px) var(--desktop-size), var(--mobile-size)',
+                      widths: '165, 360, 535, 750, 1070, 1500',
+                      class: 'w-full h-full object-cover'
+                  }}
+                {%- else -%}
+                  <div class="w-full h-full bg-gray-100 flex items-center justify-center">
+                    {{
+                      'collection-'
+                      | append: forloop.index
+                      | placeholder_svg_tag: 'w-1/2 h-1/2'
+                    }}
+                  </div>
+                {%- endif -%}
+              </div>
+              <h3 class="font-[var(--title-weight)] mt-[var(--title-margin-top)] text-[length:var(--title-size-mobile)] md:text-[length:var(--title-size-desktop)] text-[var(--text-color)]">
+                {%- if block.settings.title != blank -%}
+                  {{ block.settings.title }}
+                {%- else -%}
+                  {{ collection.title }}
+                {%- endif -%}
+              </h3>
+            </a>
+          </div>
+        {%- endfor -%}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Circular Collection Grid",
+  "tag": "section",
+  "class": "section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "inline_richtext",
+      "id": "title",
+      "default": "Shop by Category",
+      "label": "Heading"
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "options": [
+        {
+          "value": "text-[1.5rem]",
+          "label": "Small"
+        },
+        {
+          "value": "text-[2.5rem]",
+          "label": "Medium"
+        },
+        {
+          "value": "text-[3.5rem]",
+          "label": "Large"
+        },
+        {
+          "value": "text-[4rem]",
+          "label": "Extra Large"
+        },
+        {
+          "value": "text-[5rem]",
+          "label": "XXL"
+        }
+      ],
+      "default": "text-[2.5rem]",
+      "label": "Heading size"
+    },
+    {
+      "type": "range",
+      "id": "mobile_circle_size",
+      "min": 80,
+      "max": 200,
+      "step": 5,
+      "default": 100,
+      "label": "Circle size on mobile (px)",
+      "info": "Recommended: 100-120px"
+    },
+    {
+      "type": "range",
+      "id": "desktop_circle_size",
+      "min": 120,
+      "max": 250,
+      "step": 5,
+      "default": 160,
+      "label": "Circle size on desktop (px)",
+      "info": "Recommended: 150-180px"
+    },
+    {
+      "type": "range",
+      "id": "mobile_columns",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "default": 3,
+      "label": "Items per row (mobile)"
+    },
+    {
+      "type": "range",
+      "id": "desktop_columns",
+      "min": 3,
+      "max": 8,
+      "step": 1,
+      "default": 5,
+      "label": "Items per row (desktop)"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Section padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 36
+    },
+    {
+      "type": "header",
+      "content": "Text styling"
+    },
+    {
+      "type": "range",
+      "id": "title_font_size_mobile",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "default": 14,
+      "label": "Title font size - mobile (px)"
+    },
+    {
+      "type": "range",
+      "id": "title_font_size_desktop",
+      "min": 12,
+      "max": 28,
+      "step": 1,
+      "default": 16,
+      "label": "Title font size - desktop (px)"
+    },
+    {
+      "type": "select",
+      "id": "title_font_weight",
+      "options": [
+        { "value": "normal", "label": "Normal" },
+        { "value": "medium", "label": "Medium" },
+        { "value": "bold", "label": "Bold" }
+      ],
+      "default": "medium",
+      "label": "Title font weight"
+    },
+    {
+      "type": "range",
+      "id": "title_margin_top",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "default": 8,
+      "label": "Title top margin (px)"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#000000"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "collection",
+      "name": "Collection",
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Custom image (optional)",
+          "info": "Defaults to collection image if not set"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Custom title (optional)",
+          "info": "Defaults to collection title if not set"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Circular Collection Grid",
+      "blocks": [
+        {
+          "type": "collection"
+        },
+        {
+          "type": "collection"
+        },
+        {
+          "type": "collection"
+        },
+        {
+          "type": "collection"
+        },
+        {
+          "type": "collection"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

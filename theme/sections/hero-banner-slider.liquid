@@ -1,0 +1,335 @@
+{%- style -%}
+  .hero-banner-{{ section.id }} {
+    --desktop-height: {{ section.settings.desktop_height }}px;
+    --mobile-height: {{ section.settings.mobile_height }}px;
+    --slide-spacing: {{ section.settings.slide_spacing }}px;
+    --border-radius: {{ section.settings.border_radius }}px;
+    --arrow-color: {{ section.settings.arrow_color }};
+    --icon-size: {{ section.settings.icon_size }}px;
+    --desktop-margin-top: {{ section.settings.desktop_margin_top }}px;
+    --mobile-margin-top: {{ section.settings.mobile_margin_top }}px;
+  }
+{%- endstyle -%}
+
+<div class="page-width ">
+  <section class="mt-[var(--mobile-margin-top)] md:mt-[var(--desktop-margin-top)] group hero-banner-{{ section.id }} relative overflow-hidden rounded-[var(--border-radius)] transition-transform duration-300 ease-in-out hover:md:scale-[1.01]">
+    <div class="slider-container relative w-full" data-slider>
+      <div
+        class="slider-track flex transition-transform duration-300 ease-in-out"
+        style="gap: var(--slide-spacing);"
+      >
+        {%- for block in section.blocks -%}
+          <div
+            class="hero-slide flex-shrink-0 w-full h-[var(--mobile-height)] md:h-[var(--desktop-height)]"
+            {{ block.shopify_attributes }}
+            data-slide-index="{{ forloop.index0 }}"
+          >
+            {%- if block.settings.link != blank -%}
+              <a href="{{ block.settings.link }}" class="block h-full w-full">
+            {%- else -%}
+              <div class="block h-full w-full">
+            {%- endif -%}
+            <picture>
+              {%- if block.settings.desktop_image != blank -%}
+                <source
+                  media="(min-width: 768px)"
+                  srcset="{{ block.settings.desktop_image | image_url }}"
+                >
+              {%- endif -%}
+              {%- if block.settings.mobile_image != blank -%}
+                <img
+                  src="{{ block.settings.mobile_image | image_url }}"
+                  alt="{{ block.settings.mobile_image.alt | escape }}"
+                  class="w-full h-full object-cover"
+                  loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+                  width="{{ block.settings.mobile_image.width }}"
+                  height="{{ block.settings.mobile_image.height }}"
+                >
+              {%- else -%}
+                <div class="w-full h-full bg-gray-100 flex items-center justify-center">
+                  {{ 'lifestyle-1' | placeholder_svg_tag: 'w-1/2 h-1/2' }}
+                </div>
+              {%- endif -%}
+            </picture>
+            {%- if block.settings.link != blank -%}
+              </a>
+            {%- else -%}
+              </div>
+            {%- endif -%}
+          </div>
+        {%- endfor -%}
+      </div>
+
+      {%- if section.blocks.size > 1 -%}
+        <div class="slider-navigation absolute bottom-4 left-0 right-0 flex justify-center gap-2 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
+          {%- for block in section.blocks -%}
+            <button
+              class="slider-dot w-2 h-2 rounded-full bg-white opacity-50 transition-all duration-300 {% if forloop.first %}!opacity-100 !w-4{% endif %}"
+              data-slide-dot="{{ forloop.index0 }}"
+              aria-label="Go To Slide {{ forloop.index  }}"
+              aria-label="Previous Slide"
+              aria-label="Next Slide"
+            ></button>
+          {%- endfor -%}
+        </div>
+
+        <button
+          type="button"
+          class="slider-button prev-button absolute left-4 top-1/2 -translate-y-1/2 bg-white bg-opacity-80 p-2 rounded-full hover:bg-opacity-100 transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100"
+          aria-label="Previous Slide"
+          data-slider-prev
+        >
+          <svg
+            data-slot="icon"
+            fill="none"
+            stroke-width="1.5"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+            class="w-[var(--icon-size)] h-[var(--icon-size)] rotate-180"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" class="stroke-[var(--arrow-color)]"  stroke-width="2" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
+          </svg>
+        </button>
+
+        <button
+          type="button"
+          class="slider-button next-button absolute right-4 top-1/2 -translate-y-1/2 bg-white bg-opacity-80 p-2 rounded-full hover:bg-opacity-100 transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100"
+          aria-label="Next Slide"
+          data-slider-next
+        >
+          <svg
+            data-slot="icon"
+            fill="none"
+            stroke-width="1.5"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+            class="w-[var(--icon-size)] h-[var(--icon-size)]"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" class="stroke-[var(--arrow-color)]"  stroke-width="2" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
+          </svg>
+        </button>
+      {%- endif -%}
+    </div>
+  </section>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const sliders = document.querySelectorAll('[data-slider]');
+  
+  sliders.forEach(slider => {
+    const track = slider.querySelector('.slider-track');
+    const slides = slider.querySelectorAll('.hero-slide');
+    const dots = slider.querySelectorAll('.slider-dot');
+    const prevBtn = slider.querySelector('[data-slider-prev]');
+    const nextBtn = slider.querySelector('[data-slider-next]');
+    let currentIndex = 0;
+    const slideCount = slides.length;
+    const slideWidth = slides[0].offsetWidth;
+    const gap = parseInt(window.getComputedStyle(track).gap) || 0;
+
+    let interval
+    let mouseInside = false
+
+    const goToSlide = (index) => {
+      currentIndex = (index + slideCount) % slideCount;
+      const offset = -(currentIndex * (slideWidth + gap));
+      track.style.transform = `translateX(${offset}px)`;
+      
+      dots?.forEach((dot, i) => {
+        dot.classList.toggle('!opacity-100', i === currentIndex);
+        dot.classList.toggle('opacity-50', i !== currentIndex);
+        dot.classList.toggle('!w-4', i === currentIndex);
+      });
+    {% if section.settings.auto_rotate %}
+      clearInterval(interval)
+      if(!mouseInside) {
+        setTimeout(() => {
+          interval = setInterval(() => {
+            goToSlide(currentIndex + 1);
+          }, {{ section.settings.auto_rotate_delay | times: 1000 }});
+        }, 10)
+      }
+    {% endif %}
+    };
+
+    prevBtn?.addEventListener('click', () => goToSlide(currentIndex - 1));
+    nextBtn?.addEventListener('click', () => goToSlide(currentIndex + 1));
+
+    dots?.forEach((dot, index) => {
+      dot.addEventListener('click', () => goToSlide(index));
+    });
+
+    // Auto-rotate if enabled
+    {% if section.settings.auto_rotate %}
+    interval = setInterval(() => {
+      goToSlide(currentIndex + 1);
+    }, {{ section.settings.auto_rotate_delay | times: 1000 }});
+
+    slider.addEventListener('mouseenter', () => {
+      clearInterval(interval)
+      mouseInside = true
+    });
+    slider.addEventListener('mouseleave', () => {
+      interval = setInterval(() => {
+        goToSlide(currentIndex + 1);
+      }, {{ section.settings.auto_rotate_delay | times: 1000 }});
+      mouseInside = false
+    });
+    {% endif %}
+
+    // Handle window resize
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        goToSlide(currentIndex);
+      }, 250);
+    });
+  });
+});
+</script>
+
+{% schema %}
+{
+  "name": "Hero Banner Slider",
+  "tag": "section",
+  "class": "section",
+  "max_blocks": 10,
+  "settings": [
+    {
+      "type": "range",
+      "id": "desktop_margin_top",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Section top margin Desktop",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "mobile_margin_top",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Section top margin Mobile",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "desktop_height",
+      "min": 300,
+      "max": 800,
+      "step": 20,
+      "default": 500,
+      "label": "Desktop height (px)"
+    },
+    {
+      "type": "range",
+      "id": "mobile_height",
+      "min": 200,
+      "max": 600,
+      "step": 20,
+      "default": 300,
+      "label": "Mobile height (px)"
+    },
+    {
+      "type": "range",
+      "id": "slide_spacing",
+      "min": 0,
+      "max": 50,
+      "step": 2,
+      "default": 0,
+      "label": "Space between slides (px)"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "default": 8,
+      "label": "Border radius (px)"
+    },
+    {
+      "type": "color",
+      "id": "arrow_color",
+      "label": "Arrow color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "icon_size",
+      "min": 16,
+      "max": 48,
+      "step": 2,
+      "default": 36,
+      "label": "Navigation icon size (px)"
+    },
+    {
+      "type": "header",
+      "content": "Auto-rotation"
+    },
+    {
+      "type": "checkbox",
+      "id": "auto_rotate",
+      "label": "Enable auto-rotation",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "auto_rotate_delay",
+      "min": 3,
+      "max": 10,
+      "step": 1,
+      "unit": "s",
+      "label": "Change slides every",
+      "default": 5
+    }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Slide",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "desktop_image",
+          "label": "Desktop image",
+          "info": "Recommended size: 2000x800px"
+        },
+        {
+          "type": "image_picker",
+          "id": "mobile_image",
+          "label": "Mobile image",
+          "info": "Recommended size: 800x600px"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Slide link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero Banner Slider",
+      "blocks": [
+        {
+          "type": "slide"
+        },
+        {
+          "type": "slide"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

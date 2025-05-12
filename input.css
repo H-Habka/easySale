@@ -80,3 +80,10 @@ h6 {
     background-position: 0 0;
   }
 }
+
+.justify-start {
+  justify-content: start;
+}
+.justify-end {
+  justify-content: flex-end;
+}

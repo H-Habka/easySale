@@ -422,37 +422,6 @@
     </script>
 
     <script>
-          function getQueryParam(param) {
-            const urlParams = new URLSearchParams(window.location.search)
-            return urlParams.get(param)
-          }
-
-      function setPromoCodeWithExpiry(promoCode, expiryTimeInMinutes) {
-        const now = new Date().getTime(); // Current time in milliseconds
-        const expiryTime = now + expiryTimeInMinutes * 60 * 1000; // Calculate expiry timestamp
-
-        // Save promo code and expiry time in localStorage
-        localStorage.setItem(
-            'promoCode',
-            JSON.stringify({ value: promoCode, expiresAt: expiryTime })
-        );
-
-        // Get the current URL and remove only the "promo-code" query param
-        const url = new URL(window.location.href);
-        url.searchParams.delete('promo-code'); // Remove only the promo-code param
-
-        // Update the URL without reloading the page
-        window.history.replaceState(null, '', url.toString());
-      }
-
-      const promoCode = getQueryParam('promo-code')
-      if (promoCode) {
-        setPromoCodeWithExpiry(promoCode, {{ settings["promo-code-expires-after"] }})
-        console.log(" {{settings["promo-code-expires-after"]}} ")
-      }
-    </script>
-
-    <script>
       function getQueryParam(param) {
         const urlParams = new URLSearchParams(window.location.search)
         return urlParams.get(param)
@@ -469,38 +438,37 @@
         return !dismissTime || new Date().getTime() > dismissTime
       }
 
-      function createPopup(companyUrl, companyName) {
+      function createPopup(companyUrl, companyName, companyLogo) {
         if (!companyUrl || !shouldShowPopup()) return
 
         const popup = document.createElement('div')
         popup.style.cssText = `
       position: fixed;
-      bottom: 50px;
+      bottom: 40px;
       left: 50%;
       transform: translateX(-50%);
       background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%);
-      color: #333;
-      padding: 20px 25px;
-      border-radius: 16px;
+      color: #1f2937;
+      padding: 24px 30px;
+      border-radius: 18px;
       display: flex;
       align-items: center;
-      gap: 15px;
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+      gap: 18px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
       font-size: 18px;
       z-index: 1000000;
       border: 1px solid #f9a8d4;
-      max-width: 80%;
-      min-width: 300px;
-      animation: fadeInUp 0.5s ease-out;
+      max-width: 90%;
+      min-width: 320px;
+      animation: fadeInUp 0.4s ease-out;
     `
 
-        // Add animation keyframes
         const style = document.createElement('style')
         style.textContent = `
       @keyframes fadeInUp {
         from {
           opacity: 0;
-          transform: translate(-50%, 20px);
+          transform: translate(-50%, 30px);
         }
         to {
           opacity: 1;
@@ -510,18 +478,19 @@
     `
         document.head.appendChild(style)
 
-        // Create Instagram Icon
-        const instaIcon = document.createElement('img')
-        instaIcon.src =
+        const logo = document.createElement('img')
+        logo.src =
+          companyLogo ||
           'https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png'
-        instaIcon.alt = 'Instagram'
-        instaIcon.style.cssText = `
-      width: 40px;
-      height: 40px;
-      filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1));
+        logo.alt = companyName || 'Company Logo'
+        logo.style.cssText = `
+      width: 56px;
+      height: 56px;
+      object-fit: contain;
+      border-radius: 12px;
+      filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.1));
     `
 
-        // Create Text Container
         const textContainer = document.createElement('div')
         textContainer.style.cssText = `
       display: flex;
@@ -529,69 +498,55 @@
       gap: 4px;
     `
 
-        // Create Follow Text
         const followText = document.createElement('span')
-        followText.textContent = 'Follow us on Instagram'
+        followText.textContent = companyLogo
+          ? 'Follow us'
+          : 'Follow us on Instagram'
         followText.style.cssText = `
-      font-size: 14px;
+      font-size: 15px;
       color: #6b7280;
-      white-space: pre
     `
 
-        // Create Link
         const link = document.createElement('a')
         link.href = companyUrl
-        link.textContent = `${companyName || 'Our Instagram'}`
+        link.textContent =
+          companyName || (companyLogo ? 'Our Page' : 'Our Instagram')
         link.target = '_blank'
         link.style.cssText = `
       color: #E1306C;
       text-decoration: none;
       font-weight: 700;
+      font-size: 20px;
       white-space: nowrap;
-      font-size: 18px;
-      transition: all 0.2s ease;
+      transition: all 0.2s ease-in-out;
     `
-        link.onmouseover = function () {
-          this.style.color = '#c13584'
-        }
-        link.onmouseout = function () {
-          this.style.color = '#E1306C'
-        }
+        link.onmouseover = () => (link.style.color = '#c13584')
+        link.onmouseout = () => (link.style.color = '#E1306C')
 
         textContainer.appendChild(followText)
         textContainer.appendChild(link)
 
-        // Create Close Button
         const closeButton = document.createElement('span')
         closeButton.textContent = '×'
-        //     closeButton.style.cssText = `
-        //   cursor: pointer;
-        //   font-size: 24px;
-        //   margin-left: 15px;
-        //   color: #9ca3af;
-        //   transition: all 0.2s ease;
-        //   padding: 0 5px;
-        // `
         closeButton.style.cssText = `
       cursor: pointer;
-      font-size: 24px;
+      font-size: 28px;
       color: #9ca3af;
       transition: all 0.2s ease;
-      padding: 0 5px;
+      padding: 0 8px;
       position: absolute;
       top: 10px;
-      right: 10px
+      right: 14px;
     `
-
-        closeButton.onmouseover = function () {
-          this.style.color = '#6b7280'
-          this.style.transform = 'scale(1.2)'
+        closeButton.onmouseover = () => {
+          closeButton.style.color = '#6b7280'
+          closeButton.style.transform = 'scale(1.2)'
         }
-        closeButton.onmouseout = function () {
-          this.style.color = '#9ca3af'
-          this.style.transform = 'scale(1)'
+        closeButton.onmouseout = () => {
+          closeButton.style.color = '#9ca3af'
+          closeButton.style.transform = 'scale(1)'
         }
-        closeButton.onclick = function () {
+        closeButton.onclick = () => {
           popup.style.animation = 'fadeInUp 0.3s ease-out reverse'
           setTimeout(() => {
             popup.style.display = 'none'
@@ -599,18 +554,19 @@
           setPopupDismissTime(0.1)
         }
 
-        popup.appendChild(instaIcon)
+        popup.appendChild(logo)
         popup.appendChild(textContainer)
         popup.appendChild(closeButton)
 
         setTimeout(() => {
           document.body.appendChild(popup)
-        }, 1000) // Show after 1 second
+        }, 1000)
       }
 
       const companyUrl = getQueryParam('company_url')
       const companyName = getQueryParam('company_name')
-      createPopup(companyUrl, companyName)
+      const companyLogo = getQueryParam('company_logo')
+      createPopup(companyUrl, companyName, companyLogo)
     </script>
   </head>
 

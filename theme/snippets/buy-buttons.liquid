@@ -132,7 +132,7 @@
           -%}
         {%- endif -%}
 
-        <div class="product-form__buttons">
+        <div class="product-form__buttons flex flex-col gap-[1.5rem]">
           {%- liquid
             assign check_against_inventory = true
             if product.selected_or_first_available_variant.inventory_management != 'shopify' or product.selected_or_first_available_variant.inventory_policy == 'continue'
@@ -142,18 +142,19 @@
               assign quantity_rule_soldout = true
             endif
           -%}
+
           <button
             id="ProductSubmitButton-{{ section_id }}"
             type="submit"
             name="add"
-            class="product-form__submit button button--full-width {% if show_dynamic_checkout %}button--secondary{% else %}button--primary{% endif %}"
+            class="product-form__submit w-full flex items-center justify-center px-5 py-2.5 border border-transparent text-md font-medium rounded-[0.4rem] text-white bg-gradient-to-r from-[#01756E] via-[#01A89E] to-[#00CFC8] hover:from-[#01635D] hover:via-[#018F87] hover:to-[#00B8B2] shadow-md transition-all duration-150 ease-out hover:ease-in hover:shadow-lg hover:translate-y-[-0.1rem] active:translate-y-[0.05rem] focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-[#01A89E] disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-md"
             {% if product.selected_or_first_available_variant.available == false
               or quantity_rule_soldout
             %}
               disabled
             {% endif %}
           >
-            <span>
+            <span class="flex items-center">
               {%- if product.selected_or_first_available_variant.available
                   == false
                 or quantity_rule_soldout
@@ -165,8 +166,40 @@
             </span>
             {%- render 'loading-spinner' -%}
           </button>
+
           {%- if show_dynamic_checkout -%}
-            {{ form | payment_button }}
+            <div class="dynamic-checkout-button">
+              {{
+                form
+                | payment_button
+                | replace: 'shopify-payment-button',
+                  'shopify-payment-button w-full'
+              }}
+            </div>
+            <style>
+              .shopify-payment-button__button {
+                width: 100%;
+                border-radius: 0.4rem !important;
+                min-height: 4.5rem !important;
+                overflow: hidden;
+                transition: all 150ms ease-out !important;
+              }
+              .shopify-payment-button__button:hover {
+                transform: translateY(-0.1rem);
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+                  0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+              }
+              .shopify-payment-button__button--unbranded {
+                background-color: #fff !important;
+                color: #01756e !important;
+                border: 1px solid #01756e !important;
+                font-size: 1.4rem !important;
+                font-weight: 500 !important;
+              }
+              .shopify-payment-button__button--unbranded:hover {
+                background-color: #f5f5f5 !important;
+              }
+            </style>
           {%- endif -%}
         </div>
       {%- endform -%}

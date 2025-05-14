@@ -1,6 +1,5 @@
 {% comment %}
   Renders cart notification
-
   Accepts:
   - color_scheme: {String} sets the color scheme of the notification (optional)
   - desktop_menu_type: {String} passes the desktop menu type which allows us to use the right css class (optional)
@@ -13,46 +12,62 @@
   <div class="cart-notification-wrapper{% if desktop_menu_type != 'drawer' %} page-width{% endif %}">
     <div
       id="cart-notification"
-      class="cart-notification focus-inset{% if color_scheme %} color-{{ color_scheme }} gradient{% endif %}"
+      class="cart-notification focus-inset{% if color_scheme %} color-{{ color_scheme }} gradient{% endif %} bg-white shadow-xl rounded-[0.8rem] border border-gray-100"
       aria-modal="true"
       aria-label="{{ 'general.cart.item_added' | t }}"
       role="dialog"
       tabindex="-1"
     >
-      <div class="cart-notification__header">
-        <h2 class="cart-notification__heading caption-large text-body">
-          {%- render 'icon-checkmark' -%}
+      <div class="cart-notification__header flex items-center justify-between p-[2rem] border-b border-gray-100">
+        <h2 class="cart-notification__heading text-[1.4rem] font-medium text-[#01756E] flex items-center">
+          <span class="mr-[1rem] text-[#01A89E]">
+            <svg
+              width="2rem"
+              height="2rem"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
           {{ 'general.cart.item_added' | t }}
         </h2>
         <button
           type="button"
-          class="cart-notification__close modal__close-button link link--text focus-inset"
+          class="cart-notification__close p-[0.5rem] rounded-full hover:bg-gray-50 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-[#01A89E] focus:ring-offset-2"
           aria-label="{{ 'accessibility.close' | t }}"
         >
-          <svg class="icon icon-close" aria-hidden="true" focusable="false">
+          <svg
+            class="icon icon-close w-[1.6rem] h-[1.6rem]"
+            aria-hidden="true"
+            focusable="false"
+          >
             <use href="#icon-close">
           </svg>
         </button>
       </div>
+
       <div
         id="cart-notification-product"
-        class="cart-notification-product"
+        class="cart-notification-product p-[2rem]"
       ></div>
+
       <div
         x-data="
           {
-            isPromoCodeEnabled:  {{ settings["enable-promo-code"] }},
-            isPromoCodeRequired: {{ settings["is-promo-code-required"] }}
+            isPromoCodeEnabled: {{ settings['enable-promo-code'] }},
+            isPromoCodeRequired: {{ settings['is-promo-code-required'] }}
           }
         "
-        class="cart-notification__links"
+        class="cart-notification__links p-[2rem] pt-0 space-y-[1.5rem]"
       >
         <a
           href="{{ routes.cart_url }}"
           id="cart-notification-button"
-          class="button button--secondary button--full-width"
+          class="block w-full px-5 py-2.5 border border-gray-300 text-[1.4rem] font-medium rounded-[0.4rem] text-gray-700 bg-white hover:bg-gray-50 shadow-sm transition-all duration-200 text-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#01A89E]"
         >
-          {{- 'general.cart.view_empty_cart' | t -}}
+          {{ 'general.cart.view_empty_cart' | t }}
         </a>
 
         <form
@@ -62,22 +77,43 @@
           id="cart-notification-form"
         >
           <button
-            class="button button--primary button--full-width"
+            class="w-full flex items-center justify-center px-5 py-2.5 border border-transparent text-[1.4rem] font-bold rounded-[0.4rem] text-white bg-gradient-to-r from-[#01756E] via-[#01A89E] to-[#00CFC8] hover:from-[#01635D] hover:via-[#018F87] hover:to-[#00B8B2] shadow-md transition-all duration-200 ease-out hover:ease-in hover:shadow-lg hover:translate-y-[-0.1rem] active:translate-y-[0.05rem] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#01A89E]"
             name="checkout"
           >
             {{ 'sections.cart.checkout' | t }}
+            <svg
+              class="ml-[0.8rem] w-[1.4rem] h-[1.4rem]"
+              viewBox="0 0 20 20"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
           </button>
         </form>
 
-        <button type="button" class="link button-label">
+        <button
+          type="button"
+          class="w-full text-center text-[1.4rem] font-medium text-[#01A89E] hover:text-[#01635D] transition-colors duration-200"
+        >
           {{ 'general.continue_shopping' | t }}
         </button>
       </div>
     </div>
   </div>
 </cart-notification>
+
 {% style %}
   .cart-notification {
     display: none;
+    max-width: 42rem;
+    margin: 0 auto;
+  }
+
+  @media screen and (min-width: 750px) {
+    .cart-notification {
+      right: 2rem;
+      margin: 0;
+    }
   }
 {% endstyle %}

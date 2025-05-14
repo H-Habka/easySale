@@ -237,12 +237,25 @@
                 <button
                   type="submit"
                   id="checkout"
-                  class="cart__checkout-button button"
+                  class="cart__checkout-button w-full flex items-center justify-center px-5 py-3 border border-transparent text-[1.6rem] font-bold rounded-[0.4rem] text-white bg-gradient-to-r from-[#01756E] via-[#01A89E] to-[#00CFC8] hover:from-[#01635D] hover:via-[#018F87] hover:to-[#00B8B2] shadow-lg transition-all duration-200 ease-out hover:ease-in hover:shadow-xl hover:translate-y-[-0.1rem] active:translate-y-[0.05rem] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#01A89E] disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-lg"
                   name="checkout"
                   x-bind:disabled="(isPromoCodeEnabled && isPromoCodeRequired && !promoCodeContent) || (cartTotal < minOrderAmount)"
                   form="cart"
                 >
-                  {{ 'sections.cart.checkout' | t }}
+                  <span class="flex items-center">
+                    {{ 'sections.cart.checkout' | t }}
+                    <span class="ml-[1rem] inline-block transform group-hover:translate-x-[0.4rem] transition-transform duration-200">
+                      <svg
+                        width="1.8rem"
+                        height="1.8rem"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </span>
+                  </span>
                 </button>
               </div>
 

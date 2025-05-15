@@ -168,6 +168,8 @@ class CartItems extends HTMLElement {
         }
 
         publish(PUB_SUB_EVENTS.cartUpdate, { source: 'cart-items', cartData: parsedState, variantId: variantId });
+        evaluateCheckoutAvailability()
+
       })
       .catch(() => {
         this.querySelectorAll('.loading__spinner').forEach((overlay) => overlay.classList.add('hidden'));

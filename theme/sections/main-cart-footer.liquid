@@ -58,8 +58,6 @@
       isLoyaltyPointsEnabled: {{ settings['enable-loyalty-points'] }},
       loyaltyPointsConversionRate: {{ settings['loyalty-points-to-AED-conversion-rate'] }},
       promoCodeContent: '',
-      minOrderAmount: {{ settings['min-order-amount'] | default: 0 }},
-      cartTotal: {{ cart.total_price | divided_by: 100 | default: 0 }},
     }
   "
 >
@@ -142,11 +140,11 @@
               :value="promoCodeContent"
             >
             <p
-              x-show="isPromoCodeRequired && isPromoCodeAutoFilled"
-              class="text-[10px] "
+              x-show="isPromoCodeEnabled && isPromoCodeRequired && !promoCodeContent"
+              class="text-red-500 text-[12px] font-medium mt-1"
             >
-              This Filed should be filled automaticly when you git a url from
-              one of our sellers
+              Important: To proceed with your purchase, please obtain a valid
+              promo link from one of our authorized sellers.
             </p>
           </div>
         {% endif %}
@@ -194,7 +192,7 @@
                   <h2 class="totals__total">
                     {{ 'sections.cart.estimated_total' | t }}
                   </h2>
-                  <p class="totals__total-value">
+                  <p id="cart_estimated_total" class="totals__total-value">
                     {{ cart.total_price | money_with_currency }}
                   </p>
                 </div>
@@ -233,30 +231,39 @@
                     {{ 'sections.cart.update' | t }}
                   </button>
                 </noscript>
-
-                <button
-                  type="submit"
-                  id="checkout"
-                  class="cart__checkout-button w-full flex items-center justify-center px-5 py-3 border border-transparent text-[1.6rem] font-bold rounded-[0.4rem] text-white bg-gradient-to-r from-[#01756E] via-[#01A89E] to-[#00CFC8] hover:from-[#01635D] hover:via-[#018F87] hover:to-[#00B8B2] shadow-lg transition-all duration-200 ease-out hover:ease-in hover:shadow-xl hover:translate-y-[-0.1rem] active:translate-y-[0.05rem] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#01A89E] disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-lg"
-                  name="checkout"
-                  x-bind:disabled="(isPromoCodeEnabled && isPromoCodeRequired && !promoCodeContent) || (cartTotal < minOrderAmount)"
-                  form="cart"
-                >
-                  <span class="flex items-center">
-                    {{ 'sections.cart.checkout' | t }}
-                    <span class="ml-[1rem] inline-block transform group-hover:translate-x-[0.4rem] transition-transform duration-200">
-                      <svg
-                        width="1.8rem"
-                        height="1.8rem"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
+                <div class="w-full flex flex-col items-center">
+                  <button
+                    type="submit"
+                    id="checkout"
+                    class="cart__checkout-button w-full flex items-center justify-center px-5 py-3 border border-transparent text-[1.6rem] font-bold rounded-[0.4rem] text-white bg-gradient-to-r from-[#01756E] via-[#01A89E] to-[#00CFC8] hover:from-[#01635D] hover:via-[#018F87] hover:to-[#00B8B2] shadow-lg transition-all duration-200 ease-out hover:ease-in hover:shadow-xl hover:translate-y-[-0.1rem] active:translate-y-[0.05rem] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#01A89E] disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-lg"
+                    name="checkout"
+                    form="cart"
+                  >
+                    <span class="flex items-center">
+                      {{ 'sections.cart.checkout' | t }}
+                      <span class="ml-[1rem] inline-block transform group-hover:translate-x-[0.4rem] transition-transform duration-200">
+                        <svg
+                          width="1.8rem"
+                          height="1.8rem"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
                     </span>
-                  </span>
-                </button>
+                  </button>
+                  {%- if cart.item_count > 0 -%}
+                    <p
+                      class="text-lg text-red-600 mt-4 text-center checkout-warning"
+                      style="display: none;"
+                    >
+                      ⚠️ Please meet the minimum order requirements for all
+                      product types to proceed to checkout.
+                    </p>
+                  {%- endif -%}
+                </div>
               </div>
 
               {%- if additional_checkout_buttons -%}
@@ -275,32 +282,6 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    function getPromoCode() {
-      const promoData = JSON.parse(localStorage.getItem('promoCode'))
-
-      if (!promoData) {
-        console.log('No promo code found.')
-        return null
-      }
-
-      const now = new Date().getTime() // Current time in milliseconds
-
-      if (now > promoData.expiresAt) {
-        // Promo code has expired, remove it
-        localStorage.removeItem('promoCode')
-        console.log('Promo code expired and has been removed.')
-        return null
-      }
-
-      console.log(`Promo code retrieved: ${promoData.value}`)
-      return promoData.value // Return the valid promo code
-    }
-    const storedPromoCode = getPromoCode()
-    const alpineDataContainer = document.querySelector('#main-cart-footer')
-    if (storedPromoCode) {
-      Alpine.$data(alpineDataContainer).promoCodeContent = storedPromoCode
-    }
-
     function isIE() {
       const ua = window.navigator.userAgent
       const msie = ua.indexOf('MSIE ')

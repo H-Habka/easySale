@@ -48,575 +48,560 @@
         </a>
       </div>
     {% else %}
-      <form
-        action="{{ routes.cart_url }}"
-        class="cart__contents critical-hidden"
-        method="post"
-        id="cart"
-      >
-        <div
-          class="cart__items"
-          id="main-cart-items"
-          data-id="{{ section.id }}"
+      <div class="relative min-h-[calc(100vh-200px)]">
+        <form
+          action="{{ routes.cart_url }}"
+          class="cart__contents critical-hidden flex flex-col "
+          method="post"
+          id="cart"
+          style="min-height: 100%;"
         >
-          <div class="js-contents">
-            {%- assign product_types = cart.items
-              | map: 'product'
-              | map: 'type'
-              | uniq
-            -%}
-
-            {%- for type in product_types -%}
-              {%- assign type_total = 0 -%}
-              {%- for item in cart.items -%}
-                {%- if item.product.type == type -%}
-                  {%- assign type_total = type_total
-                    | plus: item.final_line_price
-                  -%}
-                {%- endif -%}
-              {%- endfor -%}
-              <div
-                data-product-type="{{ type | escape }}"
-                class="mb-12 border border-gray-200 rounded-lg overflow-hidden"
-              >
-                <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
-                  <div class="flex items-center gap-4">
-                    <h3 class="text-1.6 font-semibold text-[#01756E]">
-                      {%- if type == blank -%}
-                        Others
-                      {%- else -%}
-                        {{ type }}
-                      {%- endif -%}
-                    </h3>
-                    <span>({{ type_total | money_with_currency }}) </span>
-                    <button
-                      class="ml-auto text-red-600 hover:text-red-800 font-medium"
-                      data-remove-type="{{ type | escape }}"
-                      type="button"
-                      onclick="handleDeleteTypeGroup(this)"
-                    >
-                      <div class="flex items-center gap-4">
-                        <div class="w-8">
-                          {% render 'icon-remove' %}
-                        </div>
-                        <span class="whitespace-nowrap">Remove all</span>
-                      </div>
-                    </button>
-                  </div>
-                  {%- assign matched_rule = null -%}
-                  {%- for block in section.blocks -%}
-                    {%- if block.type == 'shipping_rule'
-                      and block.settings.product_type == type
+          <div
+            class="cart__items"
+            id="main-cart-items"
+            data-id="{{ section.id }}"
+          >
+            <div class="js-contents">
+              {%- assign product_types = cart.items
+                | map: 'product'
+                | map: 'type'
+                | uniq
+              -%}
+              {%- for type in product_types -%}
+                {%- assign type_total = 0 -%}
+                {%- for item in cart.items -%}
+                  {%- if item.product.type == type -%}
+                    {%- assign type_total = type_total
+                      | plus: item.final_line_price
                     -%}
-                      {%- assign matched_rule = block -%}
-                    {%- endif -%}
-                  {%- endfor -%}
-
-                  {%- if matched_rule != null -%}
-                    {%- assign rule_min = matched_rule.settings.min_order_amount -%}
-
-                    <div
-                      class="shipping-checkpoint absolute pointer-events-none opacity-0"
-                      data-type="{{ type | escape }}"
-                      data-min="{{ rule_min }}"
-                      data-total="{{ type_total | divided_by: 100 }}"
-                    ></div>
-                    <div
-                      class="mt-2 p-4 pb-0"
-                    >
-                      <div
-                        x-data="
-                          {
-                            freeShippingLimit: {{ matched_rule.settings.free_shipping_limit | default: 50 }},
-                            minOrderAmount: {{ matched_rule.settings.min_order_amount | default: 0 }},
-                            typeTotal: {{ type_total | divided_by: 100 | default: 0 }},
-                            minOrderAmountIconPosition() {
-                              return `${(this.minOrderAmount / this.freeShippingLimit) * 100}`;
-                            },
-                            progressWidth() {
-                              let percentage = (this.typeTotal / this.freeShippingLimit) * 100;
-                              return `${Math.min(Math.max(percentage, 0), 100)}%`;
-                            },
-                            hasReached(position) {
-                              let progress = (this.typeTotal / this.freeShippingLimit) * 100;
-                              return progress >= position;
-                            }
-                          }
-                        "
-                        class="relative w-[95%] md:w-full mx-auto bg-gray-300 rounded-full shadow-md dark:bg-gray-800 mb-[70px]"
-                      >
-                        <!-- Progress Bar -->
-                        <div
-                          class="bg-blue-500 text-blue-100 text-center text-[6px] font-semibold py-1 leading-none rounded-full shadow-lg transition-all duration-700 ease-in-out buttonLoading text-transparent"
-                          x-bind:style="{ width: progressWidth() }"
-                        >
-                          <span class="text-transparent">s</span>
-                        </div>
-
-                        <!-- Icon at the Start -->
-                        <div
-                          class="absolute top-1/2 left-0 -translate-y-1/2 -translate-x-1/2 rounded-full p-2.5 border border-blue-700 shadow-md bg-blue-500 buttonLoading text-white"
-                        >
-                          <svg
-                            data-slot="icon"
-                            fill="none"
-                            stroke-width="1.5"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
-                            aria-hidden="true"
-                            class="w-7 h-7"
-                          >
-                            <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              d="m5.25 4.5 7.5 7.5-7.5 7.5m6-15 7.5 7.5-7.5 7.5"
-                            ></path>
-                          </svg>
-                          <p
-                            class="absolute top-full mt-2 left-0 text-gray-600 z-[10] text-lg"
-                          >
-                            Start
-                          </p>
-                        </div>
-
-                        <!-- Icon in the Middle -->
-                        <div
-                          x-bind:hidden="minOrderAmount == 0"
-                          x-bind:style="{ left: `${minOrderAmountIconPosition()}%` }"
-                          x-bind:class="hasReached(minOrderAmountIconPosition()) ? 'bg-blue-500 buttonLoading text-white' : 'text-blue-500 bg-white'"
-                          class="absolute top-1/2 -translate-y-1/2 rounded-full p-2.5 border border-blue-700 shadow-md"
-                        >
-                          <svg
-                            data-slot="icon"
-                            fill="none"
-                            stroke-width="1.5"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
-                            aria-hidden="true"
-                            class="w-7 h-7"
-                          >
-                            <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
-                            ></path>
-                          </svg>
-
-                          <!-- Check Icon -->
-                          <div
-                            class="absolute top-[-8px] right-[-6px]"
-                            x-bind:class="hasReached(minOrderAmountIconPosition()) ? 'text-green-500' : 'hidden'"
-                          >
-                            <svg
-                              data-slot="icon"
-                              fill="none"
-                              stroke-width="1.5"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                              xmlns="http://www.w3.org/2000/svg"
-                              aria-hidden="true"
-                              class="w-5 h-5 stroke-[6px]"
-                            >
-                              <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"></path>
-                            </svg>
-                          </div>
-
-                          <div
-                            class="absolute top-full left-1/2 -translate-x-1/2 mt-2 text-gray-600 z-[10] text-lg flex flex-col text-center gap-0.5"
-                          >
-                            <p class="whitespace-nowrap">Min.value</p>
-                            <p
-                              class="font-semibold whitespace-nowrap"
-                              x-text="formatNumbers(minOrderAmount)"
-                            ></p>
-                          </div>
-                        </div>
-
-                        <!-- Icon at the End -->
-                        <div
-                          x-bind:class="hasReached(100) ? 'bg-blue-500 buttonLoading text-white' : 'text-blue-500 bg-white'"
-                          class="absolute top-1/2 right-0 -translate-y-1/2 translate-x-1/2  rounded-full p-2.5 border border-blue-700 shadow-md"
-                        >
-                          <div
-                            class="absolute top-[-8px] right-[-6px]"
-                            x-bind:class="hasReached(100) ? 'text-green-500' : 'hidden'"
-                          >
-                            <svg
-                              data-slot="icon"
-                              fill="none"
-                              stroke-width="1.5"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                              xmlns="http://www.w3.org/2000/svg"
-                              aria-hidden="true"
-                              class="w-5 h-5 stroke-[6px]"
-                            >
-                              <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"></path>
-                            </svg>
-                          </div>
-                          <svg
-                            data-slot="icon"
-                            fill="none"
-                            stroke-width="1.5"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
-                            aria-hidden="true"
-                            class="w-7 h-7"
-                          >
-                            <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 0 0-10.026 0 1.106 1.106 0 0 0-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"
-                            ></path>
-                          </svg>
-                          <div
-                            class="absolute right-0 top-full mt-2 text-gray-600 z-[10] text-lg flex flex-col text-center gap-0.5 "
-                          >
-                            <p class="whitespace-nowrap">Free Delivery</p>
-                            <p
-                              class="font-semibold whitespace-nowrap"
-                              x-text="formatNumbers(freeShippingLimit)"
-                            ></p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
                   {%- endif -%}
-                </div>
-
-                <table class="w-full">
-                  <thead class="border-b border-gray-200">
-                    <tr>
-                      <th
-                        class="text-left py-4 px-6 font-medium text-gray-700"
-                        colspan="1"
+                {%- endfor -%}
+                <div
+                  data-product-type="{{ type | escape }}"
+                  class="mb-12 border border-gray-200 rounded-lg overflow-hidden"
+                >
+                  <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+                    <div class="flex items-center gap-4">
+                      <h3 class="text-1.6 font-semibold text-[#01756E]">
+                        {%- if type == blank -%}
+                          Others
+                        {%- else -%}
+                          {{ type }}
+                        {%- endif -%}
+                      </h3>
+                      <span>({{ type_total | money_with_currency }}) </span>
+                      <button
+                        class="group ml-auto text-red-600 hover:text-red-800 font-medium relative flex items-center gap-4 disabled:opacity-50 disabled:cursor-not-allowed"
+                        data-remove-type="{{ type | escape }}"
+                        type="button"
+                        onclick="handleDeleteTypeGroup(this)"
                       >
-                        Product
-                      </th>
-                      <th
-                        class="text-start py-4 px-6 font-medium text-gray-700 small-hide"
-                        colspan="1"
-                      >
-                        Quantity
-                      </th>
-                      <th
-                        class="text-end py-4 px-6 font-medium text-gray-700"
-                        colspan="1"
-                      >
-                        Total
-                      </th>
-                    </tr>
-                  </thead>
-
-                  <tbody>
-                    {%- for item in cart.items -%}
-                      {%- if item.product.type == type -%}
-                        <tr
-                          class="border-b border-gray-100 hover:bg-gray-50 transition-colors duration-150"
-                          id="CartItem-{{ item.index | plus: 1 }}"
+                        <div
+                          class="group-disabled:!block hidden customLoader text-transparent"
                         >
-                          <td class="py-4 px-6">
-                            <div class="flex gap-4">
-                              <div>
-                                {% if item.image %}
-                                  <div class="w-40 h-40 rounded overflow-hidden border border-gray-100">
-                                    <img
-                                      src="{{ item.image | image_url: width: 300 }}"
-                                      class="w-full h-full object-cover"
-                                      alt="{{ item.image.alt | escape }}"
-                                      loading="lazy"
-                                      width="150"
-                                      height="{{ 150 | divided_by: item.image.aspect_ratio | ceil }}"
-                                    >
-                                  </div>
-                                {% endif %}
-                              </div>
-                              <div>
-                                {%- if settings.show_vendor -%}
-                                  <p class="text-gray-500 mb-1">
-                                    {{ item.product.vendor }}
-                                  </p>
-                                {%- endif -%}
-
-                                <a
-                                  href="{{ item.url }}"
-                                  class="text-gray-900 hover:text-[#01756E] transition-colors duration-150 font-medium"
-                                >
-                                  {{- item.product.title | escape -}}
-                                </a>
-
-                                {%- if item.original_price != item.final_price
-                                -%}
-                                  <div class="mt-1">
-                                    <s class="text-gray-500">
-                                      {{- item.original_price | money -}}
-                                    </s>
-                                    <span class="ml-2 font-medium text-[#01756E]">
-                                      {{- item.final_price | money -}}
-                                    </span>
-                                  </div>
-                                {%- else -%}
-                                  <div class="mt-1 text-[#01756E] font-medium">
-                                    {{ item.original_price | money }}
-                                  </div>
-                                {%- endif -%}
-
-                                {%- if item.product.has_only_default_variant
-                                    == false
-                                  or item.properties.size != 0
-                                  or item.selling_plan_allocation != null
-                                -%}
-                                  <dl class="mt-2 space-y-1 text-sm text-gray-600">
-                                    {%- if item.product.has_only_default_variant
-                                        == false
-                                    -%}
-                                      {%- for option in item.options_with_values -%}
-                                        <div class="flex">
-                                          <dt class="font-medium text-gray-700 mr-1">
-                                            {{ option.name }}:
-                                          </dt>
-                                          <dd>{{ option.value }}</dd>
-                                        </div>
-                                      {%- endfor -%}
-                                    {%- endif -%}
-
-                                    {%- for property in item.properties -%}
-                                      {%- assign property_first_char = property.first
-                                        | slice: 0
-                                      -%}
-                                      {%- if property.last != blank
-                                        and property_first_char != '_'
-                                      -%}
-                                        <div class="flex">
-                                          <dt class="font-medium text-gray-700 mr-1">
-                                            {{ property.first }}:
-                                          </dt>
-                                          <dd>
-                                            {%- if property.last
-                                                contains '/uploads/'
-                                            -%}
-                                              <a
-                                                href="{{ property.last }}"
-                                                class="text-[#01A89E] hover:text-[#01756E]"
-                                                target="_blank"
-                                              >
-                                                {{
-                                                  property.last
-                                                  | split: '/'
-                                                  | last
-                                                }}
-                                              </a>
-                                            {%- else -%}
-                                              {{ property.last }}
-                                            {%- endif -%}
-                                          </dd>
-                                        </div>
-                                      {%- endif -%}
-                                    {%- endfor -%}
-                                  </dl>
-                                {%- endif -%}
-
-                                {%- if item.selling_plan_allocation != null -%}
-                                  <p class="mt-2 text-sm text-gray-600">
-                                    {{ item.selling_plan_allocation.selling_plan.name }}
-                                  </p>
-                                {%- endif -%}
-
-                                <ul class="mt-2 space-y-1">
-                                  {%- for discount in item.line_level_discount_allocations -%}
-                                    <li class="text-[#01A89E] flex items-center">
-                                      {%- render 'icon-discount' -%}
-                                      <span class="ml-1">
-                                        {{- discount.discount_application.title -}}
-                                      </span>
-                                    </li>
-                                  {%- endfor -%}
-                                </ul>
-                                <div class="mt-2 750:hidden">
-                                  <quantity-popover>
-                                    <div class="flex items-center">
-                                      <quantity-input class="flex items-center border border-gray-200 rounded">
-                                        <button
-                                          class="quantity__button no-js-hidden w-10 h-10 flex items-center justify-center text-[#01756E] hover:text-[#01A89E] hover:bg-gray-100 transition-colors duration-150"
-                                          name="minus"
-                                          type="button"
-                                        >
-                                          <span class="visually-hidden">
-                                            {{-
-                                              'products.product.quantity.decrease'
-                                              | t: product: item.product.title
-                                              | escape
-                                            -}}
-                                          </span>
-                                          {% render 'icon-minus' %}
-                                        </button>
-                                        <input
-                                          class="w-12 h-10 text-center border-x border-gray-200"
-                                          type="number"
-                                          name="updates[]"
-                                          value="{{ item.quantity }}"
-                                          min="{{ item.variant.quantity_rule.min }}"
-                                          {% if item.variant.quantity_rule.max
-                                              != null
-                                          %}
-                                            max="{{ item.variant.quantity_rule.max }}"
-                                          {% endif %}
-                                          step="{{ item.variant.quantity_rule.increment }}"
-                                          data-index="{{ item.index | plus: 1 }}"
-                                        >
-
-                                        <button
-                                          class="quantity__button no-js-hidden w-10 h-10 flex items-center justify-center text-[#01756E] hover:text-[#01A89E] hover:bg-gray-100 transition-colors duration-150"
-                                          name="plus"
-                                          type="button"
-                                        >
-                                          <span class="visually-hidden">
-                                            {{-
-                                              'products.product.quantity.increase'
-                                              | t: product: item.product.title
-                                              | escape
-                                            -}}
-                                          </span>
-                                          {% render 'icon-plus' %}
-                                        </button>
-                                      </quantity-input>
-                                      <a
-                                        href="{{ item.url_to_remove }}"
-                                        class="ml-2 w-10 h-10 flex items-center justify-center text-[#01756E] hover:text-[#01A89E] hover:bg-gray-100 rounded transition-colors duration-150"
-                                        aria-label="{{ 'sections.cart.remove_title' | t: title: item.title }}"
-                                        id="Remove-{{ item.index | plus: 1 }}"
-                                        data-index="{{ item.index | plus: 1 }}"
-                                      >
-                                        {% render 'icon-remove' %}
-                                      </a>
-                                    </div>
-                                  </quantity-popover>
-                                </div>
-                              </div>
-                            </div>
-                          </td>
-
-                          <td class="py-4 !px-0 small-hide">
-                            <quantity-popover>
-                              <div class="flex items-center">
-                                <quantity-input class="flex items-center border border-gray-200 rounded">
-                                  <button
-                                    class="quantity__button no-js-hidden w-10 h-10 flex items-center justify-center text-[#01756E] hover:text-[#01A89E] hover:bg-gray-100 transition-colors duration-150"
-                                    name="minus"
-                                    type="button"
-                                  >
-                                    <span class="visually-hidden">
-                                      {{-
-                                        'products.product.quantity.decrease'
-                                        | t: product: item.product.title
-                                        | escape
-                                      -}}
-                                    </span>
-                                    {% render 'icon-minus' %}
-                                  </button>
-                                  <input
-                                    class="w-12 h-10 text-center border-x border-gray-200"
-                                    type="number"
-                                    name="updates[]"
-                                    value="{{ item.quantity }}"
-                                    min="{{ item.variant.quantity_rule.min }}"
-                                    {% if item.variant.quantity_rule.max != null
-                                    %}
-                                      max="{{ item.variant.quantity_rule.max }}"
-                                    {% endif %}
-                                    step="{{ item.variant.quantity_rule.increment }}"
-                                    data-index="{{ item.index | plus: 1 }}"
-                                  >
-
-                                  <button
-                                    class="quantity__button no-js-hidden w-10 h-10 flex items-center justify-center text-[#01756E] hover:text-[#01A89E] hover:bg-gray-100 transition-colors duration-150"
-                                    name="plus"
-                                    type="button"
-                                  >
-                                    <span class="visually-hidden">
-                                      {{-
-                                        'products.product.quantity.increase'
-                                        | t: product: item.product.title
-                                        | escape
-                                      -}}
-                                    </span>
-                                    {% render 'icon-plus' %}
-                                  </button>
-                                </quantity-input>
-                                <a
-                                  href="{{ item.url_to_remove }}"
-                                  class="ml-2 w-10 h-10 flex items-center justify-center text-[#01756E] hover:text-[#01A89E] hover:bg-gray-100 rounded transition-colors duration-150"
-                                  aria-label="{{ 'sections.cart.remove_title' | t: title: item.title }}"
-                                  id="Remove-{{ item.index | plus: 1 }}"
-                                  data-index="{{ item.index | plus: 1 }}"
-                                >
-                                  {% render 'icon-remove' %}
-                                </a>
-                              </div>
-                            </quantity-popover>
-                          </td>
-
-                          <td class="py-4 px-6 text-right">
-                            {%- if item.original_line_price
-                                != item.final_line_price
-                            -%}
-                              <div>
-                                <s class="text-gray-500">
-                                  {{- item.original_line_price | money -}}
-                                </s>
-                                <div class="font-medium text-[#01756E]">
-                                  {{ item.final_line_price | money }}
-                                </div>
-                              </div>
-                            {%- else -%}
-                              <div class="font-medium text-[#01756E]">
-                                {{ item.original_line_price | money }}
-                              </div>
-                            {%- endif -%}
-                          </td>
-                        </tr>
+                          s
+                        </div>
+                        <!-- Content -->
+                        <div class="group-disabled:hidden flex items-center gap-4">
+                          <div class="w-8">
+                            {% render 'icon-remove' %}
+                          </div>
+                          <span class="whitespace-nowrap">Remove all</span>
+                        </div>
+                      </button>
+                    </div>
+                    {%- assign matched_rule = null -%}
+                    {%- for block in section.blocks -%}
+                      {%- if block.type == 'shipping_rule'
+                        and block.settings.product_type == type
+                      -%}
+                        {%- assign matched_rule = block -%}
                       {%- endif -%}
                     {%- endfor -%}
-                  </tbody>
-                </table>
-              </div>
-            {%- endfor -%}
+                    {%- if matched_rule != null -%}
+                      {%- assign rule_min = matched_rule.settings.min_order_amount -%}
+                      <div
+                        class="shipping-checkpoint absolute pointer-events-none opacity-0"
+                        data-type="{{ type | escape }}"
+                        data-min="{{ rule_min }}"
+                        data-total="{{ type_total | divided_by: 100 }}"
+                      ></div>
+                      <div
+                        class="mt-2 p-4 pb-0"
+                      >
+                        <div
+                          x-data="
+                            {
+                              freeShippingLimit: {{ matched_rule.settings.free_shipping_limit | default: 50 }},
+                              minOrderAmount: {{ matched_rule.settings.min_order_amount | default: 0 }},
+                              typeTotal: {{ type_total | divided_by: 100 | default: 0 }},
+                              minOrderAmountIconPosition() {
+                                return `${(this.minOrderAmount / this.freeShippingLimit) * 100}`;
+                              },
+                              progressWidth() {
+                                let percentage = (this.typeTotal / this.freeShippingLimit) * 100;
+                                return `${Math.min(Math.max(percentage, 0), 100)}%`;
+                              },
+                              hasReached(position) {
+                                let progress = (this.typeTotal / this.freeShippingLimit) * 100;
+                                return progress >= position;
+                              }
+                            }
+                          "
+                          class="relative w-[95%] md:w-full mx-auto bg-gray-300 rounded-full shadow-md dark:bg-gray-800 mb-[70px]"
+                        >
+                          <!-- Progress Bar -->
+                          <div
+                            class="bg-blue-500 text-blue-100 text-center text-[6px] font-semibold py-1 leading-none rounded-full shadow-lg transition-all duration-700 ease-in-out buttonLoading text-transparent"
+                            x-bind:style="{ width: progressWidth() }"
+                          >
+                            <span class="text-transparent">s</span>
+                          </div>
+                          <!-- Icon at the Start -->
+                          <div
+                            class="absolute top-1/2 left-0 -translate-y-1/2 -translate-x-1/2 rounded-full p-2.5 border border-blue-700 shadow-md bg-blue-500 buttonLoading text-white"
+                          >
+                            <svg
+                              data-slot="icon"
+                              fill="none"
+                              stroke-width="1.5"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                              xmlns="http://www.w3.org/2000/svg"
+                              aria-hidden="true"
+                              class="w-7 h-7"
+                            >
+                              <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="m5.25 4.5 7.5 7.5-7.5 7.5m6-15 7.5 7.5-7.5 7.5"
+                              ></path>
+                            </svg>
+                            <p
+                              class="absolute top-full mt-2 left-0 text-gray-600 z-[10] text-lg"
+                            >
+                              Start
+                            </p>
+                          </div>
+                          <!-- Icon in the Middle -->
+                          <div
+                            x-bind:hidden="minOrderAmount == 0"
+                            x-bind:style="{ left: `${minOrderAmountIconPosition()}%` }"
+                            x-bind:class="hasReached(minOrderAmountIconPosition()) ? 'bg-blue-500 buttonLoading text-white' : 'text-blue-500 bg-white'"
+                            class="absolute top-1/2 -translate-y-1/2 rounded-full p-2.5 border border-blue-700 shadow-md"
+                          >
+                            <svg
+                              data-slot="icon"
+                              fill="none"
+                              stroke-width="1.5"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                              xmlns="http://www.w3.org/2000/svg"
+                              aria-hidden="true"
+                              class="w-7 h-7"
+                            >
+                              <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
+                              ></path>
+                            </svg>
+                            <!-- Check Icon -->
+                            <div
+                              class="absolute top-[-8px] right-[-6px]"
+                              x-bind:class="hasReached(minOrderAmountIconPosition()) ? 'text-green-500' : 'hidden'"
+                            >
+                              <svg
+                                data-slot="icon"
+                                fill="none"
+                                stroke-width="1.5"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg"
+                                aria-hidden="true"
+                                class="w-5 h-5 stroke-[6px]"
+                              >
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"></path>
+                              </svg>
+                            </div>
+                            <div
+                              class="absolute top-full left-1/2 -translate-x-1/2 mt-2 text-gray-600 z-[10] text-lg flex flex-col text-center gap-0.5"
+                            >
+                              <p class="whitespace-nowrap">Min.value</p>
+                              <p
+                                class="font-semibold whitespace-nowrap"
+                                x-text="formatNumbers(minOrderAmount)"
+                              ></p>
+                            </div>
+                          </div>
+                          <!-- Icon at the End -->
+                          <div
+                            x-bind:class="hasReached(100) ? 'bg-blue-500 buttonLoading text-white' : 'text-blue-500 bg-white'"
+                            class="absolute top-1/2 right-0 -translate-y-1/2 translate-x-1/2  rounded-full p-2.5 border border-blue-700 shadow-md"
+                          >
+                            <div
+                              class="absolute top-[-8px] right-[-6px]"
+                              x-bind:class="hasReached(100) ? 'text-green-500' : 'hidden'"
+                            >
+                              <svg
+                                data-slot="icon"
+                                fill="none"
+                                stroke-width="1.5"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg"
+                                aria-hidden="true"
+                                class="w-5 h-5 stroke-[6px]"
+                              >
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"></path>
+                              </svg>
+                            </div>
+                            <svg
+                              data-slot="icon"
+                              fill="none"
+                              stroke-width="1.5"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                              xmlns="http://www.w3.org/2000/svg"
+                              aria-hidden="true"
+                              class="w-7 h-7"
+                            >
+                              <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 0 0-10.026 0 1.106 1.106 0 0 0-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"
+                              ></path>
+                            </svg>
+                            <div
+                              class="absolute right-0 top-full mt-2 text-gray-600 z-[10] text-lg flex flex-col text-center gap-0.5 "
+                            >
+                              <p class="whitespace-nowrap">Free Delivery</p>
+                              <p
+                                class="font-semibold whitespace-nowrap"
+                                x-text="formatNumbers(freeShippingLimit)"
+                              ></p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    {%- endif -%}
+                  </div>
+                  <table class="w-full">
+                    <thead class="border-b border-gray-200">
+                      <tr>
+                        <th
+                          class="text-left py-4 px-6 font-medium text-gray-700"
+                          colspan="1"
+                        >
+                          Product
+                        </th>
+                        <th
+                          class="text-start py-4 px-6 font-medium text-gray-700 small-hide"
+                          colspan="1"
+                        >
+                          Quantity
+                        </th>
+                        <th
+                          class="text-end py-4 px-6 font-medium text-gray-700"
+                          colspan="1"
+                        >
+                          Total
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {%- for item in cart.items -%}
+                        {%- if item.product.type == type -%}
+                          <tr
+                            class="border-b border-gray-100 hover:bg-gray-50 transition-colors duration-150"
+                            id="CartItem-{{ item.index | plus: 1 }}"
+                          >
+                            <td class="py-4 px-6">
+                              <div class="flex gap-4">
+                                <div>
+                                  {% if item.image %}
+                                    <div class="w-40 h-40 rounded overflow-hidden border border-gray-100">
+                                      <img
+                                        src="{{ item.image | image_url: width: 300 }}"
+                                        class="w-full h-full object-cover"
+                                        alt="{{ item.image.alt | escape }}"
+                                        loading="lazy"
+                                        width="150"
+                                        height="{{ 150 | divided_by: item.image.aspect_ratio | ceil }}"
+                                      >
+                                    </div>
+                                  {% endif %}
+                                </div>
+                                <div>
+                                  {%- if settings.show_vendor -%}
+                                    <p class="text-gray-500 mb-1">
+                                      {{ item.product.vendor }}
+                                    </p>
+                                  {%- endif -%}
+                                  <a
+                                    href="{{ item.url }}"
+                                    class="text-gray-900 hover:text-[#01756E] transition-colors duration-150 font-medium"
+                                  >
+                                    {{- item.product.title | escape -}}
+                                  </a>
+                                  {%- if item.original_price != item.final_price
+                                  -%}
+                                    <div class="mt-1">
+                                      <s class="text-gray-500">
+                                        {{- item.original_price | money -}}
+                                      </s>
+                                      <span class="ml-2 font-medium text-[#01756E]">
+                                        {{- item.final_price | money -}}
+                                      </span>
+                                    </div>
+                                  {%- else -%}
+                                    <div class="mt-1 text-[#01756E] font-medium">
+                                      {{ item.original_price | money }}
+                                    </div>
+                                  {%- endif -%}
+                                  {%- if item.product.has_only_default_variant
+                                      == false
+                                    or item.properties.size != 0
+                                    or item.selling_plan_allocation != null
+                                  -%}
+                                    <dl class="mt-2 space-y-1 text-sm text-gray-600">
+                                      {%- if item.product.has_only_default_variant
+                                          == false
+                                      -%}
+                                        {%- for option in item.options_with_values -%}
+                                          <div class="flex">
+                                            <dt class="font-medium text-gray-700 mr-1">
+                                              {{ option.name }}:
+                                            </dt>
+                                            <dd>{{ option.value }}</dd>
+                                          </div>
+                                        {%- endfor -%}
+                                      {%- endif -%}
+                                      {%- for property in item.properties -%}
+                                        {%- assign property_first_char = property.first
+                                          | slice: 0
+                                        -%}
+                                        {%- if property.last != blank
+                                          and property_first_char != '_'
+                                        -%}
+                                          <div class="flex">
+                                            <dt class="font-medium text-gray-700 mr-1">
+                                              {{ property.first }}:
+                                            </dt>
+                                            <dd>
+                                              {%- if property.last
+                                                  contains '/uploads/'
+                                              -%}
+                                                <a
+                                                  href="{{ property.last }}"
+                                                  class="text-[#01A89E] hover:text-[#01756E]"
+                                                  target="_blank"
+                                                >
+                                                  {{
+                                                    property.last
+                                                    | split: '/'
+                                                    | last
+                                                  }}
+                                                </a>
+                                              {%- else -%}
+                                                {{ property.last }}
+                                              {%- endif -%}
+                                            </dd>
+                                          </div>
+                                        {%- endif -%}
+                                      {%- endfor -%}
+                                    </dl>
+                                  {%- endif -%}
+                                  {%- if item.selling_plan_allocation != null
+                                  -%}
+                                    <p class="mt-2 text-sm text-gray-600">
+                                      {{ item.selling_plan_allocation.selling_plan.name }}
+                                    </p>
+                                  {%- endif -%}
+                                  <ul class="mt-2 space-y-1">
+                                    {%- for discount in item.line_level_discount_allocations -%}
+                                      <li class="text-[#01A89E] flex items-center">
+                                        {%- render 'icon-discount' -%}
+                                        <span class="ml-1">
+                                          {{- discount.discount_application.title -}}
+                                        </span>
+                                      </li>
+                                    {%- endfor -%}
+                                  </ul>
+                                  <div class="mt-2 750:hidden">
+                                    <quantity-popover>
+                                      <div class="flex items-center">
+                                        <quantity-input class="flex items-center border border-gray-200 rounded">
+                                          <button
+                                            class="quantity__button no-js-hidden w-10 h-10 flex items-center justify-center text-[#01756E] hover:text-[#01A89E] hover:bg-gray-100 transition-colors duration-150"
+                                            name="minus"
+                                            type="button"
+                                          >
+                                            <span class="visually-hidden">
+                                              {{-
+                                                'products.product.quantity.decrease'
+                                                | t: product: item.product.title
+                                                | escape
+                                              -}}
+                                            </span>
+                                            {% render 'icon-minus' %}
+                                          </button>
+                                          <input
+                                            class="w-16 h-10 text-center border-x border-gray-200"
+                                            type="number"
+                                            disabled
+                                            name="updates[]"
+                                            value="{{ item.quantity }}"
+                                            min="{{ item.variant.quantity_rule.min }}"
+                                            {% if item.variant.quantity_rule.max
+                                                != null
+                                            %}
+                                              max="{{ item.variant.quantity_rule.max }}"
+                                            {% endif %}
+                                            step="{{ item.variant.quantity_rule.increment }}"
+                                            data-index="{{ item.index | plus: 1 }}"
+                                          >
+                                          <button
+                                            class="quantity__button no-js-hidden w-10 h-10 flex items-center justify-center text-[#01756E] hover:text-[#01A89E] hover:bg-gray-100 transition-colors duration-150"
+                                            name="plus"
+                                            type="button"
+                                          >
+                                            <span class="visually-hidden">
+                                              {{-
+                                                'products.product.quantity.increase'
+                                                | t: product: item.product.title
+                                                | escape
+                                              -}}
+                                            </span>
+                                            {% render 'icon-plus' %}
+                                          </button>
+                                        </quantity-input>
+                                        <a
+                                          href="{{ item.url_to_remove }}"
+                                          class="ml-2 w-10 h-10 flex items-center justify-center text-[#01756E] hover:text-[#01A89E] hover:bg-gray-100 rounded transition-colors duration-150"
+                                          aria-label="{{ 'sections.cart.remove_title' | t: title: item.title }}"
+                                          id="Remove-{{ item.index | plus: 1 }}"
+                                          data-index="{{ item.index | plus: 1 }}"
+                                        >
+                                          {% render 'icon-remove' %}
+                                        </a>
+                                      </div>
+                                    </quantity-popover>
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+                            <td class="py-4 !px-0 small-hide">
+                              <quantity-popover>
+                                <div class="flex items-center">
+                                  <quantity-input class="flex items-center border border-gray-200 rounded">
+                                    <button
+                                      class="quantity__button no-js-hidden w-10 h-10 flex items-center justify-center text-[#01756E] hover:text-[#01A89E] hover:bg-gray-100 transition-colors duration-150"
+                                      name="minus"
+                                      type="button"
+                                    >
+                                      <span class="visually-hidden">
+                                        {{-
+                                          'products.product.quantity.decrease'
+                                          | t: product: item.product.title
+                                          | escape
+                                        -}}
+                                      </span>
+                                      {% render 'icon-minus' %}
+                                    </button>
+                                    <input
+                                      class="w-16 h-10 text-center border-x border-gray-200"
+                                      type="number"
+                                      disabled
+                                      name="updates[]"
+                                      value="{{ item.quantity }}"
+                                      min="{{ item.variant.quantity_rule.min }}"
+                                      {% if item.variant.quantity_rule.max
+                                          != null
+                                      %}
+                                        max="{{ item.variant.quantity_rule.max }}"
+                                      {% endif %}
+                                      step="{{ item.variant.quantity_rule.increment }}"
+                                      data-index="{{ item.index | plus: 1 }}"
+                                    >
+                                    <button
+                                      class="quantity__button no-js-hidden w-10 h-10 flex items-center justify-center text-[#01756E] hover:text-[#01A89E] hover:bg-gray-100 transition-colors duration-150"
+                                      name="plus"
+                                      type="button"
+                                    >
+                                      <span class="visually-hidden">
+                                        {{-
+                                          'products.product.quantity.increase'
+                                          | t: product: item.product.title
+                                          | escape
+                                        -}}
+                                      </span>
+                                      {% render 'icon-plus' %}
+                                    </button>
+                                  </quantity-input>
+                                  <a
+                                    href="{{ item.url_to_remove }}"
+                                    class="ml-2 w-10 h-10 flex items-center justify-center text-[#01756E] hover:text-[#01A89E] hover:bg-gray-100 rounded transition-colors duration-150"
+                                    aria-label="{{ 'sections.cart.remove_title' | t: title: item.title }}"
+                                    id="Remove-{{ item.index | plus: 1 }}"
+                                    data-index="{{ item.index | plus: 1 }}"
+                                  >
+                                    {% render 'icon-remove' %}
+                                  </a>
+                                </div>
+                              </quantity-popover>
+                            </td>
+                            <td class="py-4 px-6 text-right">
+                              {%- if item.original_line_price
+                                  != item.final_line_price
+                              -%}
+                                <div>
+                                  <s class="text-gray-500">
+                                    {{- item.original_line_price | money -}}
+                                  </s>
+                                  <div class="font-medium text-[#01756E]">
+                                    {{ item.final_line_price | money }}
+                                  </div>
+                                </div>
+                              {%- else -%}
+                                <div class="font-medium text-[#01756E]">
+                                  {{ item.original_line_price | money }}
+                                </div>
+                              {%- endif -%}
+                            </td>
+                          </tr>
+                        {%- endif -%}
+                      {%- endfor -%}
+                    </tbody>
+                  </table>
+                </div>
+              {%- endfor -%}
+            </div>
           </div>
-        </div>
-        <p
-          class="visually-hidden"
-          id="cart-live-region-text"
-          aria-live="polite"
-          role="status"
-        ></p>
-        <p
-          class="visually-hidden"
-          id="shopping-cart-line-item-status"
-          aria-live="polite"
-          aria-hidden="true"
-          role="status"
-        >
-          {{ 'accessibility.loading' | t }}
-        </p>
-        {%- if cart.item_count > 0 -%}
           <p
-            class="text-lg text-red-600 mt-4 text-center"
-            id="checkout-warning"
-            style="display: none;"
+            class="visually-hidden"
+            id="cart-live-region-text"
+            aria-live="polite"
+            role="status"
+          ></p>
+          <p
+            class="visually-hidden"
+            id="shopping-cart-line-item-status"
+            aria-live="polite"
+            aria-hidden="true"
+            role="status"
           >
-            ⚠️ Please meet the minimum order requirements for all product types
-            to proceed to checkout.
+            {{ 'accessibility.loading' | t }}
           </p>
-        {%- endif -%}
-      </form>
+        </form>
+        {% render 'sticky-checkout', cart_total: cart.total_price | money_with_currency %}
+      </div>
     {% endif %}
   </div>
 
   <script>
     async function handleDeleteTypeGroup(button) {
+      button.disabled = true
       const type = button.getAttribute('data-remove-type')
       const res = await fetch('/cart.js')
       const cart = await res.json()
@@ -644,7 +629,36 @@
     }
   </script>
   <script>
+    function getPromoCode() {
+      const promoData = JSON.parse(localStorage.getItem('promoCode'))
+
+      if (!promoData) {
+        console.log('No promo code found.')
+        return null
+      }
+
+      const now = new Date().getTime() // Current time in milliseconds
+
+      if (now > promoData.expiresAt) {
+        // Promo code has expired, remove it
+        localStorage.removeItem('promoCode')
+        console.log('Promo code expired and has been removed.')
+        return null
+      }
+
+      console.log(`Promo code retrieved: ${promoData.value}`)
+      return promoData.value // Return the valid promo code
+    }
+
     function evaluateCheckoutAvailability() {
+      const storedPromoCode = getPromoCode()
+      const alpineDataContainer = document.querySelector('#main-cart-footer')
+      const cartFooterAlpineData = Alpine.$data(alpineDataContainer)
+      const isPromoCodeEnabled = cartFooterAlpineData.isPromoCodeEnabled
+      const isPromoCodeRequired = cartFooterAlpineData.isPromoCodeRequired
+      cartFooterAlpineData.promoCodeContent = storedPromoCode
+      let promoCodeContent = cartFooterAlpineData.promoCodeContent
+
       const checkpoints = document.querySelectorAll('.shipping-checkpoint')
       let allPassed = true
       checkpoints.forEach((el) => {
@@ -655,16 +669,55 @@
         }
       })
       const checkoutButton = document.getElementById('checkout')
-      const warning = document.getElementById('checkout-warning')
-      if (warning) {
-        warning.style.display = allPassed ? 'none' : 'block'
+      const stickyCheckoutButton = document.getElementById(
+        'sticky-checkout-button'
+      )
+      const warnings = document.querySelectorAll('.checkout-warning')
+      if (warnings.length) {
+        warnings.forEach((warning) => {
+          warning.style.display = allPassed ? 'none' : 'block'
+        })
       }
 
+      const checkoutDisableStateDueToPromoCode =
+        isPromoCodeEnabled && isPromoCodeRequired && !promoCodeContent
+
+      const isCheckoutButtonDisabled =
+        !allPassed || checkoutDisableStateDueToPromoCode
+
       if (checkoutButton) {
-        checkoutButton.disabled = !allPassed
-        checkoutButton.classList.toggle('opacity-50', !allPassed)
-        checkoutButton.classList.toggle('cursor-not-allowed', !allPassed)
+        checkoutButton.disabled = isCheckoutButtonDisabled
+        checkoutButton.classList.toggle('opacity-50', isCheckoutButtonDisabled)
+        checkoutButton.classList.toggle(
+          'cursor-not-allowed',
+          isCheckoutButtonDisabled
+        )
+        checkoutButton.classList.toggle(
+          'pointer-events-none',
+          isCheckoutButtonDisabled
+        )
       }
+      if (stickyCheckoutButton) {
+        stickyCheckoutButton.disabled = isCheckoutButtonDisabled
+        stickyCheckoutButton.classList.toggle(
+          'opacity-50',
+          isCheckoutButtonDisabled
+        )
+        stickyCheckoutButton.classList.toggle(
+          'cursor-not-allowed',
+          isCheckoutButtonDisabled
+        )
+        stickyCheckoutButton.classList.toggle(
+          'pointer-events-none',
+          isCheckoutButtonDisabled
+        )
+      }
+
+      let cartEstimatedTotal = document.getElementById(
+        'cart_estimated_total'
+      ).innerText
+      document.getElementById('sticky-cart-total').innerText =
+        cartEstimatedTotal
     }
 
     document.addEventListener('DOMContentLoaded', evaluateCheckoutAvailability)

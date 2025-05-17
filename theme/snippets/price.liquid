@@ -1,5 +1,6 @@
 {% comment %}
   Renders a list of product's price (regular, sale)
+  Updated to show price in compact format with AED currency
 
   Accepts:
   - product: {Object} Product Liquid object (optional)
@@ -23,14 +24,9 @@
   assign price_min = product.price_min
   assign price_max = product.price_max
   assign available = target.available | default: false
-  assign money_price = price | money
-  assign money_price_min = price_min | money
-  assign money_price_max = price_max | money
-  if settings.currency_code_enabled
-    assign money_price = price | money_with_currency
-    assign money_price_min = price_min | money_with_currency
-    assign money_price_max = price_max | money_with_currency
-  endif
+  assign money_price = price | money_without_currency
+  assign money_price_min = price_min | money_without_currency
+  assign money_price_max = price_max | money_without_currency
 
   if target == product and product.price_varies
     assign money_price = 'products.product.price.from_price_html' | t: price: money_price
@@ -48,81 +44,114 @@
     {%- if show_badges %} price--show-badge{% endif -%}
   "
 >
-  <div class="price__container">
+  <div class="price__container flex items-center">
     {%- comment -%}
       Explanation of description list:
         - div.price__regular: Displayed when there are no variants on sale
         - div.price__sale: Displayed when a variant is a sale
     {%- endcomment -%}
-    <div class="price__regular">
-      {%- if product.quantity_price_breaks_configured? -%}
-        {%- if show_compare_at_price and compare_at_price -%}
-          {%- unless product.price_varies == false and product.compare_at_price_varies %}
-            <span class="visually-hidden visually-hidden--inline">
-              {{- 'products.product.price.regular_price' | t -}}
+    {%- if compare_at_price > price -%}
+      {%- comment -%} On sale price display {%- endcomment -%}
+      <div class="price__sale">
+        <span class="visually-hidden">
+          {{- 'products.product.price.regular_price' | t -}}
+        </span>
+        <span class="price-item price-item--sale price-item--last text-[#01A89E] !flex gap-px !-mb-[8px]">
+          <span class="text-[1.25rem] font-bold md:text-[1.75rem]">
+            {{- money_price | split: '.' | first -}}
+          </span>
+          <span class="flex flex-col text-[8px] md:text-[10px] gap-1 -mt-0.5">
+            <span class=" font-bold leading-[10px]"
+              >.{{ money_price | split: '.' | last -}}
             </span>
-            <span>
-              <s class="price-item price-item--regular variant-item__old-price">
-                {% if settings.currency_code_enabled %}
-                  {{ compare_at_price | money_with_currency }}
-                {% else %}
-                  {{ compare_at_price | money }}
-                {% endif %}
-              </s>
+            <span class=" font-medium leading-[10px]">AED</span>
+          </span>
+        </span>
+        {%- unless product.price_varies == false
+          and product.compare_at_price_varies
+        -%}
+          <span class="visually-hidden">
+            {{- 'products.product.price.sale_price' | t -}}
+          </span>
+          <span class="price-item price-item--regular !text-[10px] text-gray-500">
+            {{- compare_at_price | money_with_currency -}}
+          </span>
+        {%- endunless -%}
+      </div>
+    {%- else -%}
+      {%- comment -%} Regular price display {%- endcomment -%}
+      <div class="price__regular">
+        {%- if product.quantity_price_breaks_configured? -%}
+          <span class="visually-hidden">
+            {{- 'products.product.price.regular_price' | t -}}
+          </span>
+          <span class="price-item price-item--regular  text-[#01A89E] !flex gap-px">
+            <span class="text-lg font-bold md:text-xl">
+              {{- money_price_min | split: '.' | first -}}
             </span>
-          {%- endunless -%}
+            <span class="flex flex-col text-[8px] md:text-[10px] gap-1">
+              <span class=" font-bold leading-[10px]"
+                >.{{ money_price_min | split: '.' | last -}}
+              </span>
+              <span class=" font-medium leading-[10px]">AED</span>
+            </span>
+            -
+            <span class="text-lg font-bold md:text-xl">
+              {{- money_price_max | split: '.' | first -}}
+            </span>
+            <span class="flex flex-col ml-px">
+              <span class="text-[10px] font-bold leading-[10px]"
+                >.{{ money_price_max | split: '.' | last -}}
+              </span>
+              <span class="text-[10px] font-medium leading-[10px]">AED</span>
+            </span>
+          </span>
+        {%- else -%}
+          <span class="visually-hidden">
+            {{- 'products.product.price.regular_price' | t -}}
+          </span>
+          <span class="price-item price-item--sale price-item--last text-[#01A89E] !flex gap-px">
+            <span class="text-[1.25rem] font-bold md:text-[1.75rem]">
+              {{- money_price | split: '.' | first -}}
+            </span>
+            <span class="flex flex-col text-[8px] md:text-[10px] gap-1 -mt-0.5">
+              <span class=" font-bold leading-[10px]"
+                >.{{ money_price | split: '.' | last -}}
+              </span>
+              <span class=" font-medium leading-[10px]">AED</span>
+            </span>
+          </span>
         {%- endif -%}
-        <span class="visually-hidden visually-hidden--inline">{{ 'products.product.price.regular_price' | t }}</span>
-        <span class="price-item price-item--regular">
-          {{- 'products.product.volume_pricing.price_range' | t: minimum: money_price_min, maximum: money_price_max -}}
-        </span>
-      {%- else -%}
-        <span class="visually-hidden visually-hidden--inline">{{ 'products.product.price.regular_price' | t }}</span>
-        <span class="price-item price-item--regular">
-          {{ money_price }}
-        </span>
-      {%- endif -%}
-    </div>
-    <div class="price__sale">
-      {%- unless product.price_varies == false and product.compare_at_price_varies %}
-        <span class="visually-hidden visually-hidden--inline">{{ 'products.product.price.regular_price' | t }}</span>
-        <span>
-          <s class="price-item price-item--regular">
-            {% if settings.currency_code_enabled %}
-              {{ compare_at_price | money_with_currency }}
-            {% else %}
-              {{ compare_at_price | money }}
-            {% endif %}
-          </s>
-        </span>
-      {%- endunless -%}
-      <span class="visually-hidden visually-hidden--inline">{{ 'products.product.price.sale_price' | t }}</span>
-      <span class="price-item price-item--sale price-item--last">
-        {{ money_price }}
+      </div>
+    {%- endif -%}
+
+    <small class="unit-price caption{% if product.selected_or_first_available_variant.unit_price_measurement == nil %} hidden{% endif %} mt-1 ml-1 text-xs text-gray-500">
+      <span class="visually-hidden">
+        {{- 'products.product.price.unit_price' | t -}}
       </span>
-    </div>
-    <small class="unit-price caption{% if product.selected_or_first_available_variant.unit_price_measurement == nil %} hidden{% endif %}">
-      <span class="visually-hidden">{{ 'products.product.price.unit_price' | t }}</span>
       <span class="price-item price-item--last">
-        <span>{{- product.selected_or_first_available_variant.unit_price | money -}}</span>
-        <span aria-hidden="true">/</span>
-        <span class="visually-hidden">&nbsp;{{ 'accessibility.unit_price_separator' | t }}&nbsp;</span>
-        <span>
-          {%- if product.selected_or_first_available_variant.unit_price_measurement.reference_value != 1 -%}
-            {{- product.selected_or_first_available_variant.unit_price_measurement.reference_value -}}
-          {%- endif -%}
-          {{ product.selected_or_first_available_variant.unit_price_measurement.reference_unit }}
-        </span>
+        {{ product.selected_or_first_available_variant.unit_price | money }}/
+        {%- if product.selected_or_first_available_variant.unit_price_measurement.reference_value
+            != 1
+        -%}
+          {{- product.selected_or_first_available_variant.unit_price_measurement.reference_value -}}
+        {%- endif -%}
+        {{ product.selected_or_first_available_variant.unit_price_measurement.reference_unit }}
       </span>
     </small>
   </div>
   {%- if show_badges -%}
-    <span class="badge price__badge-sale color-{{ settings.sale_badge_color_scheme }}">
-      {{ 'products.product.on_sale' | t }}
-    </span>
-
-    <span class="badge price__badge-sold-out color-{{ settings.sold_out_badge_color_scheme }}">
-      {{ 'products.product.sold_out' | t }}
-    </span>
+    <div class="mt-1">
+      {%- if compare_at_price > price -%}
+        <span class="badge price__badge-sale color-{{ settings.sale_badge_color_scheme }} text-xs px-2 py-1 rounded-full">
+          {{ 'products.product.on_sale' | t }}
+        </span>
+      {%- endif -%}
+      {%- unless available -%}
+        <span class="badge price__badge-sold-out color-{{ settings.sold_out_badge_color_scheme }} text-xs px-2 py-1 rounded-full">
+          {{ 'products.product.sold_out' | t }}
+        </span>
+      {%- endunless -%}
+    </div>
   {%- endif -%}
 </div>

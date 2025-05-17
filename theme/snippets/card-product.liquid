@@ -114,7 +114,7 @@
               <a
                 href="{{ card_product.url }}"
                 id="StandardCardNoMediaLink-{{ section_id }}-{{ card_product.id }}"
-                class="full-unstyled-link"
+                class="full-unstyled-link "
                 aria-labelledby="StandardCardNoMediaLink-{{ section_id }}-{{ card_product.id }} NoMediaStandardBadge-{{ section_id }}-{{ card_product.id }}"
               >
                 {{ card_product.title | escape }}
@@ -162,7 +162,7 @@
             <a
               href="{{ card_product.url }}"
               id="CardLink-{{ section_id }}-{{ card_product.id }}"
-              class="full-unstyled-link"
+              class="full-unstyled-link "
               aria-labelledby="CardLink-{{ section_id }}-{{ card_product.id }} Badge-{{ section_id }}-{{ card_product.id }}"
             >
               {{ card_product.title | escape }}
@@ -315,7 +315,15 @@
                     id="{{ product_form_id }}-submit"
                     type="submit"
                     name="add"
-                    class="quick-add__submit w-full flex items-center justify-center px-5 py-2.5 border border-transparent text-md font-medium rounded-[0.4rem] text-white bg-gradient-to-r from-[#01756E] via-[#01A89E] to-[#00CFC8] hover:from-[#01635D] hover:via-[#018F87] hover:to-[#00B8B2] shadow-md transition-all duration-150 ease-out hover:ease-in hover:shadow-lg hover:translate-y-[-0.1rem] active:translate-y-[0.05rem] focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-[#01A89E]{% if horizontal_quick_add %} card--horizontal__quick-add{% endif %}"
+                    class="
+                      quick-add__submit w-full flex items-center justify-center px-5 py-2.5 text-md font-medium rounded-[0.4rem] shadow-md transition-all duration-150 ease-out hover:ease-in focus:outline-none
+                      {% if card_product.selected_or_first_available_variant.available %}
+                        text-white bg-gradient-to-r from-[#01756E] via-[#01A89E] to-[#00CFC8] hover:from-[#01635D] hover:via-[#018F87] hover:to-[#00B8B2] hover:shadow-lg hover:translate-y-[-0.1rem] active:translate-y-[0.05rem] focus:ring-2 focus:ring-offset-1 focus:ring-[#01A89E]
+                      {% else %}
+                        text-gray-600 bg-gray-200 border border-gray-300 cursor-not-allowed hover:bg-gray-200 focus:ring-2 focus:ring-offset-1 focus:ring-gray-400
+                      {% endif %}
+                      {% if horizontal_quick_add %} card--horizontal__quick-add{% endif %}
+                    "
                     aria-haspopup="dialog"
                     aria-labelledby="{{ product_form_id }}-submit title-{{ section_id }}-{{ card_product.id }}"
                     aria-live="polite"
@@ -336,7 +344,9 @@
                     <span class="sold-out-message hidden">
                       {{ 'products.product.sold_out' | t }}
                     </span>
-                    {%- if horizontal_quick_add -%}
+                    {%- if horizontal_quick_add
+                      and card_product.selected_or_first_available_variant.available
+                    -%}
                       <span class="icon-wrap ml-1.5 w-[1.4rem] h-[1.4rem]">
                         {%- render 'icon-plus' -%}
                       </span>

@@ -117,7 +117,7 @@
                 class="full-unstyled-link "
                 aria-labelledby="StandardCardNoMediaLink-{{ section_id }}-{{ card_product.id }} NoMediaStandardBadge-{{ section_id }}-{{ card_product.id }}"
               >
-                {{ card_product.title | escape }}
+                <p class="truncate">{{ card_product.title | escape }}</p>
               </a>
             </h3>
           </div>
@@ -165,7 +165,7 @@
               class="full-unstyled-link "
               aria-labelledby="CardLink-{{ section_id }}-{{ card_product.id }} Badge-{{ section_id }}-{{ card_product.id }}"
             >
-              {{ card_product.title | escape }}
+              <p class="truncate">{{ card_product.title | escape }}</p>
             </a>
           </h3>
           <div class="card-information">
@@ -438,3 +438,30 @@
     </div>
   </div>
 {%- endif -%}
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Get all card wrappers (use querySelectorAll since there are multiple)
+    const wrappers = document.querySelectorAll(
+      '.card-wrapper.product-card-wrapper'
+    )
+
+    wrappers.forEach((wrapper) => {
+      // Get the computed width of each wrapper (not style.width which only gets inline styles)
+      const wrapperWidth = window.getComputedStyle(wrapper).width
+
+      // Find title wrappers within each specific card (scoped to the current wrapper)
+      const titleWrappers = wrapper.querySelectorAll('.full-unstyled-link p')
+
+      titleWrappers.forEach((titleWrapper) => {
+        // Apply the width to the title wrappers
+        titleWrapper.style.width = wrapperWidth
+
+        // Optional: Add text overflow handling
+        titleWrapper.style.whiteSpace = 'nowrap'
+        titleWrapper.style.overflow = 'hidden'
+        titleWrapper.style.textOverflow = 'ellipsis'
+      })
+    })
+  })
+</script>

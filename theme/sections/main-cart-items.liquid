@@ -82,14 +82,18 @@
                 >
                   <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
                     <div class="flex items-center gap-4">
-                      <h3 class="text-1.6 font-semibold text-[#01756E]">
-                        {%- if type == blank -%}
-                          Others
-                        {%- else -%}
-                          {{ type }}
-                        {%- endif -%}
-                      </h3>
-                      <span>({{ type_total | money_with_currency }}) </span>
+                      <div class="flex flex-col md:flex-row md:items-center md:gap-4">
+                        <p class="text-[1.5rem] md:text-[1.7rem] font-semibold text-[#01756E]">
+                          {%- if type == blank -%}
+                            Others
+                          {%- else -%}
+                            {{ type }}
+                          {%- endif -%}
+                        </p>
+                        <span class="text-[1.2rem] md:text-[1.5rem]"
+                          >({{ type_total | money_with_currency }})
+                        </span>
+                      </div>
                       <button
                         class="group ml-auto text-red-600 hover:text-red-800 font-medium relative flex items-center gap-4 disabled:opacity-50 disabled:cursor-not-allowed"
                         data-remove-type="{{ type | escape }}"

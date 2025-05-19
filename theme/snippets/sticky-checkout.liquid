@@ -1,8 +1,8 @@
 <div class="sticky-checkout-container  mt-auto sticky bottom-0 bg-white border-t border-gray-200 py-6">
-  <div class="page-width">
+  <div class="page-width p-0">
     <div class="flex items-center justify-between gap-4">
       <div class="">
-        <div class="flex items-center gap-4">
+        <div class="flex md:items-center md:gap-4 flex-col md:flex-row">
           <p class="text-xl font-medium">
             {{ 'sections.cart.estimated_total' | t }}
           </p>
@@ -12,7 +12,7 @@
           ></p>
         </div>
         <p
-          class="text-lg text-red-600 text-start checkout-warning mt-1"
+          class="text-sm md:text-lg text-red-600 text-start checkout-warning mt-1"
           style="display: none;"
         >
           ⚠️ Please meet the minimum order requirements for all product types to

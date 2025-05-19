@@ -64,12 +64,12 @@
   <div class="page-width">
     {% if settings['enable-loyalty-points'] %}
       {% if customer and cart.item_count != 0 %}
-        <div class="py-2">
-          <p class="text-[2rem]">
+        <div class="pb-4 pt-8">
+          <p class="md:text-[1.7rem] text-[1.4rem]">
             Your total points are:
             <span
               x-text="customerPoints"
-              class="text-[2.2rem] font-semibold rounded-md px-2 py-1"
+              class="font-semibold rounded-md px-2 py-1"
             >
             </span>
             <span x-show="customerPoints">&#8776;</span>
@@ -96,28 +96,36 @@
                   messageToShow = `<p class='text-[14px] text-green-600'>Gift Card Code Has Been Sent to Your Email</p>`
                   navigator.clipboard.writeText(giftCardCode)
                   isLoading = false
-                  }catch(err) {
+                } catch(err) {
                   isLoading = false
                   console.log({err})
                   errorMessage = 'something went wrong, please contact us to figure it out, or try again later'
                 }
               }
             "
-            class="button mt-2"
-            x-bind:disabled="customerPoints === 0"
+            class="w-full mt-2 max-w-[220px] flex items-center justify-center px-5 py-2.5 border border-transparent text-[1.4rem] font-bold rounded-[0.4rem] text-white bg-gradient-to-r from-[#01756E] via-[#01A89E] to-[#00CFC8] hover:from-[#01635D] hover:via-[#018F87] hover:to-[#00B8B2] shadow-md transition-all duration-150 ease-out hover:ease-in hover:shadow-lg hover:translate-y-[-0.1rem] active:translate-y-[0.05rem] focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-[#01A89E] disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-md"
+            x-bind:disabled="customerPoints === 0 || isLoading"
+            x-bind:class="{'opacity-70 cursor-not-allowed': customerPoints === 0 || isLoading}"
           >
-            Redeem Points
+            <span x-show="!isLoading" class="flex items-center">
+              Redeem Points
+            </span>
+            <span x-show="isLoading" class="flex items-center">
+              <svg
+                class="animate-spin -ml-1 mr-2 h-5 w-5 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Processing...
+            </span>
           </button>
         </div>
       {% endif %}
     {% endif %}
-    <div
-      x-show="isLoading"
-      id="redeemPointsLoader"
-      class="w-screen h-screen fixed top-0 start-0 z-[1000] bg-[#12121244] flex items-center justify-center"
-    >
-      <div class="CSSloader text-transparent">1</div>
-    </div>
     <div class="items-end cart__footer isolate section-{{ section.id }}-padding">
       <div class="flex flex-col gap-6">
         {% if settings['enable-promo-code'] %}

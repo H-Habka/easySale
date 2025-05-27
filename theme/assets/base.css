@@ -2679,9 +2679,9 @@ menu-drawer + .header__search {
   line-height: 0;
 }
 
-.header--top-center > .header__search {
+/* .header--top-center > .header__search {
   display: none;
-}
+} */
 
 .header--top-center * > .header__search {
   display: inline-flex;
@@ -3642,10 +3642,13 @@ details-disclosure > details {
   text-align: center !important;
 }
 
-
-.shopify-policy__container a{
-  text-decoration: underline
+.shopify-policy__container a {
+  text-decoration: underline;
 }
-.shopify-policy__container{
-  padding-top: 20px
+.shopify-policy__container {
+  padding-top: 20px;
+}
+
+.header {
+  padding: 6px 1rem 2px 1rem !important;
 }

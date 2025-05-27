@@ -117,7 +117,23 @@
                 class="full-unstyled-link "
                 aria-labelledby="StandardCardNoMediaLink-{{ section_id }}-{{ card_product.id }} NoMediaStandardBadge-{{ section_id }}-{{ card_product.id }}"
               >
-                <p class="truncate">{{ card_product.title | escape }}</p>
+                <div
+                  x-data="
+                    {
+                      raw: '{{ card_product.title | escape }}',
+                      get highlighted() {
+                        // Regex for quantity/unit/x formats
+                        const regex = /(\d{1,5}(?:[.,]\d+)?\s?(?:pcs?|Pcs?|pkts?|pkt|bags?|bag|gm|kg|Kg|ltrs?|ltr|Ltr|ml|gallon|sheet|egg|Tray|cartoon|boxes?|pkt|Pack|bottle|box|sheet|bag|egg|pcs|pkt|gm|kg|ltr|ml|gallon|sheet|egg|tray|carton|sachet|tin|dozen)\b(?:\s*x\s*\d{1,5}(?:[.,]\d+)?\s?(?:pcs?|Pcs?|pkts?|pkt|bags?|bag|gm|kg|Kg|ltrs?|ltr|Ltr|ml|gallon|sheet|egg|Tray|cartoon|boxes?|pkt|Pack|bottle|box|sheet|bag|egg|pcs|pkt|gm|kg|ltr|ml|gallon|sheet|egg|tray|carton|sachet|tin|dozen)?)?)/gi;
+                        // Replace matches with span tags (for highlighting)
+                        return this.raw.replace(regex, match =>
+                          `<span class='text-teal-600 text-[14px] font-semibold'>${match}</span>`
+                        );
+                      }
+                    }
+                  "
+                  x-html="highlighted"
+                  class="text-xl flex flex-col flex-wrap gap-1"
+                ></div>
               </a>
             </h3>
           </div>
@@ -125,7 +141,7 @@
             {%- if card_product.available == false -%}
               <span
                 id="NoMediaStandardBadge-{{ section_id }}-{{ card_product.id }}"
-                class="badge badge--bottom-left color-{{ settings.sold_out_badge_color_scheme }} px-3 py-1.5 rounded-full text-base font-semibold uppercase tracking-wide"
+                class="  badge badge--bottom-left color-{{ settings.sold_out_badge_color_scheme }} px-3 py-1.5 rounded-full text-base font-semibold uppercase tracking-wide"
               >
                 {{- 'products.product.sold_out' | t -}}
               </span>
@@ -165,7 +181,23 @@
               class="full-unstyled-link "
               aria-labelledby="CardLink-{{ section_id }}-{{ card_product.id }} Badge-{{ section_id }}-{{ card_product.id }}"
             >
-              <p class="truncate">{{ card_product.title | escape }}</p>
+              <div
+                x-data="
+                  {
+                    raw: '{{ card_product.title | escape }}',
+                    get highlighted() {
+                      // Regex for quantity/unit/x formats
+                      const regex = /(\d{1,5}(?:[.,]\d+)?\s?(?:pcs?|Pcs?|pkts?|pkt|bags?|bag|gm|kg|Kg|ltrs?|ltr|Ltr|ml|gallon|sheet|egg|Tray|cartoon|boxes?|pkt|Pack|bottle|box|sheet|bag|egg|pcs|pkt|gm|kg|ltr|ml|gallon|sheet|egg|tray|carton|sachet|tin|dozen)\b(?:\s*x\s*\d{1,5}(?:[.,]\d+)?\s?(?:pcs?|Pcs?|pkts?|pkt|bags?|bag|gm|kg|Kg|ltrs?|ltr|Ltr|ml|gallon|sheet|egg|Tray|cartoon|boxes?|pkt|Pack|bottle|box|sheet|bag|egg|pcs|pkt|gm|kg|ltr|ml|gallon|sheet|egg|tray|carton|sachet|tin|dozen)?)?)/gi;
+                      // Replace matches with span tags (for highlighting)
+                      return this.raw.replace(regex, match =>
+                        `<span class='text-teal-600 text-[14px] font-semibold'>${match}</span>`
+                      );
+                    }
+                  }
+                "
+                x-html="highlighted"
+                class="text-xl flex flex-col flex-wrap gap-1"
+              ></div>
             </a>
           </h3>
           <div class="card-information">
@@ -438,30 +470,3 @@
     </div>
   </div>
 {%- endif -%}
-
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    // Get all card wrappers (use querySelectorAll since there are multiple)
-    const wrappers = document.querySelectorAll(
-      '.card-wrapper.product-card-wrapper'
-    )
-
-    wrappers.forEach((wrapper) => {
-      // Get the computed width of each wrapper (not style.width which only gets inline styles)
-      const wrapperWidth = window.getComputedStyle(wrapper).width
-
-      // Find title wrappers within each specific card (scoped to the current wrapper)
-      const titleWrappers = wrapper.querySelectorAll('.full-unstyled-link p')
-
-      titleWrappers.forEach((titleWrapper) => {
-        // Apply the width to the title wrappers
-        titleWrapper.style.width = wrapperWidth
-
-        // Optional: Add text overflow handling
-        titleWrapper.style.whiteSpace = 'nowrap'
-        titleWrapper.style.overflow = 'hidden'
-        titleWrapper.style.textOverflow = 'ellipsis'
-      })
-    })
-  })
-</script>

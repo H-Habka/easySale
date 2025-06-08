@@ -482,8 +482,8 @@
                                         </quantity-input>
                                         <a
                                           href="{{ item.url_to_remove }}"
-                                          class="ml-2 w-10 h-10 flex items-center justify-center text-[#01756E] hover:text-[#01A89E] hover:bg-gray-100 rounded transition-colors duration-150"
                                           aria-label="{{ 'sections.cart.remove_title' | t: title: item.title }}"
+                                          class="w-9 h-9 text-red-600 ml-2"
                                           id="Remove-{{ item.index | plus: 1 }}"
                                           data-index="{{ item.index | plus: 1 }}"
                                         >
@@ -545,8 +545,8 @@
                                   </quantity-input>
                                   <a
                                     href="{{ item.url_to_remove }}"
-                                    class="ml-2 w-10 h-10 flex items-center justify-center text-[#01756E] hover:text-[#01A89E] hover:bg-gray-100 rounded transition-colors duration-150"
                                     aria-label="{{ 'sections.cart.remove_title' | t: title: item.title }}"
+                                    class="w-9 h-9 text-red-600 ml-2"
                                     id="Remove-{{ item.index | plus: 1 }}"
                                     data-index="{{ item.index | plus: 1 }}"
                                   >

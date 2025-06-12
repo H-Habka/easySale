@@ -46,16 +46,18 @@
       src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
       defer="defer"
     ></script>
-    <script>
-      document.addEventListener('DOMContentLoaded', function () {
-        setTimeout(function () {
-          const section = document.getElementById('section_to_scroll_to')
-          if (section) {
-            section.scrollIntoView({ behavior: 'smooth' })
-          }
-        }, 2000)
-      })
-    </script>
+    {% comment %}
+      <script>
+        document.addEventListener('DOMContentLoaded', function () {
+          setTimeout(function () {
+            const section = document.getElementById('section_to_scroll_to')
+            if (section) {
+              section.scrollIntoView({ behavior: 'smooth' })
+            }
+          }, 2000)
+        })
+      </script>
+    {% endcomment %}
 
     {%- if settings.animations_reveal_on_scroll -%}
       <script src="{{ 'animations.js' | asset_url }}" defer="defer"></script>
@@ -427,6 +429,16 @@
         return urlParams.get(param)
       }
 
+      function removeQueryParam(param) {
+          const url = new URL(window.location)
+          url.searchParams.delete(param)
+          window.history.replaceState(
+            {},
+            document.title,
+            url.pathname + url.search
+          )
+        }
+
       function setPromoCodeWithExpiry(promoCode, expiryTimeInMinutes) {
         const now = new Date().getTime() // Current time in milliseconds
         const expiryTime = now + expiryTimeInMinutes * 60 * 1000 // Calculate expiry timestamp
@@ -436,12 +448,7 @@
           'promoCode',
           JSON.stringify({ value: promoCode, expiresAt: expiryTime })
         )
-        // Remove the query string
-        const urlWithoutQuery = window.location.origin + window.location.pathname;
-
-        // Update the URL without reloading the page
-        window.history.replaceState(null, '', urlWithoutQuery);
-
+        removeQueryParam("promo-code")
       }
 
       const promoCode = getQueryParam('promo-code')
@@ -862,6 +869,116 @@
         defer="defer"
       ></script>
     {%- endif -%}
+
+    <script>
+      document.addEventListener('DOMContentLoaded', async function () {
+        // 1. Detect shared-cart in URL
+        function getQueryParam(param) {
+          const urlParams = new URLSearchParams(window.location.search)
+          return urlParams.get(param)
+        }
+
+        const sharedCartId = getQueryParam('shared-cart')
+        if (!sharedCartId) return // No shared cart
+
+        // 3. Show loading state (optional, improve UX)
+        const loadingNotice = document.createElement('div')
+        loadingNotice.textContent = 'Loading shared cart...'
+        loadingNotice.style.cssText = `
+          position: fixed;
+          top: 18px;
+          left: 50%;
+          transform: translateX(-50%);
+          z-index: 99999;
+          padding: 1rem 2rem;
+          border-radius: 12px;
+          background: #01A89E;
+          color: #fff;
+          font-size: 1.25rem;
+          font-weight: 500;
+          max-width: 92vw;
+          min-width: 200px;
+          box-shadow: 0 6px 28px rgba(1,168,158,0.14);
+          text-align: center;
+        `
+
+        if (window.innerWidth < 600) {
+          loadingNotice.style.fontSize = '1rem'
+          loadingNotice.style.padding = '0.7rem 1.2rem'
+          loadingNotice.style.top = '12px'
+          loadingNotice.style.minWidth = '120px'
+        }
+
+        document.body.appendChild(loadingNotice)
+
+        try {
+          // 4. Fetch shared cart details from your backend
+          const api = `{{settings['loyalty-points-server-URL']}}/shared-carts/${sharedCartId}`
+          const res = await fetch(api)
+          const json = await res.json()
+
+          if (
+            !res.ok ||
+            !json.data ||
+            !Array.isArray(json.data.items) ||
+            !json.data.items.length
+          ) {
+            loadingNotice.textContent = 'Shared cart not found or empty.'
+            setTimeout(() => loadingNotice.remove(), 2500)
+            removeQueryParam('shared-cart')
+            return
+          }
+
+          // 5. Prepare updates for Shopify cart
+          const updates = {}
+          // You might want to clear the cart first for a true "replace" effect
+          try {
+            const cartRes = await fetch('/cart.js')
+            const currentCart = await cartRes.json()
+            if (currentCart.items && currentCart.items.length) {
+              currentCart.items.forEach((item) => {
+                updates[item.key] = 0 // set all current to zero
+              })
+            }
+            const updateRes = await fetch('/cart/update.js', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ updates }),
+            })
+            if (!updateRes.ok) throw new Error('Failed to update cart')
+          } catch (e) {}
+
+          // Add shared cart items
+          const updates2 = {}
+          json.data.items.forEach((item) => {
+            if (item.variantId && item.quantity > 0) {
+              updates2[item.variantId] = item.quantity
+            }
+          })
+
+          // 6. Update the cart via Shopify AJAX API
+          const updateRes = await fetch('/cart/update.js', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ updates: updates2 }),
+          })
+          if (!updateRes.ok) throw new Error('Failed to update cart')
+
+          loadingNotice.textContent = 'Cart loaded from shared link!'
+          setTimeout(() => loadingNotice.remove(), 1200)
+
+          // 7. Remove shared-cart from URL
+          removeQueryParam('shared-cart')
+
+          // 8. Optionally: Reload page to show new cart state
+          setTimeout(() => (window.location.href = '/cart'), 1000)
+        } catch (err) {
+          loadingNotice.textContent = 'Error loading shared cart.'
+          setTimeout(() => loadingNotice.remove(), 2500)
+          removeQueryParam('shared-cart')
+        }
+      })
+    </script>
   </body>
 
   <script>

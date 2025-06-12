@@ -13,9 +13,39 @@
 <cart-items class="gradient color-{{ section.settings.color_scheme }} isolate{% if cart == empty %} is-empty{% else %} section-{{ section.id }}-padding{% endif %}">
   <div class="page-width">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-10">
-      <h1 class="text-2.4 md:text-2.8 font-semibold text-[#01635D] tracking-tight">
-        {{ 'sections.cart.title' | t }}
-      </h1>
+      <div class="flex items-center gap-6 sm:flex-col justify-between">
+        <h1 class="text-2.4 md:text-2.8 !mb-1 !mt-1 font-semibold text-[#01635D] tracking-tight">
+          {{ 'sections.cart.title' | t }}
+        </h1>
+        <button
+          id="share-cart-btn"
+          type="button"
+          class="inline-flex sm:mt-[10px] items-center gap-2 px-3 py-1.5 text-1.4 font-medium rounded-lg border border-[#01A89E] text-[#01A89E] hover:bg-[#01A89E] hover:text-white transition-colors duration-200 relative"
+        >
+          <svg
+            width="1.5rem"
+            height="1.5rem"
+            fill="none"
+            viewBox="0 0 24 24"
+            class="share-cart-icon"
+          >
+            <path d="M16 12l5-4.5m0 0L16 3m5 4.5H10.8a5.8 5.8 0 000 11.6H12"
+                  stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span class="share-cart-text">Share Cart</span>
+          <!-- Spinner (hidden by default) -->
+          <svg
+            id="share-cart-spinner"
+            class="hidden animate-spin ml-1"
+            width="22"
+            height="22"
+            viewBox="0 0 22 22"
+            fill="none"
+          >
+            <circle cx="11" cy="11" r="10" stroke="#01A89E" stroke-width="3" stroke-linecap="round" stroke-dasharray="60" stroke-dashoffset="20"/>
+          </svg>
+        </button>
+      </div>
       <a
         href="{{ routes.all_products_collection_url }}"
         class="inline-flex items-center text-1.4 font-medium text-[#01A89E] hover:text-[#01635D] transition-colors duration-200 group"
@@ -725,6 +755,79 @@
     }
 
     document.addEventListener('DOMContentLoaded', evaluateCheckoutAvailability)
+  </script>
+
+  <script>
+    // Replace this with your actual method to get the current cart items as array
+    async function getCartItems() {
+      // Example: Fetch cart from Shopify's cart API
+      const res = await fetch('/cart.js')
+      const cart = await res.json()
+      // Map your items to { variantId, quantity }
+      return cart.items.map((item) => ({
+        variantId: item.variant_id,
+        quantity: item.quantity,
+      }))
+    }
+
+    async function shareCart() {
+      const btn = document.getElementById('share-cart-btn');
+      const spinner = document.getElementById('share-cart-spinner');
+      const btnText = btn.querySelector('.share-cart-text');
+      const btnIcon = btn.querySelector('.share-cart-icon');
+      btn.disabled = true;
+      if (spinner) spinner.classList.remove('hidden');
+      if (btnText) btnText.textContent = 'Sharing...';
+      if (btnIcon) btnIcon.classList.add('opacity-40');
+
+      try {
+        const items = await getCartItems();
+        if (!items.length) {
+          alert('Cart is empty!');
+          return;
+        }
+
+        const customer_id = {{customer.id | default: 'null'}};
+        const expires_at = null;
+
+        const response = await fetch('{{settings['loyalty-points-server-URL']}}/shared-carts', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            customer_id,
+            items,
+            expires_at,
+          }),
+        });
+
+        const data = await response.json();
+
+        const promoCode = getPromoCode()
+
+        if (response.ok && data.data && data.data.shareable_link) {
+          const shareUrl = `${window.location.origin}?shared-cart=${data.data.shareable_link}&promo-code=${promoCode}`;
+          await navigator.clipboard.writeText(shareUrl);
+          alert('Cart shared! Link copied to clipboard:\n' + shareUrl);
+        } else {
+          alert('Failed to create shared cart. Try again.');
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Error sharing cart.');
+      } finally {
+        btn.disabled = false;
+        if (spinner) spinner.classList.add('hidden');
+        if (btnText) btnText.textContent = 'Share Cart';
+        if (btnIcon) btnIcon.classList.remove('opacity-40');
+      }
+    }
+
+
+    document
+      .getElementById('share-cart-btn')
+      .addEventListener('click', shareCart)
   </script>
 </cart-items>
 

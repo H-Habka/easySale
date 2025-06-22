@@ -99,7 +99,7 @@
             <span class="text-lg font-bold md:text-xl">
               {{- money_price_max | split: '.' | first -}}
             </span>
-            <span class="flex flex-col ml-px">
+            <span class="flex flex-col m-px">
               <span class="text-[10px] font-bold leading-[10px]"
                 >.{{ money_price_max | split: '.' | last -}}
               </span>
@@ -145,7 +145,7 @@
       </div>
     {%- endif -%}
 
-    <small class="unit-price caption{% if product.selected_or_first_available_variant.unit_price_measurement == nil %} hidden{% endif %} mt-1 ml-1 text-xs text-gray-500">
+    <small class="unit-price caption{% if product.selected_or_first_available_variant.unit_price_measurement == nil %} hidden{% endif %} mt-1 ms-1 text-xs text-gray-500">
       <span class="visually-hidden">
         {{- 'products.product.price.unit_price' | t -}}
       </span>

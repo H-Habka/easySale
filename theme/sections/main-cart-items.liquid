@@ -38,7 +38,7 @@
           <!-- Spinner (hidden by default) -->
           <svg
             id="share-cart-spinner"
-            class="hidden animate-spin ml-1"
+            class="hidden animate-spin ms-1"
             width="22"
             height="22"
             viewBox="0 0 22 22"
@@ -53,7 +53,7 @@
         class="inline-flex items-center text-1.4 font-medium text-[#01A89E] hover:text-[#01635D] transition-colors duration-200 group"
       >
         {{ 'general.continue_shopping' | t }}
-        <span class="rtl:rotate-180 ml-2 inline-block transform group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-transform duration-200">
+        <span class="rtl:rotate-180 ms-2 inline-block transform group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-transform duration-200">
           <svg
             width="1.4rem"
             height="1.4rem"
@@ -392,7 +392,7 @@
                                       <s class="text-gray-500">
                                         {{- item.original_price | money -}}
                                       </s>
-                                      <span class="ml-2 font-medium text-[#01756E]">
+                                      <span class="ms-2 font-medium text-[#01756E]">
                                         {{- item.final_price | money -}}
                                       </span>
                                     </div>
@@ -412,7 +412,7 @@
                                       -%}
                                         {%- for option in item.options_with_values -%}
                                           <div class="flex">
-                                            <dt class="font-medium text-gray-700 mr-1">
+                                            <dt class="font-medium text-gray-700 me-1">
                                               {{ option.name }}:
                                             </dt>
                                             <dd>{{ option.value }}</dd>
@@ -427,7 +427,7 @@
                                           and property_first_char != '_'
                                         -%}
                                           <div class="flex">
-                                            <dt class="font-medium text-gray-700 mr-1">
+                                            <dt class="font-medium text-gray-700 me-1">
                                               {{ property.first }}:
                                             </dt>
                                             <dd>
@@ -464,7 +464,7 @@
                                     {%- for discount in item.line_level_discount_allocations -%}
                                       <li class="text-[#01A89E] flex items-center">
                                         {%- render 'icon-discount' -%}
-                                        <span class="ml-1">
+                                        <span class="ms-1">
                                           {{- discount.discount_application.title -}}
                                         </span>
                                       </li>
@@ -521,7 +521,7 @@
                                         <a
                                           href="{{ item.url_to_remove }}"
                                           aria-label="{{ 'sections.cart.remove_title' | t: title: item.title }}"
-                                          class="w-9 h-9 text-red-600 ml-2"
+                                          class="w-9 h-9 text-red-600 ms-2"
                                           id="Remove-{{ item.index | plus: 1 }}"
                                           data-index="{{ item.index | plus: 1 }}"
                                         >
@@ -584,7 +584,7 @@
                                   <a
                                     href="{{ item.url_to_remove }}"
                                     aria-label="{{ 'sections.cart.remove_title' | t: title: item.title }}"
-                                    class="w-9 h-9 text-red-600 ml-2"
+                                    class="w-9 h-9 text-red-600 ms-2"
                                     id="Remove-{{ item.index | plus: 1 }}"
                                     data-index="{{ item.index | plus: 1 }}"
                                   >

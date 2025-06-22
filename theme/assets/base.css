@@ -3652,3 +3652,14 @@ details-disclosure > details {
 .header {
   padding: 6px 1rem 2px 1rem !important;
 }
+
+@media (min-width: 750px) {
+  .mobile-only {
+    display: none !important;
+  }
+}
+@media (max-width: 749px) {
+  .mobile-only {
+    display: block !important;
+  }
+}

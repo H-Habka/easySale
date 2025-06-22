@@ -111,14 +111,34 @@
             {{- 'products.product.price.regular_price' | t -}}
           </span>
           <span class="price-item price-item--sale price-item--last text-[#01A89E] !flex gap-px">
-            <span class="text-[1.25rem] font-bold md:text-[1.75rem]">
-              {{- money_price | split: '.' | first -}}
-            </span>
-            <span class="flex flex-col text-[8px] md:text-[10px] gap-1 -mt-0.5">
-              <span class=" font-bold leading-[10px]"
-                >.{{ money_price | split: '.' | last -}}
+            {% assign money_helper_text = money_price | split: ' ' | first %}
+            {% assign digits = '0,1,2,3,4,5,6,7,8,9,٠,١,٢,٣,٤,٥,٦,٧,٨,٩'
+              | split: ','
+            %}
+            {% assign show_helper = true %}
+
+            {% for digit in digits %}
+              {% if money_helper_text contains digit %}
+                {% assign show_helper = false %}
+              {% endif %}
+            {% endfor %}
+
+            {% if show_helper %}
+              <span class="text-[1.25rem] font-bold md:text-[1.75rem] me-1">
+                {{- money_helper_text -}}
               </span>
-              <span class=" font-medium leading-[10px]">AED</span>
+            {% endif %}
+            {% assign money_main_digits = money_price | split: ' ' | last %}
+            <span dir="ltr" class="flex gap-0.5">
+              <span class="text-[1.25rem] font-bold md:text-[1.75rem]">
+                {{- money_main_digits | split: '.' | first -}}
+              </span>
+              <span class="flex flex-col text-[8px] md:text-[10px] gap-1 -mt-0.5">
+                <span class=" font-bold leading-[10px]">
+                  .{{ money_price | split: '.' | last -}}
+                </span>
+                <span class=" font-medium leading-[10px]">AED</span>
+              </span>
             </span>
           </span>
         {%- endif -%}

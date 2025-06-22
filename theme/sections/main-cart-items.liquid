@@ -32,7 +32,9 @@
             <path d="M16 12l5-4.5m0 0L16 3m5 4.5H10.8a5.8 5.8 0 000 11.6H12"
                   stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
-          <span class="share-cart-text">Share Cart</span>
+          <span class="share-cart-text">
+            {{- 'extra_translations.share_cart' | t -}}
+          </span>
           <!-- Spinner (hidden by default) -->
           <svg
             id="share-cart-spinner"
@@ -115,7 +117,7 @@
                       <div class="flex flex-col md:flex-row md:items-center md:gap-4">
                         <p class="text-[1.5rem] md:text-[1.7rem] font-semibold text-[#01756E]">
                           {%- if type == blank -%}
-                            Others
+                            {{ 'extra_translations.others' | t }}
                           {%- else -%}
                             {{ type }}
                           {%- endif -%}
@@ -125,7 +127,7 @@
                         </span>
                       </div>
                       <button
-                        class="group ml-auto text-red-600 hover:text-red-800 font-medium relative flex items-center gap-4 disabled:opacity-50 disabled:cursor-not-allowed"
+                        class="group ms-auto text-red-600 hover:text-red-800 font-medium relative flex items-center gap-4 disabled:opacity-50 disabled:cursor-not-allowed"
                         data-remove-type="{{ type | escape }}"
                         type="button"
                         onclick="handleDeleteTypeGroup(this)"
@@ -140,7 +142,9 @@
                           <div class="w-8">
                             {% render 'icon-remove' %}
                           </div>
-                          <span class="whitespace-nowrap">Remove all</span>
+                          <span class="whitespace-nowrap">
+                            {{- 'extra_translations.remove_all' | t -}}
+                          </span>
                         </div>
                       </button>
                     </div>
@@ -193,7 +197,7 @@
                           </div>
                           <!-- Icon at the Start -->
                           <div
-                            class="absolute top-1/2 left-0 -translate-y-1/2 -translate-x-1/2 rounded-full p-2.5 border border-blue-700 shadow-md bg-blue-500 buttonLoading text-white"
+                            class="absolute top-1/2 start-0 -translate-y-1/2 -translate-x-1/2  rtl:translate-x-1/2 rounded-full p-2.5 border border-blue-700 shadow-md bg-blue-500 buttonLoading text-white"
                           >
                             <svg
                               data-slot="icon"
@@ -203,7 +207,7 @@
                               viewBox="0 0 24 24"
                               xmlns="http://www.w3.org/2000/svg"
                               aria-hidden="true"
-                              class="w-7 h-7"
+                              class="w-7 h-7 rtl:rotate-180"
                             >
                               <path
                                 stroke-linecap="round"
@@ -212,15 +216,15 @@
                               ></path>
                             </svg>
                             <p
-                              class="absolute top-full mt-2 left-0 text-gray-600 z-[10] text-lg"
+                              class="absolute top-full mt-2 start-0 text-gray-600 z-[10] text-lg"
                             >
-                              Start
+                              {{- 'extra_translations.start' | t -}}
                             </p>
                           </div>
                           <!-- Icon in the Middle -->
                           <div
                             x-bind:hidden="minOrderAmount == 0"
-                            x-bind:style="{ left: `${minOrderAmountIconPosition()}%` }"
+                            x-bind:style="{ inset-inline-start:`${minOrderAmountIconPosition()}%` }"
                             x-bind:class="hasReached(minOrderAmountIconPosition()) ? 'bg-blue-500 buttonLoading text-white' : 'text-blue-500 bg-white'"
                             class="absolute top-1/2 -translate-y-1/2 rounded-full p-2.5 border border-blue-700 shadow-md"
                           >
@@ -242,7 +246,7 @@
                             </svg>
                             <!-- Check Icon -->
                             <div
-                              class="absolute top-[-8px] right-[-6px]"
+                              class="absolute top-[-8px] end-[-6px]"
                               x-bind:class="hasReached(minOrderAmountIconPosition()) ? 'text-green-500' : 'hidden'"
                             >
                               <svg
@@ -259,9 +263,11 @@
                               </svg>
                             </div>
                             <div
-                              class="absolute top-full left-1/2 -translate-x-1/2 mt-2 text-gray-600 z-[10] text-lg flex flex-col text-center gap-0.5"
+                              class="absolute top-full start-1/2 -translate-x-1/2  rtl:translate-x-1/2 mt-2 text-gray-600 z-[10] text-lg flex flex-col text-center gap-0.5"
                             >
-                              <p class="whitespace-nowrap">Min.value</p>
+                              <p class="whitespace-nowrap">
+                                {{- 'extra_translations.min_value' | t -}}
+                              </p>
                               <p
                                 class="font-semibold whitespace-nowrap"
                                 x-text="formatNumbers(minOrderAmount)"
@@ -271,10 +277,10 @@
                           <!-- Icon at the End -->
                           <div
                             x-bind:class="hasReached(100) ? 'bg-blue-500 buttonLoading text-white' : 'text-blue-500 bg-white'"
-                            class="absolute top-1/2 right-0 -translate-y-1/2 translate-x-1/2  rounded-full p-2.5 border border-blue-700 shadow-md"
+                            class="absolute top-1/2 end-0 -translate-y-1/2 translate-x-1/2 rtl:-translate-x-1/2  rounded-full p-2.5 border border-blue-700 shadow-md"
                           >
                             <div
-                              class="absolute top-[-8px] right-[-6px]"
+                              class="absolute top-[-8px] end-[-6px]"
                               x-bind:class="hasReached(100) ? 'text-green-500' : 'hidden'"
                             >
                               <svg
@@ -307,9 +313,11 @@
                               ></path>
                             </svg>
                             <div
-                              class="absolute right-0 top-full mt-2 text-gray-600 z-[10] text-lg flex flex-col text-center gap-0.5 "
+                              class="absolute end-0 top-full mt-2 text-gray-600 z-[10] text-lg flex flex-col text-center gap-0.5 "
                             >
-                              <p class="whitespace-nowrap">Free Delivery</p>
+                              <p class="whitespace-nowrap">
+                                {{- 'extra_translations.free_delivery' | t -}}
+                              </p>
                               <p
                                 class="font-semibold whitespace-nowrap"
                                 x-text="formatNumbers(freeShippingLimit)"
@@ -324,22 +332,22 @@
                     <thead class="border-b border-gray-200">
                       <tr>
                         <th
-                          class="text-left py-4 px-6 font-medium text-gray-700"
+                          class="text-start py-4 px-6 font-medium text-gray-700"
                           colspan="1"
                         >
-                          Product
+                          {{- 'extra_translations.product' | t -}}
                         </th>
                         <th
                           class="text-start py-4 px-6 font-medium text-gray-700 small-hide"
                           colspan="1"
                         >
-                          Quantity
+                          {{- 'extra_translations.quantity' | t -}}
                         </th>
                         <th
                           class="text-end py-4 px-6 font-medium text-gray-700"
                           colspan="1"
                         >
-                          Total
+                          {{- 'extra_translations.total' | t -}}
                         </th>
                       </tr>
                     </thead>
@@ -585,7 +593,7 @@
                                 </div>
                               </quantity-popover>
                             </td>
-                            <td class="py-4 px-6 text-right">
+                            <td class="py-4 px-6 text-end">
                               {%- if item.original_line_price
                                   != item.final_line_price
                               -%}
@@ -627,6 +635,31 @@
           >
             {{ 'accessibility.loading' | t }}
           </p>
+          <input
+            type="hidden"
+            id="cart-empty-msg"
+            value="{{ 'extra_translations.cart_is_empty' | t }}"
+          >
+          <input
+            type="hidden"
+            id="sharing-msg"
+            value="{{ 'extra_translations.sharing' | t }}"
+          >
+          <input
+            type="hidden"
+            id="cart-shared-link-msg"
+            value="{{ 'extra_translations.cart_shared_link_copied' | t }}"
+          >
+          <input
+            type="hidden"
+            id="failed-create-shared-cart-msg"
+            value="{{ 'extra_translations.failed_to_create_shared_cart' | t }}"
+          >
+          <input
+            type="hidden"
+            id="error-sharing-cart-msg"
+            value="{{ 'extra_translations.error_sharing_cart' | t }}"
+          >
         </form>
         {% render 'sticky-checkout', cart_total: cart.total_price | money_with_currency %}
       </div>
@@ -692,6 +725,8 @@
       const isPromoCodeRequired = cartFooterAlpineData.isPromoCodeRequired
       cartFooterAlpineData.promoCodeContent = storedPromoCode
       let promoCodeContent = cartFooterAlpineData.promoCodeContent
+      const promoCodeIsValid =
+        promoCodeContent === '' || /^\d+_[a-zA-Z0-9]{8}$/.test(promoCodeContent)
 
       const checkpoints = document.querySelectorAll('.shipping-checkpoint')
       let allPassed = true
@@ -714,7 +749,7 @@
       }
 
       const checkoutDisableStateDueToPromoCode =
-        isPromoCodeEnabled && isPromoCodeRequired && !promoCodeContent
+        isPromoCodeEnabled && isPromoCodeRequired && !promoCodeIsValid
 
       const isCheckoutButtonDisabled =
         !allPassed || checkoutDisableStateDueToPromoCode
@@ -770,59 +805,67 @@
       }))
     }
 
-    async function shareCart() {
-      const btn = document.getElementById('share-cart-btn');
-      const spinner = document.getElementById('share-cart-spinner');
-      const btnText = btn.querySelector('.share-cart-text');
-      const btnIcon = btn.querySelector('.share-cart-icon');
-      btn.disabled = true;
-      if (spinner) spinner.classList.remove('hidden');
-      if (btnText) btnText.textContent = 'Sharing...';
-      if (btnIcon) btnIcon.classList.add('opacity-40');
+  async function shareCart() {
+    const btn = document.getElementById('share-cart-btn');
+    const spinner = document.getElementById('share-cart-spinner');
+    const btnText = btn.querySelector('.share-cart-text');
+    const btnIcon = btn.querySelector('.share-cart-icon');
 
-      try {
-        const items = await getCartItems();
-        if (!items.length) {
-          alert('Cart is empty!');
-          return;
-        }
+    // Translation strings from hidden inputs
+    const sharingMsg = document.getElementById('sharing-msg').value;
+    const cartEmptyMsg = document.getElementById('cart-empty-msg').value;
+    const cartSharedLinkMsg = document.getElementById('cart-shared-link-msg').value;
+    const failedCreateSharedCartMsg = document.getElementById('failed-create-shared-cart-msg').value;
+    const errorSharingCartMsg = document.getElementById('error-sharing-cart-msg').value;
 
-        const customer_id = {{customer.id | default: 'null'}};
-        const expires_at = null;
+    btn.disabled = true;
+    if (spinner) spinner.classList.remove('hidden');
+    if (btnText) btnText.textContent = sharingMsg;
+    if (btnIcon) btnIcon.classList.add('opacity-40');
 
-        const response = await fetch('{{settings['loyalty-points-server-URL']}}/shared-carts', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            customer_id,
-            items,
-            expires_at,
-          }),
-        });
-
-        const data = await response.json();
-
-        const promoCode = getPromoCode()
-
-        if (response.ok && data.data && data.data.shareable_link) {
-          const shareUrl = `${window.location.origin}?shared-cart=${data.data.shareable_link}&promo-code=${promoCode}`;
-          await navigator.clipboard.writeText(shareUrl);
-          alert('Cart shared! Link copied to clipboard:\n' + shareUrl);
-        } else {
-          alert('Failed to create shared cart. Try again.');
-        }
-      } catch (err) {
-        console.error(err);
-        alert('Error sharing cart.');
-      } finally {
-        btn.disabled = false;
-        if (spinner) spinner.classList.add('hidden');
-        if (btnText) btnText.textContent = 'Share Cart';
-        if (btnIcon) btnIcon.classList.remove('opacity-40');
+    try {
+      const items = await getCartItems();
+      if (!items.length) {
+        alert(cartEmptyMsg);
+        return;
       }
+
+      const customer_id = {{customer.id | default: 'null'}};
+      const expires_at = null;
+      const promoCode = getPromoCode();
+
+      const response = await fetch('{{settings['loyalty-points-server-URL']}}/shared-carts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          customer_id,
+          items,
+          expires_at,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.data && data.data.shareable_link) {
+        const shareUrl = `${window.location.origin}?shared-cart=${data.data.shareable_link}&promo-code=${promoCode}`;
+        await navigator.clipboard.writeText(shareUrl);
+        alert(`${cartSharedLinkMsg}\n${shareUrl}`);
+      } else {
+        alert(failedCreateSharedCartMsg);
+      }
+    } catch (err) {
+      console.error(err);
+      alert(errorSharingCartMsg);
+    } finally  {
+      btn.disabled = false;
+      if (spinner) spinner.classList.add('hidden');
+      if (btnText) btnText.textContent = document.getElementById('share-cart-text')?.value || '{{ "extra_translations.share_cart" | t }}';
+      if (btnIcon) btnIcon.classList.remove('opacity-40');
     }
+  }
+
 
 
     document

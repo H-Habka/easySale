@@ -114,7 +114,7 @@
                   }
                 "
                 x-init="
-                                                                                       document.getElementById('checkout').disabled = cartTotal < minOrderAmount
+                                                                                                                                                                                 document.getElementById('checkout').disabled = cartTotal < minOrderAmount
                 "
                 class="relative w-[95%] md:w-full mx-auto bg-gray-300 rounded-full shadow-md dark:bg-gray-800 mb-[70px]"
               >
@@ -128,7 +128,7 @@
 
                 <!-- Icon at the Start -->
                 <div
-                  class="absolute top-1/2 left-0 -translate-y-1/2 -translate-x-1/2 rounded-full p-2.5 border border-blue-700 shadow-md bg-blue-500 buttonLoading text-white"
+                  class="absolute top-1/2 start-0 -translate-y-1/2 -translate-x-1/2 rounded-full p-2.5 border border-blue-700 shadow-md bg-blue-500 buttonLoading text-white"
                 >
                   <svg
                     data-slot="icon"
@@ -147,7 +147,7 @@
                     ></path>
                   </svg>
                   <p
-                    class="absolute top-full mt-2 left-0 text-gray-600 z-[10] text-lg"
+                    class="absolute top-full mt-2 start-0 text-gray-600 z-[10] text-lg"
                   >
                     Start
                   </p>
@@ -156,7 +156,7 @@
                 <!-- Icon in the Middle -->
                 <div
                   x-bind:hidden="minOrderAmount == 0"
-                  x-bind:style="{ left: `${minOrderAmountIconPosition()}%` }"
+                  x-bind:style="{ inset-inline-start: `${minOrderAmountIconPosition()}%` }"
                   x-bind:class="hasReached(minOrderAmountIconPosition()) ? 'bg-blue-500 buttonLoading text-white' : 'text-blue-500 bg-white'"
                   class="absolute top-1/2 -translate-y-1/2 rounded-full p-2.5 border border-blue-700 shadow-md"
                 >
@@ -179,7 +179,7 @@
 
                   <!-- Check Icon -->
                   <div
-                    class="absolute top-[-8px] right-[-6px]"
+                    class="absolute top-[-8px] end-[-6px]"
                     x-bind:class="hasReached(minOrderAmountIconPosition()) ? 'text-green-500' : 'hidden'"
                   >
                     <svg
@@ -197,7 +197,7 @@
                   </div>
 
                   <div
-                    class="absolute top-full left-1/2 -translate-x-1/2 mt-2 text-gray-600 z-[10] text-lg flex flex-col text-center gap-0.5"
+                    class="absolute top-full start-1/2 -translate-x-1/2 mt-2 text-gray-600 z-[10] text-lg flex flex-col text-center gap-0.5"
                   >
                     <p class="whitespace-nowrap">Min.value</p>
                     <p
@@ -210,10 +210,10 @@
                 <!-- Icon at the End -->
                 <div
                   x-bind:class="hasReached(100) ? 'bg-blue-500 buttonLoading text-white' : 'text-blue-500 bg-white'"
-                  class="absolute top-1/2 right-0 -translate-y-1/2 translate-x-1/2  rounded-full p-2.5 border border-blue-700 shadow-md"
+                  class="absolute top-1/2 end-0 -translate-y-1/2 translate-x-1/2  rounded-full p-2.5 border border-blue-700 shadow-md"
                 >
                   <div
-                    class="absolute top-[-8px] right-[-6px]"
+                    class="absolute top-[-8px] end-[-6px]"
                     x-bind:class="hasReached(100) ? 'text-green-500' : 'hidden'"
                   >
                     <svg
@@ -246,9 +246,11 @@
                     ></path>
                   </svg>
                   <div
-                    class="absolute right-0 top-full mt-2 text-gray-600 z-[10] text-lg flex flex-col text-center gap-0.5 "
+                    class="absolute end-0 top-full mt-2 text-gray-600 z-[10] text-lg flex flex-col text-center gap-0.5 "
                   >
-                    <p class="whitespace-nowrap">Free Delivery</p>
+                    <p class="whitespace-nowrap">
+                      {{- 'extra_translations.free_delivery' | t -}}
+                    </p>
                     <p
                       class="font-semibold whitespace-nowrap"
                       x-text="formatNumbers(freeShippingLimit)"

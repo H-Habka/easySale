@@ -62,7 +62,7 @@
       </div>
 
       {%- if section.blocks.size > 1 -%}
-        <div class="slider-navigation absolute bottom-4 left-0 right-0 flex justify-center gap-2 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
+        <div class="slider-navigation absolute bottom-4 start-0 end-0 flex justify-center gap-2 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
           {%- for block in section.blocks -%}
             <button
               class="slider-dot w-2 h-2 rounded-full bg-white opacity-50 transition-all duration-300 {% if forloop.first %}!opacity-100 !w-4{% endif %}"
@@ -76,7 +76,7 @@
 
         <button
           type="button"
-          class="slider-button prev-button absolute left-4 top-1/2 -translate-y-1/2 bg-white bg-opacity-80 p-2 rounded-full hover:bg-opacity-100 transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100"
+          class="slider-button prev-button absolute start-4 top-1/2 -translate-y-1/2 bg-white bg-opacity-80 p-2 rounded-full hover:bg-opacity-100 transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100"
           aria-label="Previous Slide"
           data-slider-prev
         >
@@ -96,7 +96,7 @@
 
         <button
           type="button"
-          class="slider-button next-button absolute right-4 top-1/2 -translate-y-1/2 bg-white bg-opacity-80 p-2 rounded-full hover:bg-opacity-100 transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100"
+          class="slider-button next-button absolute end-4 top-1/2 -translate-y-1/2 bg-white bg-opacity-80 p-2 rounded-full hover:bg-opacity-100 transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100"
           aria-label="Next Slide"
           data-slider-next
         >

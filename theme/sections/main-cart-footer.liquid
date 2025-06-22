@@ -58,6 +58,11 @@
       isLoyaltyPointsEnabled: {{ settings['enable-loyalty-points'] }},
       loyaltyPointsConversionRate: {{ settings['loyalty-points-to-AED-conversion-rate'] }},
       promoCodeContent: '',
+      isPromoCodeValid() {
+      // Matches: one or more digits, underscore, then one or more alphanumeric (letters/numbers)
+      const regex = /^\d+_[a-zA-Z0-9]{8}$/;
+        return this.promoCodeContent === '' || regex.test(this.promoCodeContent);
+      }
     }
   "
 >
@@ -66,7 +71,7 @@
       {% if customer and cart.item_count != 0 %}
         <div class="pb-4 pt-8">
           <p class="md:text-[1.7rem] text-[1.4rem]">
-            Your total points are:
+            {{- 'extra_translations.messages.total_points_are' | t -}}
             <span
               x-text="customerPoints"
               class="font-semibold rounded-md px-2 py-1"
@@ -83,7 +88,7 @@
             x-show="messageToShow"
             x-html="messageToShow"
           ></div>
-          <p x-text="errorMessage" class="text-red-600 text-[14px]"></p>
+          <p x-html="errorMessage" class="text-red-600 text-[14px]"></p>
           <button
             x-on:click="
               async () => {
@@ -93,13 +98,13 @@
                   isLoading = true
                   const { giftCardCode } = await redeemPoints({customerId})
                   customerPoints = 0
-                  messageToShow = `<p class='text-[14px] text-green-600'>Gift Card Code Has Been Sent to Your Email</p>`
+                  messageToShow = `<p class='text-[14px] text-green-600'>{{- 'extra_translations.messages.gift_card_code_sent' | t -}}</p>`
                   navigator.clipboard.writeText(giftCardCode)
-                  isLoading = false
+                  isLoading = falseS
                 } catch(err) {
                   isLoading = false
                   console.log({err})
-                  errorMessage = 'something went wrong, please contact us to figure it out, or try again later'
+                  errorMessage = `<span>{{- 'extra_translations.messages.gift_card_generate_failed' | t -}}</span>`
                 }
               }
             "
@@ -120,7 +125,7 @@
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
-              Processing...
+              {{- 'extra_translations.processing' | t -}}
             </span>
           </button>
         </div>
@@ -131,7 +136,8 @@
         {% if settings['enable-promo-code'] %}
           <div class="">
             <div class="flex items-center">
-              <p>Promo Code</p>
+              <p>{{- 'extra_translations.promo_code' | t -}}</p>
+
               <span x-show="isPromoCodeRequired" class="text-red-500">*</span>
             </div>
             <input
@@ -148,11 +154,10 @@
               :value="promoCodeContent"
             >
             <p
-              x-show="isPromoCodeEnabled && isPromoCodeRequired && !promoCodeContent"
+              x-show="isPromoCodeEnabled && isPromoCodeRequired && !isPromoCodeValid() "
               class="text-red-500 text-[12px] font-medium mt-1"
             >
-              Important: To proceed with your purchase, please obtain a valid
-              promo link from one of our authorized sellers.
+              {{- 'extra_translations.messages.promo_code_required' | t -}}
             </p>
           </div>
         {% endif %}
@@ -256,6 +261,7 @@
                           viewBox="0 0 24 24"
                           fill="none"
                           xmlns="http://www.w3.org/2000/svg"
+                          class="rtl:rotate-180"
                         >
                           <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
@@ -267,8 +273,10 @@
                       class="text-lg text-red-600 mt-4 text-center checkout-warning"
                       style="display: none;"
                     >
-                      ⚠️ Please meet the minimum order requirements for all
-                      product types to proceed to checkout.
+                      {{-
+                        'extra_translations.messages.min_order_requirements'
+                        | t
+                      -}}
                     </p>
                   {%- endif -%}
                 </div>

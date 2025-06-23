@@ -986,7 +986,7 @@
     const isDarkMode =
       window.matchMedia &&
       window.matchMedia('(prefers-color-scheme: dark)').matches
-    if (url.split('/').includes('ar')) {
+    if (document.documentElement.lang === 'ar') {
       document.documentElement.dir = 'rtl'
     } else {
       document.documentElement.dir = 'ltr'

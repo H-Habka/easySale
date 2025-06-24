@@ -516,6 +516,11 @@
     "cart_shared_link_copied": "Cart shared! Link copied to clipboard:",
     "failed_to_create_shared_cart": "Failed to create shared cart. Try again.",
     "error_sharing_cart": "Error sharing cart.",
+    "copy_link": "Copy Link",
+    "copied": "✓ Copied!",
+    "select_and_copy": "Select & Copy!",
+    "shared_cart_link_label": "Your shared cart link:",
+    "cart_link_copied": "✅ Cart link copied!",
     "messages": {
       "promo_code_required": "Important: To proceed with your purchase, please obtain a valid promo link from one of our authorized sellers.",
       "min_order_requirements": "⚠️ Please meet the minimum order requirements for all product types to proceed to checkout.",

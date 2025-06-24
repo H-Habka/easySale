@@ -664,6 +664,31 @@
         {% render 'sticky-checkout', cart_total: cart.total_price | money_with_currency %}
       </div>
     {% endif %}
+    <input
+      type="hidden"
+      id="copy-link-msg"
+      value="{{ 'extra_translations.copy_link' | t }}"
+    >
+    <input
+      type="hidden"
+      id="copied-msg"
+      value="{{ 'extra_translations.copied' | t }}"
+    >
+    <input
+      type="hidden"
+      id="select-and-copy-msg"
+      value="{{ 'extra_translations.select_and_copy' | t }}"
+    >
+    <input
+      type="hidden"
+      id="shared-cart-link-label-msg"
+      value="{{ 'extra_translations.shared_cart_link_label' | t }}"
+    >
+    <input
+      type="hidden"
+      id="cart-link-copied-msg"
+      value="{{ 'extra_translations.cart_link_copied' | t }}"
+    >
   </div>
 
   <script>
@@ -793,6 +818,14 @@
   </script>
 
   <script>
+
+    const copyLinkMsg = document.getElementById('copy-link-msg').value;
+    const copiedMsg = document.getElementById('copied-msg').value;
+    const selectAndCopyMsg = document.getElementById('select-and-copy-msg').value;
+    const sharedCartLinkLabelMsg = document.getElementById('shared-cart-link-label-msg').value;
+    const cartLinkCopiedMsg = document.getElementById('cart-link-copied-msg').value;
+
+
     // Replace this with your actual method to get the current cart items as array
     async function getCartItems() {
       // Example: Fetch cart from Shopify's cart API
@@ -804,6 +837,209 @@
         quantity: item.quantity,
       }))
     }
+
+    function showShareCartToast(link, message = sharedCartLinkLabelMsg) {
+  // Remove previous if exists
+  const prevToast = document.getElementById('share-cart-toast');
+  if (prevToast) prevToast.remove();
+
+  // Main toast container
+  const toast = document.createElement('div');
+  toast.id = 'share-cart-toast';
+  toast.style.cssText = `
+    position: fixed;
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-24px);
+    z-index: 99999;
+    min-width: 240px;
+    max-width: 90vw;
+    width: 370px;
+    background: rgba(1, 168, 158, 0.98);
+    color: #fff;
+    font-size: 1.19rem;
+    font-weight: 500;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.21), 0 1.5px 12px #01a89e33;
+    border-radius: 22px;
+    padding: 2.5rem 1.15rem 1.3rem 1.15rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    backdrop-filter: blur(4.5px);
+    animation: fadeSlideDown 0.28s cubic-bezier(.47,1.64,.41,.8);
+  `;
+  if (window.innerWidth < 600) {
+    toast.style.width = '97vw';
+    toast.style.minWidth = '120px';
+    toast.style.fontSize = '1.1rem';
+    toast.style.padding = '1.35rem 0.45rem 1.05rem 0.45rem';
+  }
+
+  // Animate in
+  const styleTag = document.createElement('style');
+  styleTag.textContent = `
+    @keyframes fadeSlideDown {
+      from { opacity: 0; transform: translateX(-50%) translateY(-45px); }
+      to { opacity: 1; transform: translateX(-50%) translateY(-24px); }
+    }
+    #share-cart-toast input:focus {
+      outline: 2px solid #01A89E33;
+      background: #ecfffd;
+    }
+    #share-cart-toast button:active { transform: scale(0.97); }
+  `;
+  document.head.appendChild(styleTag);
+
+  // Message
+  const msg = document.createElement('div');
+  msg.textContent = message;
+  msg.style.cssText = `
+    margin-bottom: 0.85rem;
+    font-weight: 700;
+    font-size: 1.5rem;
+    letter-spacing: 0.04em;
+    text-shadow: 0 2px 9px #00b2a855;
+    width: 95%;
+    text-align: center
+  `;
+  toast.appendChild(msg);
+
+  // Link (input)
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.value = link;
+  input.readOnly = true;
+  input.style.cssText = `
+    width: 100%;
+    margin: 0 0 1.3rem 0;
+    border-radius: 12px;
+    border: none;
+    font-size: 1.13rem;
+    padding: 10px 15px;
+    color: #14605a;
+    background: #e6fcfa;
+    font-weight: 600;
+    text-align: center;
+    letter-spacing: 0.015em;
+    box-shadow: 0 2px 6px #01a89e22;
+    transition: background 0.2s;
+  `;
+  input.onclick = function() { this.select(); };
+  toast.appendChild(input);
+
+  // Copy button (with icon)
+  const copyBtn = document.createElement('button');
+  copyBtn.innerHTML = `
+    <span style="vertical-align:middle;display:inline-block;margin-right:0.55em;">
+      <svg width="22" height="22" fill="none" stroke="#01A89E" stroke-width="2.1" viewBox="0 0 24 24">
+        <rect x="8" y="8" width="10" height="12" rx="2" stroke="#01A89E" />
+        <rect x="4" y="4" width="10" height="12" rx="2" />
+      </svg>
+    </span>
+    <span style="vertical-align:middle;font-size:1.11rem;">${copyLinkMsg}</span>
+  `;
+  copyBtn.style.cssText = `
+    margin: 0.2rem auto 0 auto;
+    padding: 0.55rem 1.42rem;
+    background: linear-gradient(90deg,#fff 60%,#e2f6f3 100%);
+    color: #01A89E;
+    border: none;
+    border-radius: 13px;
+    font-weight: 700;
+    font-size: 1.19rem;
+    box-shadow: 0 1.5px 7px rgba(1,168,158,0.07);
+    cursor: pointer;
+    transition: background 0.16s, color 0.16s;
+    display: flex;
+    align-items: center;
+    gap: 0.32em;
+  `;
+  copyBtn.onmouseenter = () => {
+    copyBtn.style.background = 'linear-gradient(90deg,#e6fcfa 0%,#fff 100%)';
+    copyBtn.style.color = '#01A89E';
+  };
+  copyBtn.onmouseleave = () => {
+    copyBtn.style.background = 'linear-gradient(90deg,#fff 60%,#e2f6f3 100%)';
+    copyBtn.style.color = '#01A89E';
+  };
+  copyBtn.onclick = async function() {
+    try {
+      await navigator.clipboard.writeText(link);
+      copyBtn.innerHTML = `<span style="font-weight:600;font-size:1.09rem;">${copiedMsg}</span>`;
+      copyBtn.style.color = '#32b19d';
+      setTimeout(() => {
+        if (toast) toast.remove();
+      }, 900);
+    } catch {
+      input.select();
+      copyBtn.innerHTML = `<span style="font-weight:600;">${select_and_copy}</span>`;
+      setTimeout(() => {
+        if (toast) toast.remove();
+      }, 1500);
+    }
+  };
+  toast.appendChild(copyBtn);
+
+  // Append toast to body
+  document.body.appendChild(toast);
+}
+
+
+function showCartCopiedToast(message = cartLinkCopiedMsg ) {
+  // Remove previous if exists
+  const prevToast = document.getElementById('cart-copied-toast');
+  if (prevToast) prevToast.remove();
+
+  // Main toast container
+  const toast = document.createElement('div');
+  toast.id = 'cart-copied-toast';
+  toast.style.cssText = `
+    position: fixed;
+    top: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 99999;
+    min-width: 150px;
+    max-width: 85vw;
+    background: #01A89E;
+    color: #fff;
+    font-size: 1.22rem;
+    font-weight: 600;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.14);
+    border-radius: 22px;
+    padding: 1.15rem 2.2rem;
+    text-align: center;
+    letter-spacing: 0.02em;
+    opacity: 0.96;
+    animation: fadeSlideDown 0.29s cubic-bezier(.47,1.64,.41,.8);
+  `;
+  if (window.innerWidth < 600) {
+    toast.style.fontSize = '1rem';
+    toast.style.padding = '0.85rem 1.2rem';
+  }
+
+  // Animate in
+  const styleTag = document.createElement('style');
+  styleTag.textContent = `
+    @keyframes fadeSlideDown {
+      from { opacity: 0; transform: translateX(-50%) translateY(-30px);}
+      to { opacity: 0.96; transform: translateX(-50%) translateY(0);}
+    }
+  `;
+  document.head.appendChild(styleTag);
+
+  // Message text
+  toast.textContent = message;
+
+  document.body.appendChild(toast);
+
+  // Auto-dismiss after 1.6s
+  setTimeout(() => {
+    toast.remove();
+  }, 1600);
+}
+
+
 
   async function shareCart() {
     const btn = document.getElementById('share-cart-btn');
@@ -833,7 +1069,7 @@
       const customer_id = {{customer.id | default: 'null'}};
       const expires_at = null;
       const promoCode = getPromoCode();
-
+      
       const response = await fetch('{{settings['loyalty-points-server-URL']}}/shared-carts', {
         method: 'POST',
         headers: {
@@ -845,13 +1081,17 @@
           expires_at,
         }),
       });
-
+      
       const data = await response.json();
-
+      
       if (response.ok && data.data && data.data.shareable_link) {
-        const shareUrl = `${window.location.origin}?shared-cart=${data.data.shareable_link}&promo-code=${promoCode}`;
-        await navigator.clipboard.writeText(shareUrl);
-        alert(`${cartSharedLinkMsg}\n${shareUrl}`);
+        const shareUrl = `${window.location.origin}?shared-cart=${data.data.shareable_link}${promoCode ? `&promo-code=${promoCode}` : ""}`;
+        try{
+          await navigator.clipboard.writeText(shareUrl);
+          showCartCopiedToast('✅ Cart link copied!'); // or customize the message
+        }catch(err){
+          showShareCartToast(shareUrl, cartSharedLinkMsg);
+        }
       } else {
         alert(failedCreateSharedCartMsg);
       }

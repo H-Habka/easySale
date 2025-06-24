@@ -48,10 +48,6 @@
   width: calc(100% - 3rem);
 }
 
-[dir="rtl"] .quick-add-modal__content {
-  transform: translateX(50%);
-}
-
 @media screen and (min-width: 750px) {
   .quick-add-modal__content {
     --modal-height-offset: 10rem;

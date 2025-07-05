@@ -105,12 +105,58 @@
                 <div class="product__title" {{ block.shopify_attributes }}>
                   <h1
                     x-data="
-                      {
-                        raw: `{{ product.title | escape }}`,
-                        get highlighted() {
-                          // Brand names array
+                                            {
+                                              raw: `{{ product.title | escape }}`,
+                                              get highlighted() {
+                        // Brand names array (extended, deduplicated, sorted)
+                        const brands = [
+                          'A.P.C.', 'Alexander Mcqueen', 'Amina Muaddi', 'Bally', 'Balenciaga', 'Baume Et Mercier', 'Blancpain', 'Bonpoint', 'Bottega Veneta',
+                          'Breitling', 'Bvlgari', 'Burberry', 'Cahu', 'Carl F. Bucherer', 'Cartier', 'Casablanca', 'Celine', 'Chanel', 'Chloé', 'Coach',
+                          'Corum', 'Dior', 'Dolce & Gabbana', 'Ebel', 'Emporio Armani', 'Fendi', 'Ferragamo', 'Fossil', 'Franck Muller', 'Furla', 'Gevril',
+                          'Girard Perregaux', 'Givenchy', 'Gucci', 'Gv2 By Gevril', 'Hamilton', 'Harry Winston', 'Hermes', 'Hublot', 'Inoui Editions',
+                          'IWC', 'Isabel Marant', 'Jaeger LeCoultre', 'Jimmy Choo', 'JW Anderson', 'Kara', 'Kenzo', 'Kipling', 'La Double J', 'Le Sportsac',
+                          'Locman', 'Loewe', 'Longchamp', 'Longines', 'Mach & Mach', 'Maria La Rosa', 'Marni', 'Matt & Nat', 'Maui Jim', 'MCM',
+                          'Michele', 'Michel Jordi', 'Michael Kors', 'MM6', 'Moncler', 'Montblanc', 'Movado', 'Off-White', 'Omega', 'Paco Rabanne',
+                          'Philipp Plein', 'Piaget', 'Prada', 'Prada Linea Rossa', 'Rado', 'Ray-Ban', 'Saint Laurent', 'See By Chloe', 'Stella McCartney',
+                          'Tag Heuer', 'The Attico', 'Tom Ford', 'Tory Burch', 'Tudor', 'Tumi', 'Ulysse Nardin', 'Vacheron Constantin', 'Valentino Garavani',
+                          'Van Cleef & Arpels', 'Versace', 'Wandler', 'Zenith'
+                        ];
+                        // Escape regex special chars
+                        const escapeReg = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                        // Build regex for any brand followed by comma+space, or brand alone
+                        const brandRegex = new RegExp(
+                          `(${brands.map(escapeReg).join('|')})(,\\s)?`,
+                          'gi'
+                        );
+                        // Add <br> before brand, and highlight it (removing comma/space)
+                        return this.raw.replace(brandRegex, (match, brand) => {
+                          return `<span class='text-teal-600 text-[22px] font-semibold'>${brand}</span><br>`;
+                        });
+                      }
+
+                                            }
+                    "
+                    x-html="highlighted"
+                  ></h1>
+                  <a href="{{ product.url }}" class="product__title">
+                    <h2
+                      class="h1"
+                      x-data="
+                                                {
+                                                  raw: `{{ product.title | escape }}`,
+                                                  get highlighted() {
+                          // Brand names array (extended, deduplicated, sorted)
                           const brands = [
-                            'Breitling', 'Bvlgari', 'Carl F. Bucherer', 'Baume Et Mercier', 'Cartier', 'Chopard', 'Corum', 'Blancpain', 'Dior', 'Ebel', 'Ferragamo', 'Franck Muller', 'Girard Perregaux', 'Gevril', 'Gucci', 'Gv2 By Gevril', 'Hamilton', 'Harry Winston', 'Hermes', 'Hublot', 'IWC', 'Jaeger LeCoultre', 'Locman', 'Longines', 'Michele', 'Michel Jordi', 'Movado', 'Omega', 'Piaget', 'Rado', 'Tag Heuer', 'Tudor', 'Ulysse Nardin', 'Vacheron Constantin', 'Van Cleef & Arpels', 'Versace', 'Zenith', 'Chanel', 'Alexander Mcqueen', 'Balenciaga', 'Bottega Veneta', 'Burberry', 'Celine', 'Chloé', 'Dolce & Gabbana', 'Emporio Armani', 'Fendi', 'Givenchy', 'Jimmy Choo', 'Loewe', 'Maui Jim', 'Moncler', 'Montblanc', 'Off-White', 'Philipp Plein', 'Prada', 'Prada Linea Rossa', 'Ray-Ban', 'Saint Laurent', 'Tom Ford'
+                            'A.P.C.', 'Alexander Mcqueen', 'Amina Muaddi', 'Bally', 'Balenciaga', 'Baume Et Mercier', 'Blancpain', 'Bonpoint', 'Bottega Veneta',
+                            'Breitling', 'Bvlgari', 'Burberry', 'Cahu', 'Carl F. Bucherer', 'Cartier', 'Casablanca', 'Celine', 'Chanel', 'Chloé', 'Coach',
+                            'Corum', 'Dior', 'Dolce & Gabbana', 'Ebel', 'Emporio Armani', 'Fendi', 'Ferragamo', 'Fossil', 'Franck Muller', 'Furla', 'Gevril',
+                            'Girard Perregaux', 'Givenchy', 'Gucci', 'Gv2 By Gevril', 'Hamilton', 'Harry Winston', 'Hermes', 'Hublot', 'Inoui Editions',
+                            'IWC', 'Isabel Marant', 'Jaeger LeCoultre', 'Jimmy Choo', 'JW Anderson', 'Kara', 'Kenzo', 'Kipling', 'La Double J', 'Le Sportsac',
+                            'Locman', 'Loewe', 'Longchamp', 'Longines', 'Mach & Mach', 'Maria La Rosa', 'Marni', 'Matt & Nat', 'Maui Jim', 'MCM',
+                            'Michele', 'Michel Jordi', 'Michael Kors', 'MM6', 'Moncler', 'Montblanc', 'Movado', 'Off-White', 'Omega', 'Paco Rabanne',
+                            'Philipp Plein', 'Piaget', 'Prada', 'Prada Linea Rossa', 'Rado', 'Ray-Ban', 'Saint Laurent', 'See By Chloe', 'Stella McCartney',
+                            'Tag Heuer', 'The Attico', 'Tom Ford', 'Tory Burch', 'Tudor', 'Tumi', 'Ulysse Nardin', 'Vacheron Constantin', 'Valentino Garavani',
+                            'Van Cleef & Arpels', 'Versace', 'Wandler', 'Zenith'
                           ];
                           // Escape regex special chars
                           const escapeReg = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -124,30 +170,8 @@
                             return `<span class='text-teal-600 text-[22px] font-semibold'>${brand}</span><br>`;
                           });
                         }
-                      }
-                    "
-                    x-html="highlighted"
-                  ></h1>
-                  <a href="{{ product.url }}" class="product__title">
-                    <h2
-                      class="h1"
-                      x-data="
-                        {
-                          raw: `{{ product.title | escape }}`,
-                          get highlighted() {
-                            const brands = [
-                              'Breitling', 'Bvlgari', 'Carl F. Bucherer', 'Baume Et Mercier', 'Cartier', 'Chopard', 'Corum', 'Blancpain', 'Dior', 'Ebel', 'Ferragamo', 'Franck Muller', 'Girard Perregaux', 'Gevril', 'Gucci', 'Gv2 By Gevril', 'Hamilton', 'Harry Winston', 'Hermes', 'Hublot', 'IWC', 'Jaeger LeCoultre', 'Locman', 'Longines', 'Michele', 'Michel Jordi', 'Movado', 'Omega', 'Piaget', 'Rado', 'Tag Heuer', 'Tudor', 'Ulysse Nardin', 'Vacheron Constantin', 'Van Cleef & Arpels', 'Versace', 'Zenith', 'Chanel', 'Alexander Mcqueen', 'Balenciaga', 'Bottega Veneta', 'Burberry', 'Celine', 'Chloé', 'Dolce & Gabbana', 'Emporio Armani', 'Fendi', 'Givenchy', 'Jimmy Choo', 'Loewe', 'Maui Jim', 'Moncler', 'Montblanc', 'Off-White', 'Philipp Plein', 'Prada', 'Prada Linea Rossa', 'Ray-Ban', 'Saint Laurent', 'Tom Ford'
-                            ];
-                            const escapeReg = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                            const brandRegex = new RegExp(
-                              `(${brands.map(escapeReg).join('|')})(,\\s)?`,
-                              'gi'
-                            );
-                            return this.raw.replace(brandRegex, (match, brand) => {
-                              return `<span class='text-teal-600 text-[22px] font-semibold'>${brand}</span><br>`;
-                            });
-                          }
-                        }
+
+                                                }
                       "
                       x-html="highlighted"
                     ></h2>

@@ -1333,6 +1333,10 @@ video {
   gap: 10px !important;
 }
 
+.\!gap-\[30px\] {
+  gap: 30px !important;
+}
+
 .\!gap-\[50px\] {
   gap: 50px !important;
 }
@@ -1818,6 +1822,11 @@ video {
   font-size: 10px !important;
 }
 
+.\!text-xl {
+  font-size: 1.25rem !important;
+  line-height: 1.75rem !important;
+}
+
 .text-2xl {
   font-size: 1.5rem;
   line-height: 2rem;
@@ -1871,16 +1880,16 @@ video {
   font-size: 2.5rem;
 }
 
+.text-\[22px\] {
+  font-size: 22px;
+}
+
 .text-\[2rem\] {
   font-size: 2rem;
 }
 
 .text-\[3\.5rem\] {
   font-size: 3.5rem;
-}
-
-.text-\[30px\] {
-  font-size: 30px;
 }
 
 .text-\[4rem\] {
@@ -1928,10 +1937,6 @@ video {
   line-height: 1rem;
 }
 
-.text-\[22px\] {
-  font-size: 22px;
-}
-
 .\!font-\[300\] {
   font-weight: 300 !important;
 }
@@ -1946,6 +1951,10 @@ video {
 
 .font-medium {
   font-weight: 500;
+}
+
+.font-normal {
+  font-weight: 400;
 }
 
 .font-semibold {
@@ -2917,8 +2926,8 @@ h6 {
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 
-.group\/menuTitle:hover .group-hover\/menuTitle\:font-semibold {
-  font-weight: 600;
+.group\/menuTitle:hover .group-hover\/menuTitle\:font-medium {
+  font-weight: 500;
 }
 
 .group:hover .group-hover\:opacity-100 {

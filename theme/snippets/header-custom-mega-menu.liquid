@@ -20,7 +20,7 @@
                 <div class="py-4 pt-8">
                   <div class="mx-auto">
                     <div class="flex items-center justify-center">
-                      <div class="relative justify-center flex px-[40px] !gap-[50px] border-b pb-1 border-gray-200 menu-{{link.handle}}">
+                      <div class="relative justify-center flex px-[40px] !gap-[30px] border-b pb-1 border-gray-200 menu-{{link.handle}}">
                         {% for child_link in block.settings.linklist.links -%}
                           <div class="">
                             <div
@@ -44,12 +44,12 @@
                                 }
                               "
                               x-bind:class="activeChild == {{ forloop.index }} ? 'before:w-full' : '' "
-                              class="relative  before:top-full before:start-0 before:absolute before:w-0 before:h-[3px] before:bg-primary-200 before:transition-all   duration-300 cursor-pointer  !text-3xl font-medium pb-2 group/menuTitle "
+                              class="relative before:top-full before:start-0 before:absolute before:w-0 before:h-[3px] before:bg-primary-200 before:transition-all duration-300 cursor-pointer !text-xl font-normal pb-2 group/menuTitle"
                             >
                               <p class="opacity-0 ">{{ child_link.title }}</p>
                               <p
-                                x-bind:class="activeChild == {{ forloop.index }} ? 'font-semibold' : '' "
-                                class=" absolute start-0 top-0 group-hover/menuTitle:font-semibold whitespace-nowrap"
+                                x-bind:class="activeChild == {{ forloop.index }} ? 'font-medium' : ''"
+                                class="absolute start-0 top-0 whitespace-nowrap transition-all duration-200 group-hover/menuTitle:font-medium"
                               >
                                 {{ child_link.title }}
                               </p>
@@ -270,7 +270,7 @@
                                                     150x150
                                                   </div>
                                                 {% endif %}
-                                                <p class="text-center mt-2 px-2">
+                                                <p class="text-center mt-2 text-xl px-2">
                                                   {{ title }}
                                                 </p>
                                               </div>
@@ -293,7 +293,7 @@
                   {% if block.settings.extraLinklist.links == blank %}
                     <div>
                       <p class="text-center italic !text-4xl font-semibold">
-                        Be Authentic
+                        {{ block.settings.authentic_text }}
                       </p>
                     </div>
                   {% endif %}
@@ -304,7 +304,9 @@
                   </div>
                   {% if block.settings.extraLinklist.links.size %}
                     <div class="flex justify-center items-center flex-col gap-10 mt-6 pb-10">
-                      <p class="italic !text-4xl font-semibold">Be Authentic</p>
+                      <p class="italic !text-4xl font-semibold">
+                        {{ block.settings.authentic_text }}
+                      </p>
                       <div class="flex items-center gap-8">
                         {% for child_link in block.settings.extraLinklist.links -%}
                           <p

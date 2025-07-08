@@ -105,59 +105,11 @@
                 <div class="product__title" {{ block.shopify_attributes }}>
                   <h1
                     x-data="
-                                            {
-                                              raw: `{{ product.title | escape }}`,
-                                              get highlighted() {
-                        // Brand names array (extended, deduplicated, sorted)
-                        const brands = [
-                          'A.P.C.', 'Alexander Mcqueen', 'Amina Muaddi', 'Bally', 'Balenciaga', 'Baume Et Mercier', 'Blancpain', 'Bonpoint', 'Bottega Veneta',
-                          'Breitling', 'Bvlgari', 'Burberry', 'Cahu', 'Carl F. Bucherer', 'Cartier', 'Casablanca', 'Celine', 'Chanel', 'Chloé', 'Coach',
-                          'Corum', 'Dior', 'Dolce & Gabbana', 'Ebel', 'Emporio Armani', 'Fendi', 'Ferragamo', 'Fossil', 'Franck Muller', 'Furla', 'Gevril',
-                          'Girard Perregaux', 'Givenchy', 'Gucci', 'Gv2 By Gevril', 'Hamilton', 'Harry Winston', 'Hermes', 'Hublot', 'Inoui Editions',
-                          'IWC', 'Isabel Marant', 'Jaeger LeCoultre', 'Jimmy Choo', 'JW Anderson', 'Kara', 'Kenzo', 'Kipling', 'La Double J', 'Le Sportsac',
-                          'Locman', 'Loewe', 'Longchamp', 'Longines', 'Mach & Mach', 'Maria La Rosa', 'Marni', 'Matt & Nat', 'Maui Jim', 'MCM',
-                          'Michele', 'Michel Jordi', 'Michael Kors', 'MM6', 'Moncler', 'Montblanc', 'Movado', 'Off-White', 'Omega', 'Paco Rabanne',
-                          'Philipp Plein', 'Piaget', 'Prada', 'Prada Linea Rossa', 'Rado', 'Ray-Ban', 'Saint Laurent', 'See By Chloe', 'Stella McCartney',
-                          'Tag Heuer', 'The Attico', 'Tom Ford', 'Tory Burch', 'Tudor', 'Tumi', 'Ulysse Nardin', 'Vacheron Constantin', 'Valentino Garavani',
-                          'Van Cleef & Arpels', 'Versace', 'Wandler', 'Zenith'
-                        ];
-                        // Escape regex special chars
-                        const escapeReg = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                        // Build regex for any brand followed by comma+space, or brand alone
-                        const brandRegex = new RegExp(
-                          `(${brands.map(escapeReg).join('|')})(,\\s)?`,
-                          'gi'
-                        );
-                        // Add <br> before brand, and highlight it (removing comma/space)
-                        return this.raw.replace(brandRegex, (match, brand) => {
-                          return `<span class='text-teal-600 text-[22px] font-semibold'>${brand}</span><br>`;
-                        });
-                      }
-
-                                            }
-                    "
-                    x-html="highlighted"
-                  ></h1>
-                  <a href="{{ product.url }}" class="product__title">
-                    <h2
-                      class="h1"
-                      x-data="
-                                                {
-                                                  raw: `{{ product.title | escape }}`,
-                                                  get highlighted() {
+                      {
+                        raw: `{{ product.title | escape }}`,
+                        get highlighted() {
                           // Brand names array (extended, deduplicated, sorted)
-                          const brands = [
-                            'A.P.C.', 'Alexander Mcqueen', 'Amina Muaddi', 'Bally', 'Balenciaga', 'Baume Et Mercier', 'Blancpain', 'Bonpoint', 'Bottega Veneta',
-                            'Breitling', 'Bvlgari', 'Burberry', 'Cahu', 'Carl F. Bucherer', 'Cartier', 'Casablanca', 'Celine', 'Chanel', 'Chloé', 'Coach',
-                            'Corum', 'Dior', 'Dolce & Gabbana', 'Ebel', 'Emporio Armani', 'Fendi', 'Ferragamo', 'Fossil', 'Franck Muller', 'Furla', 'Gevril',
-                            'Girard Perregaux', 'Givenchy', 'Gucci', 'Gv2 By Gevril', 'Hamilton', 'Harry Winston', 'Hermes', 'Hublot', 'Inoui Editions',
-                            'IWC', 'Isabel Marant', 'Jaeger LeCoultre', 'Jimmy Choo', 'JW Anderson', 'Kara', 'Kenzo', 'Kipling', 'La Double J', 'Le Sportsac',
-                            'Locman', 'Loewe', 'Longchamp', 'Longines', 'Mach & Mach', 'Maria La Rosa', 'Marni', 'Matt & Nat', 'Maui Jim', 'MCM',
-                            'Michele', 'Michel Jordi', 'Michael Kors', 'MM6', 'Moncler', 'Montblanc', 'Movado', 'Off-White', 'Omega', 'Paco Rabanne',
-                            'Philipp Plein', 'Piaget', 'Prada', 'Prada Linea Rossa', 'Rado', 'Ray-Ban', 'Saint Laurent', 'See By Chloe', 'Stella McCartney',
-                            'Tag Heuer', 'The Attico', 'Tom Ford', 'Tory Burch', 'Tudor', 'Tumi', 'Ulysse Nardin', 'Vacheron Constantin', 'Valentino Garavani',
-                            'Van Cleef & Arpels', 'Versace', 'Wandler', 'Zenith'
-                          ];
+                          const brands = ['A.P.C.','Alexander Mcqueen','Amina Muaddi','Bally','Balenciaga','Baume Et Mercier','Blancpain','Bonpoint','Bottega Veneta','Breitling','Bvlgari','Burberry','Cahu','Carl F. Bucherer','Cartier','Casablanca','Celine','Chanel','Chloé','Coach','Corum','Dior','Dolce & Gabbana','Ebel','Emporio Armani','Fendi','Ferragamo','Fossil','Franck Muller','Furla','Gevril','Girard Perregaux','Givenchy','Gucci','Gv2 By Gevril','Hamilton','Harry Winston','Hermes','Hublot','Inoui Editions','IWC','Isabel Marant','Jaeger LeCoultre','Jimmy Choo','JW Anderson','Kara','Kenzo','Kipling','La Double J','Le Sportsac','Locman','Loewe','Longchamp','Longines','Mach & Mach','Maria La Rosa','Marni','Matt & Nat','Maui Jim','MCM','Michele','Michel Jordi','Michael Kors','MM6','Moncler','Montblanc','Movado','Off-White','Omega','Paco Rabanne','Philipp Plein','Piaget','Prada','Prada Linea Rossa','Rado','Ray-Ban','Saint Laurent','See By Chloe','Stella McCartney','Tag Heuer','The Attico','Tom Ford','Tory Burch','Tudor','Tumi','Ulysse Nardin','Vacheron Constantin','Valentino Garavani','Van Cleef & Arpels','Versace','Wandler','Zenith','Adee Kaye','Akribos Xxiv','Alpina','Armand Nicolet','Audemars Piguet','Ball','Bedat','Bell And Ross','Bertha','Breguet','Brera Orologi','Briston','Bulova','Certina','Chopard','Christian Van Sant','Citizen','Concord','Dufa','Edox','Egard','Empress','Ferre Milano','Franck Dubarry','Frederique Constant','Gc By Guess','Giulio Romano','Glashutte Original','Grand Seiko','Guess','Haurex Italy','Invicta','Jaquet Droz','JBW','Johan Eric','Junghans','Just Cavalli','Le Vian','Louis Erard','Mathey-Tissot','Mido','Nomos','Oceanaut','Olivia Burton','Oniss','Orient','Oris','Panerai','Polanti','Porsamo Bleu','Raymond Weil','Rebel','Rene Mouris','Roberto Cavalli','Rolex','Rudiger','Salvatore Ferragamo','Seiko','Sevenfriday','Shinola','Sophie And Freda','Stuhrling Original','Swarovski','Technomarine','Tissot','Titoni','Torino Carrero','U-Boat','Victorinox'];
                           // Escape regex special chars
                           const escapeReg = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
                           // Build regex for any brand followed by comma+space, or brand alone
@@ -170,9 +122,35 @@
                             return `<span class='text-teal-600 text-[22px] font-semibold'>${brand}</span><br>`;
                           });
                         }
+                      }
+                    "
 
-                                                }
+                    x-html="highlighted"
+                  ></h1>
+                  <a href="{{ product.url }}" class="product__title">
+                    <h2
+                      class="h1"
+                      x-data="
+                        {
+                          raw: `{{ product.title | escape }}`,
+                          get highlighted() {
+                            // Brand names array (extended, deduplicated, sorted)
+                            const brands = ['A.P.C.','Alexander Mcqueen','Amina Muaddi','Bally','Balenciaga','Baume Et Mercier','Blancpain','Bonpoint','Bottega Veneta','Breitling','Bvlgari','Burberry','Cahu','Carl F. Bucherer','Cartier','Casablanca','Celine','Chanel','Chloé','Coach','Corum','Dior','Dolce & Gabbana','Ebel','Emporio Armani','Fendi','Ferragamo','Fossil','Franck Muller','Furla','Gevril','Girard Perregaux','Givenchy','Gucci','Gv2 By Gevril','Hamilton','Harry Winston','Hermes','Hublot','Inoui Editions','IWC','Isabel Marant','Jaeger LeCoultre','Jimmy Choo','JW Anderson','Kara','Kenzo','Kipling','La Double J','Le Sportsac','Locman','Loewe','Longchamp','Longines','Mach & Mach','Maria La Rosa','Marni','Matt & Nat','Maui Jim','MCM','Michele','Michel Jordi','Michael Kors','MM6','Moncler','Montblanc','Movado','Off-White','Omega','Paco Rabanne','Philipp Plein','Piaget','Prada','Prada Linea Rossa','Rado','Ray-Ban','Saint Laurent','See By Chloe','Stella McCartney','Tag Heuer','The Attico','Tom Ford','Tory Burch','Tudor','Tumi','Ulysse Nardin','Vacheron Constantin','Valentino Garavani','Van Cleef & Arpels','Versace','Wandler','Zenith','Adee Kaye','Akribos Xxiv','Alpina','Armand Nicolet','Audemars Piguet','Ball','Bedat','Bell And Ross','Bertha','Breguet','Brera Orologi','Briston','Bulova','Certina','Chopard','Christian Van Sant','Citizen','Concord','Dufa','Edox','Egard','Empress','Ferre Milano','Franck Dubarry','Frederique Constant','Gc By Guess','Giulio Romano','Glashutte Original','Grand Seiko','Guess','Haurex Italy','Invicta','Jaquet Droz','JBW','Johan Eric','Junghans','Just Cavalli','Le Vian','Louis Erard','Mathey-Tissot','Mido','Nomos','Oceanaut','Olivia Burton','Oniss','Orient','Oris','Panerai','Polanti','Porsamo Bleu','Raymond Weil','Rebel','Rene Mouris','Roberto Cavalli','Rolex','Rudiger','Salvatore Ferragamo','Seiko','Sevenfriday','Shinola','Sophie And Freda','Stuhrling Original','Swarovski','Technomarine','Tissot','Titoni','Torino Carrero','U-Boat','Victorinox'];
+                            // Escape regex special chars
+                            const escapeReg = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                            // Build regex for any brand followed by comma+space, or brand alone
+                            const brandRegex = new RegExp(
+                              `(${brands.map(escapeReg).join('|')})(,\\s)?`,
+                              'gi'
+                            );
+                            // Add <br> before brand, and highlight it (removing comma/space)
+                            return this.raw.replace(brandRegex, (match, brand) => {
+                              return `<span class='text-teal-600 text-[22px] font-semibold'>${brand}</span><br>`;
+                            });
+                          }
+                        }
                       "
+
                       x-html="highlighted"
                     ></h2>
                   </a>

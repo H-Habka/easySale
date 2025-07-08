@@ -15,7 +15,7 @@
   <div class="collection-hero__inner page-width {% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}">
     <div class="collection-hero__text-wrapper">
       <h1
-        x-data="{title: '{{ collection.title }}', splittedTitle : [], generatedURLs : [] }"
+        x-data="{title: `{{ collection.title }}`, splittedTitle : [], generatedURLs : [] }"
         x-init="
            const splittedTitleOrigin = title.split('/')
            splittedTitle=splittedTitleOrigin
@@ -44,30 +44,34 @@
         </span>
         <div class="flex items-center gap-3 flex-wrap">
           <template x-for="(item,index) in splittedTitle.slice(0,-1)">
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2">
               <a
                 x-show="!window.location.pathname.split('/').includes('ar')"
                 x-bind:href="generatedURLs[index]"
+                class="flex items-center"
               >
                 <p
                   x-text="item"
                   class="
-                    text-nowrap !text-3xl cursor-pointer relative font-medium hover:text-primary-200 transition-all duration-200 hover:scale-105 hover:-translate-y-[2px]  before:top-full before:start-0 before:absolute before:w-0 before:h-px before:bg-primary-100/50 before:transition-all hover:before:w-full before:duration-300
-                    after:top-full after:end-0 after:absolute after:w-0 after:h-px after:bg-primary-100/50 after:transition-all hover:after:w-full after:duration-300
+                    text-nowrap !text-2xl cursor-pointer relative font-medium
+                    hover:text-primary-200 transition-all duration-150
+                    hover:scale-103 hover:-translate-y-[1px]
+                    before:top-full before:start-0 before:absolute before:w-0 before:h-px before:bg-primary-100/60 before:transition-all hover:before:w-full before:duration-200
+                    after:top-full after:end-0 after:absolute after:w-0 after:h-px after:bg-primary-100/60 after:transition-all hover:after:w-full after:duration-200
                   "
                 ></p>
               </a>
               <p
                 x-text="item"
                 x-show="window.location.pathname.split('/').includes('ar')"
-                class="!text-3xl font-medium"
+                class="!text-xl font-medium"
               ></p>
-              <span>/</span>
+              <span class="mx-1 text-gray-300 text-lg">/</span>
             </div>
           </template>
           <p
             x-text="splittedTitle.slice(-1)[0]"
-            class="!text-3xl"
+            class="!text-2xl"
           ></p>
         </div>
       </h1>

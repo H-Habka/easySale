@@ -290,23 +290,18 @@
                   </div>
 
                   <div class="w-full h-[270px] text-transparent">s</div>
-                  {% if block.settings.extraLinklist.links == blank %}
-                    <div>
-                      <p class="text-center italic !text-4xl font-semibold">
-                        {{ block.settings.authentic_text }}
-                      </p>
-                    </div>
-                  {% endif %}
+                  <div class="flex justify-center">
+                    <p class="text-center italic !text-4xl font-semibold">
+                      {{ block.settings.menu_title }}
+                    </p>
+                  </div>
                   <div
-                    class="w-[30vw] mx-auto text-transparent border-b border-gray-700/15"
+                    class="w-[30vw] mx-auto h-0 text-transparent border-b border-gray-700/15"
                   >
                     s
                   </div>
                   {% if block.settings.extraLinklist.links.size %}
                     <div class="flex justify-center items-center flex-col gap-10 mt-6 pb-10">
-                      <p class="italic !text-4xl font-semibold">
-                        {{ block.settings.authentic_text }}
-                      </p>
                       <div class="flex items-center gap-8">
                         {% for child_link in block.settings.extraLinklist.links -%}
                           <p

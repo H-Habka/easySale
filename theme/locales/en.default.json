@@ -526,7 +526,17 @@
       "min_order_requirements": "⚠️ Please meet the minimum order requirements for all product types to proceed to checkout.",
       "total_points_are": "Your total points are:",
       "gift_card_code_sent": "Gift Card Code Has Been Sent to Your Email",
-      "gift_card_generate_failed": "something went wrong, please contact us to figure it out, or try again later"
+      "gift_card_generate_failed": "something went wrong, please contact us to figure it out, or try again later",
+      "bank_transfer_modal_heading": "Save Instantly with Bank Deposit!",
+      "bank_transfer_modal_subtitle_1": "Choose",
+      "bank_transfer_modal_subtitle_2": "as your payment method to get an",
+      "bank_transfer_modal_subtitle_3": "immediate 2% discount",
+      "bank_transfer_modal_subtitle_4": "on your order total.",
+      "bank_transfer_modal_discount_note": "*Discount will be applied to your final amount including shipping and taxes.",
+      "bank_transfer_modal_example_label": "Example:",
+      "bank_transfer_modal_example_note": "*The actual amount may change based on shipping & taxes at checkout.",
+      "bank_transfer_modal_contact_us": "Please contact us directly after placing your order to get your new total to pay.",
+      "bank_transfer_modal_continue_button": "Continue to Checkout"
     }
   }
 }

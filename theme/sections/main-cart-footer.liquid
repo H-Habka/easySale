@@ -294,7 +294,130 @@
       </div>
     </div>
   </div>
+  <div
+    id="bank-transfer-modal"
+    style="display:none;"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000]"
+  >
+    <div class="bg-white rounded-2xl p-8 shadow-2xl max-w-[340px] w-full relative">
+      <button
+        onclick="closeBankTransferModal()"
+        class="absolute top-3 right-4 text-gray-400 hover:text-gray-600 text-4xl leading-none"
+        aria-label="Close"
+        style="font-size: 2.5rem; line-height: 2.5rem;"
+      >
+        &times;
+      </button>
+      <h2 class="text-2xl font-bold mb-5 text-center text-[#01756E]">
+        Save Instantly with Bank Deposit!
+      </h2>
+      <p class="mb-6 text-gray-800 text-lg text-center font-medium">
+        Choose <span class="font-bold">Bank Deposit</span> as your payment
+        method to get an
+        <span class="font-bold text-green-700">immediate 2% discount</span> on
+        your order total. <br>
+        <br>
+        <span class="text-base text-gray-500"
+          >*Discount will be applied to your final amount including shipping and
+          taxes.</span
+        >
+      </p>
+      <div class="bg-gray-100 rounded-xl py-5 px-3 mb-6 text-center">
+        <span class="block text-lg font-semibold text-gray-700 mb-2">
+          Example:
+        </span>
+        <span
+          id="discount-example"
+          class="font-mono font-bold text-xl text-[#01756E]"
+        ></span>
+        <span class="block mt-4 text-[9px] text-gray-500"
+          >*The actual amount may change based on shipping & taxes at checkout.</span
+        >
+      </div>
+      <p class="text-[12px] text-center text-gray-700 mb-4">
+        Please contact us directly after placing your order to get your new
+        total to pay.
+      </p>
+      <button
+        onclick="proceedToCheckoutFromModal()"
+        id="proceed-checkout-btn"
+        class="w-full px-4 py-3 rounded-lg text-lg bg-gradient-to-r from-[#01756E] via-[#01A89E] to-[#00CFC8] text-white font-bold hover:from-[#01635D] hover:to-[#00B8B2] transition-all"
+      >
+        Continue to Checkout
+      </button>
+    </div>
+  </div>
 </div>
+
+<script>
+  ;(function () {
+    let proceedToCheckout = null
+    let submitting = false
+
+    function formatAED(value) {
+      return (
+        Number(value).toLocaleString('en-AE', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }) + ' AED'
+      )
+    }
+
+    function showBankTransferModal(event) {
+      if (submitting) return
+      event.preventDefault()
+      proceedToCheckout = event.target
+
+      // Get subtotal (cart_estimated_total) - note: excludes shipping & taxes
+      let totalText =
+        document
+          .getElementById('cart_estimated_total')
+          ?.innerText?.replace(/[^\d.]/g, '') || '0'
+      let total = parseFloat(totalText.replace(/,/g, '')) || 0
+
+      let discount = +(total * 0.02).toFixed(2)
+      let discountedTotal = +(total - discount).toFixed(2)
+
+      document.getElementById('discount-example').innerHTML =
+        total > 0
+          ? `${formatAED(
+              total
+            )} <span class="text-gray-400">- 2% =</span> <span class="text-[#01A89E]">${formatAED(
+              discountedTotal
+            )}</span>`
+          : ''
+
+      document.getElementById('bank-transfer-modal').style.display = 'flex'
+    }
+
+    window.closeBankTransferModal = function () {
+      document.getElementById('bank-transfer-modal').style.display = 'none'
+      submitting = false
+    }
+
+    window.proceedToCheckoutFromModal = function () {
+      submitting = true
+      document.getElementById('bank-transfer-modal').style.display = 'none'
+      if (proceedToCheckout) {
+        let form = proceedToCheckout.closest('form')
+        if (form) {
+          form.submit()
+        } else {
+          proceedToCheckout.click()
+        }
+        proceedToCheckout = null
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      document
+        .querySelectorAll('button[type="submit"][name="checkout"]')
+        .forEach(function (btn) {
+          btn.addEventListener('click', showBankTransferModal)
+        })
+    })
+  })()
+</script>
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {

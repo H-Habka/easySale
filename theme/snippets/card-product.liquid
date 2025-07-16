@@ -57,6 +57,7 @@
             <div class="media media--transparent media--hover-effect">
               {% comment %}theme-check-disable ImgLazyLoading{% endcomment %}
               <img
+                class="!absolute !w-[85%] !h-[85%] !-translate-x-1/2 rtl:!translate-x-1/2 !-translate-y-1/2 !top-1/2 !start-1/2"
                 srcset="
                   {%- if card_product.featured_media.width >= 165 -%}{{ card_product.featured_media | image_url: width: 165 }} 165w,{%- endif -%}
                   {%- if card_product.featured_media.width >= 360 -%}{{ card_product.featured_media | image_url: width: 360 }} 360w,{%- endif -%}
@@ -80,6 +81,7 @@
 
               {%- if card_product.media[1] != null and show_secondary_image -%}
                 <img
+                  class="!absolute !w-[85%] !h-[85%] !-translate-x-1/2 rtl:!translate-x-1/2 !-translate-y-1/2 !top-1/2 !start-1/2"
                   srcset="
                     {%- if card_product.media[1].width >= 165 -%}{{ card_product.media[1] | image_url: width: 165 }} 165w,{%- endif -%}
                     {%- if card_product.media[1].width >= 360 -%}{{ card_product.media[1] | image_url: width: 360 }} 360w,{%- endif -%}

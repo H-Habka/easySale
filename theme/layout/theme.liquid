@@ -871,6 +871,39 @@
     {%- endif -%}
 
     <script>
+      function showLoadingOverlay({ innerText = 'Loading...' }) {
+        if (document.getElementById('custom-loading-overlay')) return // avoid duplicates
+
+        // Detect color scheme
+        const bgColor = '#fff'
+        const overlay = document.createElement('div')
+        overlay.id = 'custom-loading-overlay'
+        overlay.style.position = 'fixed'
+        overlay.style.top = 0
+        overlay.style.left = 0
+        overlay.style.width = '100vw'
+        overlay.style.height = '100vh'
+        overlay.style.zIndex = 99999999999999
+        overlay.style.background = bgColor
+        overlay.style.display = 'flex'
+        overlay.style.alignItems = 'center'
+        overlay.style.justifyContent = 'center'
+        overlay.style.transition = 'opacity 0.2s'
+        overlay.style.opacity = 1
+
+        const loader = document.createElement('div')
+        loader.innerText = innerText
+        loader.style.fontSize = '1.7rem'
+        loader.style.color = '#222'
+        overlay.appendChild(loader)
+
+        document.body.appendChild(overlay)
+      }
+      const commingFromApp = getQueryParam('from-app')
+      if (commingFromApp) {
+        showLoadingOverlay({ innerText: 'just a moment...' })
+      }
+
       document.addEventListener('DOMContentLoaded', async function () {
         // 1. Detect shared-cart in URL
         function getQueryParam(param) {
@@ -971,7 +1004,16 @@
           removeQueryParam('shared-cart')
 
           // 8. Optionally: Reload page to show new cart state
-          setTimeout(() => (window.location.href = '/cart'), 1000)
+          const commingFromApp = getQueryParam('from-app')
+          setTimeout(() => {
+            if (commingFromApp) {
+              window.location.href = `/cart?from-app-prop=${encodeURIComponent(
+                commingFromApp
+              )}`
+            } else {
+              window.location.href = '/cart'
+            }
+          }, 1000)
         } catch (err) {
           loadingNotice.textContent = 'Error loading shared cart.'
           setTimeout(() => loadingNotice.remove(), 2500)

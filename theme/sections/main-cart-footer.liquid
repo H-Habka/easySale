@@ -422,14 +422,16 @@
         proceedToCheckout = null
       }
     }
-
-    document.addEventListener('DOMContentLoaded', function () {
-      document
-        .querySelectorAll('button[type="submit"][name="checkout"]')
-        .forEach(function (btn) {
-          btn.addEventListener('click', showBankTransferModal)
-        })
-    })
+    const commingFromApp = getQueryParam('from-app-prop')
+    if (!commingFromApp) {
+      document.addEventListener('DOMContentLoaded', function () {
+        document
+          .querySelectorAll('button[type="submit"][name="checkout"]')
+          .forEach(function (btn) {
+            btn.addEventListener('click', showBankTransferModal)
+          })
+      })
+    }
   })()
 </script>
 
@@ -454,6 +456,69 @@
         document.querySelector('#cart').submit()
       })
   })
+</script>
+
+<script>
+  ;(function () {
+    function showLoadingOverlay({ innerText = 'Loading...' }) {
+      // if (document.getElementById('custom-loading-overlay')) return // avoid duplicates
+
+      // Detect color scheme
+      const bgColor = '#fff'
+      const overlay = document.createElement('div')
+      overlay.id = 'custom-loading-overlay'
+      overlay.style.position = 'fixed'
+      overlay.style.top = 0
+      overlay.style.left = 0
+      overlay.style.width = '100vw'
+      overlay.style.height = '100vh'
+      overlay.style.zIndex = 99999
+      overlay.style.background = bgColor
+      overlay.style.display = 'flex'
+      overlay.style.alignItems = 'center'
+      overlay.style.justifyContent = 'center'
+      overlay.style.transition = 'opacity 0.2s'
+      overlay.style.opacity = 1
+
+      const loader = document.createElement('div')
+      loader.innerText = innerText
+      loader.style.fontSize = '1.7rem'
+      loader.style.color = '#222'
+      overlay.appendChild(loader)
+
+      document.body.appendChild(overlay)
+    }
+
+    function hideLoadingOverlay() {
+      const overlay = document.getElementById('custom-loading-overlay')
+      if (overlay) {
+        overlay.style.opacity = 0
+        setTimeout(() => overlay.remove(), 200)
+      }
+    }
+
+    function submitCheckoutForm() {
+      // Try common checkout button IDs
+      const btn =
+        document.getElementById('checkout') ||
+        document.getElementById('sticky-checkout-button')
+
+      if (btn && !btn.disabled) {
+        btn.click()
+      }
+      setTimeout(hideLoadingOverlay, 1000)
+    }
+
+    const commingFromApp = getQueryParam('from-app-prop')
+    if (commingFromApp) {
+      showLoadingOverlay({ innerText: 'Preparing Checkout Page...' })
+
+      // Wait for DOMContentLoaded before submitting (in case elements are not rendered yet)
+      document.addEventListener('DOMContentLoaded', function () {
+        setTimeout(submitCheckoutForm, 700)
+      })
+    }
+  })()
 </script>
 
 {% schema %}

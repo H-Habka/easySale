@@ -49,6 +49,7 @@
         </button>
       </div>
       <a
+        id="continue-shopping-1"
         href="{{ routes.all_products_collection_url }}"
         class="inline-flex items-center text-1.4 font-medium text-[#01A89E] hover:text-[#01635D] transition-colors duration-200 group"
       >
@@ -73,6 +74,7 @@
           {{ 'sections.cart.empty' | t }}
         </h1>
         <a
+          id="continue-shopping-2"
           href="{{ routes.all_products_collection_url }}"
           class="inline-flex items-center justify-center px-5 py-2.5 border border-transparent text-md font-medium rounded-[0.4rem] text-white bg-gradient-to-r from-[#01756E] via-[#01A89E] to-[#00CFC8] hover:from-[#01635D] hover:via-[#018F87] hover:to-[#00B8B2] shadow-md transition-all duration-150 ease-out hover:ease-in hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-[#01A89E]"
         >
@@ -690,6 +692,18 @@
       value="{{ 'extra_translations.cart_link_copied' | t }}"
     >
   </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var lastCollectionUrl = localStorage.getItem('lastCollectionUrl')
+      ;['continue-shopping-1', 'continue-shopping-2'].forEach(function (id) {
+        var btn = document.getElementById(id)
+        if (btn && lastCollectionUrl) {
+          btn.setAttribute('href', lastCollectionUrl)
+        }
+      })
+    })
+  </script>
 
   <script>
     async function handleDeleteTypeGroup(button) {

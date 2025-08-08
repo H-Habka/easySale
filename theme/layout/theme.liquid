@@ -1021,6 +1021,90 @@
         }
       })
     </script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        // Only run if we're on a collections page
+        if (!window.location.pathname.startsWith('/collections/')) return
+
+        // === 1. Save last visited collection page with filters ===
+        function saveLastCollectionPage() {
+          localStorage.setItem('lastCollectionUrl', window.location.href)
+        }
+
+        // === 2. Hide matching filters as before ===
+        function extractTotalProductCount() {
+          const el = document.querySelector('#ProductCountDesktop')
+          if (!el) return null
+
+          const text = el.textContent.trim()
+          const matches = text.match(/\bof\s+(\d+)\b|\b(\d+)\s+products\b/i)
+
+          if (!matches) return null
+
+          // Case: "9 of 199 products"
+          if (matches[1]) return parseInt(matches[1])
+          // Case: "199 products"
+          if (matches[2]) return parseInt(matches[2])
+
+          return null
+        }
+
+        function hideMatchingFilters() {
+          const totalCount = extractTotalProductCount()
+          if (!totalCount) return
+
+          const filterSpans = document.querySelectorAll('.facet-checkbox__text')
+
+          filterSpans.forEach((span) => {
+            const labelText = span.textContent.trim().toLowerCase()
+
+            // Skip availability filters
+            if (
+              labelText.includes('in stock') ||
+              labelText.includes('out of stock')
+            )
+              return
+
+            const match = labelText.match(/\((\d+)\)/)
+            if (match && parseInt(match[1]) === totalCount) {
+              const li = span.closest('li')
+              if (li) li.style.display = 'none'
+            }
+          })
+        }
+
+        // Unified function to call on every collection page update
+        function onCollectionPageUpdate() {
+          saveLastCollectionPage()
+          hideMatchingFilters()
+        }
+
+        // Run once on load
+        onCollectionPageUpdate()
+
+        // Observe changes in filter grid for dynamic updates
+        const container =
+          document.querySelector('[data-id$="__product-grid"]') || document.body
+
+        const observer = new MutationObserver(() => {
+          onCollectionPageUpdate()
+        })
+
+        observer.observe(container, {
+          childList: true,
+          subtree: true,
+        })
+
+        // Also watch for URL changes (navigation/filter changes with AJAX)
+        let lastUrl = location.href
+        setInterval(() => {
+          if (location.href !== lastUrl) {
+            lastUrl = location.href
+            onCollectionPageUpdate()
+          }
+        }, 500)
+      })
+    </script>
   </body>
 
   <script>

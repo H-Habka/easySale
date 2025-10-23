@@ -497,10 +497,10 @@
                                             name="updates[]"
                                             value="{{ item.quantity }}"
                                             min="{{ item.variant.quantity_rule.min }}"
-                                            {% if item.variant.quantity_rule.max
+                                            {% if item.variant.inventory_quantity
                                                 != null
                                             %}
-                                              max="{{ item.variant.quantity_rule.max }}"
+                                              max="{{ item.variant.inventory_quantity }}"
                                             {% endif %}
                                             step="{{ item.variant.quantity_rule.increment }}"
                                             data-index="{{ item.index | plus: 1 }}"
@@ -560,10 +560,10 @@
                                       name="updates[]"
                                       value="{{ item.quantity }}"
                                       min="{{ item.variant.quantity_rule.min }}"
-                                      {% if item.variant.quantity_rule.max
+                                      {% if item.variant.inventory_quantity
                                           != null
                                       %}
-                                        max="{{ item.variant.quantity_rule.max }}"
+                                        max="{{ item.variant.inventory_quantity }}"
                                       {% endif %}
                                       step="{{ item.variant.quantity_rule.increment }}"
                                       data-index="{{ item.index | plus: 1 }}"

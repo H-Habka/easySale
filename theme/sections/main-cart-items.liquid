@@ -765,7 +765,9 @@
       cartFooterAlpineData.promoCodeContent = storedPromoCode
       let promoCodeContent = cartFooterAlpineData.promoCodeContent
       const promoCodeIsValid =
-        promoCodeContent === '' || /^\d+_[a-zA-Z0-9_-]{8,}$/.test(promoCodeContent)
+        !promoCodeContent.endsWith('--') &&
+        (promoCodeContent === '' ||
+          /^\d+_[a-zA-Z0-9_-]{8,}$/.test(promoCodeContent))
 
       const checkpoints = document.querySelectorAll('.shipping-checkpoint')
       let allPassed = true

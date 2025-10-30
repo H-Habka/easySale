@@ -1083,6 +1083,9 @@ function showCartCopiedToast(message = cartLinkCopiedMsg ) {
       const customer_id = {{customer.id | default: 'null'}};
       const expires_at = null;
       const promoCode = getPromoCode();
+      // Parse 'createdBy' from URL query parameters and assign it as 'userId' in payload
+
+      const relatedChatUserId = JSON.parse(localStorage.getItem('relatedChatUserId'))?.value || null;
       
       const response = await fetch('{{settings['loyalty-points-server-URL']}}/shared-carts', {
         method: 'POST',
@@ -1093,6 +1096,7 @@ function showCartCopiedToast(message = cartLinkCopiedMsg ) {
           customer_id,
           items,
           expires_at,
+          relatedChatUserId
         }),
       });
       

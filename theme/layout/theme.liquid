@@ -452,6 +452,14 @@
       }
 
       const promoCode = getQueryParam('promo-code')
+      const relatedChatUserId = getQueryParam('chat-user-id')
+      if(relatedChatUserId) {
+        localStorage.setItem(
+            'relatedChatUserId',
+            JSON.stringify({ value: relatedChatUserId })
+          )
+        removeQueryParam("chat-user-id")
+      }
       if (promoCode) {
         setPromoCodeWithExpiry(promoCode, {{ settings["promo-code-expires-after"] }})
         console.log(" {{settings["promo-code-expires-after"]}} ")

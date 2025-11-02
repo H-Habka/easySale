@@ -61,10 +61,7 @@
       isPromoCodeValid() {
       // Matches: one or more digits, underscore, then one or more alphanumeric (letters/numbers)
       const regex = /^\d+_[a-zA-Z0-9_-]{8,}$/;
-      if(this.promoCodeContent.endsWith('--')) {
-        return false;
-      }
-      return this.promoCodeContent === '' || regex.test(this.promoCodeContent);
+      return !(this.promoCodeContent || '').endsWith('--') && this.promoCodeContent !== '' && regex.test(this.promoCodeContent);
       }
     }
   "

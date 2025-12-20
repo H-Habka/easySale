@@ -521,6 +521,11 @@
     "select_and_copy": "Select & Copy!",
     "shared_cart_link_label": "Your shared cart link:",
     "cart_link_copied": "✅ Cart link copied!",
+    "cart_name_modal_title": "Name Your Cart",
+    "cart_name_modal_description": "Give your cart a name to make it easier to identify (optional)",
+    "cart_name_modal_input_placeholder": "Enter cart name...",
+    "cart_name_modal_cancel": "Cancel",
+    "cart_name_modal_share": "Share Cart",
     "messages": {
       "promo_code_required": "Important: To proceed with your purchase, please obtain a valid promo link from one of our authorized sellers.",
       "min_order_requirements": "⚠️ Please meet the minimum order requirements for all product types to proceed to checkout.",

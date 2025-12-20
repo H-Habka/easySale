@@ -10,7 +10,7 @@
 {%- endunless -%}
 <script src="{{ 'quantity-popover.js' | asset_url }}" defer="defer"></script>
 
-<cart-items class="gradient color-{{ section.settings.color_scheme }} isolate{% if cart == empty %} is-empty{% else %} section-{{ section.id }}-padding{% endif %}">
+<cart-items class="z-[10] gradient color-{{ section.settings.color_scheme }} isolate{% if cart == empty %} is-empty{% else %} section-{{ section.id }}-padding{% endif %}">
   <div class="page-width">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-10">
       <div class="flex items-center gap-6 sm:flex-col justify-between">
@@ -691,6 +691,80 @@
       id="cart-link-copied-msg"
       value="{{ 'extra_translations.cart_link_copied' | t }}"
     >
+    <input
+      type="hidden"
+      id="cart-name-modal-title"
+      value="{{ 'extra_translations.cart_name_modal_title' | t }}"
+    >
+    <input
+      type="hidden"
+      id="cart-name-modal-description"
+      value="{{ 'extra_translations.cart_name_modal_description' | t }}"
+    >
+    <input
+      type="hidden"
+      id="cart-name-modal-placeholder"
+      value="{{ 'extra_translations.cart_name_modal_input_placeholder' | t }}"
+    >
+    <input
+      type="hidden"
+      id="cart-name-modal-cancel"
+      value="{{ 'extra_translations.cart_name_modal_cancel' | t }}"
+    >
+    <input
+      type="hidden"
+      id="cart-name-modal-share"
+      value="{{ 'extra_translations.cart_name_modal_share' | t }}"
+    >
+  </div>
+
+  <!-- Cart Name Modal -->
+  <div
+    id="cart-name-modal"
+    style="display:none;"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]"
+    onclick="if(event.target === this) closeCartNameModal()"
+  >
+    <div class="bg-white rounded-2xl p-4 sm:p-8 shadow-2xl max-w-[420px] w-[calc(100%-2rem)] sm:w-[420px] mx-4 relative" onclick="event.stopPropagation()">
+      <button
+        onclick="closeCartNameModal()"
+        class="absolute top-3 right-4 text-gray-400 hover:text-gray-600 text-4xl leading-none transition-colors"
+        aria-label="Close"
+        style="font-size: 2.5rem; line-height: 2.5rem;"
+      >
+        &times;
+      </button>
+      <h2 class="text-2xl font-bold mb-3 text-center text-[#01756E]">
+        {{ 'extra_translations.cart_name_modal_title' | t }}
+      </h2>
+      <p class="mb-6 text-gray-600 text-sm sm:text-base text-center">
+        {{ 'extra_translations.cart_name_modal_description' | t }}
+      </p>
+      <div class="mb-6">
+        <input
+          type="text"
+          id="cart-name-input"
+          placeholder="{{ 'extra_translations.cart_name_modal_input_placeholder' | t }}"
+          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#01A89E] focus:border-transparent transition-all text-base"
+          maxlength="100"
+        />
+      </div>
+      <div class="flex gap-3">
+        <button
+          onclick="closeCartNameModal()"
+          class="flex-1 px-4 py-3 rounded-lg text-base font-medium border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
+        >
+          {{ 'extra_translations.cart_name_modal_cancel' | t }}
+        </button>
+        <button
+          onclick="proceedWithCartName()"
+          id="proceed-cart-name-btn"
+          class="flex-1 px-4 py-3 rounded-lg text-base font-bold bg-gradient-to-r from-[#01756E] via-[#01A89E] to-[#00CFC8] text-white hover:from-[#01635D] hover:via-[#018F87] hover:to-[#00B8B2] transition-all"
+        >
+          {{ 'extra_translations.cart_name_modal_share' | t }}
+        </button>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -1057,7 +1131,31 @@ function showCartCopiedToast(message = cartLinkCopiedMsg ) {
 
 
 
-  async function shareCart() {
+  window.showCartNameModal = function() {
+    const modal = document.getElementById('cart-name-modal');
+    const input = document.getElementById('cart-name-input');
+    if (modal && input) {
+      input.value = '';
+      modal.style.display = 'flex';
+      input.focus();
+    }
+  }
+
+  window.closeCartNameModal = function() {
+    const modal = document.getElementById('cart-name-modal');
+    if (modal) {
+      modal.style.display = 'none';
+    }
+  }
+
+  window.proceedWithCartName = async function() {
+    const input = document.getElementById('cart-name-input');
+    const cartName = input ? input.value.trim() : '';
+    closeCartNameModal();
+    await shareCart(cartName);
+  }
+
+  async function shareCart(cartName = '') {
     const btn = document.getElementById('share-cart-btn');
     const spinner = document.getElementById('share-cart-spinner');
     const btnText = btn.querySelector('.share-cart-text');
@@ -1089,17 +1187,24 @@ function showCartCopiedToast(message = cartLinkCopiedMsg ) {
 
       const relatedChatUserId = JSON.parse(localStorage.getItem('relatedChatUserId'))?.value || null;
       
+      const requestBody = {
+        customer_id,
+        items,
+        expires_at,
+        relatedChatUserId
+      };
+
+      // Add cart_name only if provided
+      if (cartName) {
+        requestBody.cart_name = cartName;
+      }
+      
       const response = await fetch('{{settings['loyalty-points-server-URL']}}/shared-carts', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          customer_id,
-          items,
-          expires_at,
-          relatedChatUserId
-        }),
+        body: JSON.stringify(requestBody),
       });
       
       const data = await response.json();
@@ -1130,7 +1235,19 @@ function showCartCopiedToast(message = cartLinkCopiedMsg ) {
 
     document
       .getElementById('share-cart-btn')
-      .addEventListener('click', shareCart)
+      .addEventListener('click', function() {
+        window.showCartNameModal();
+      });
+
+    // Allow Enter key to submit cart name
+    const cartNameInput = document.getElementById('cart-name-input');
+    if (cartNameInput) {
+      cartNameInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          window.proceedWithCartName();
+        }
+      });
+    }
   </script>
 </cart-items>
 

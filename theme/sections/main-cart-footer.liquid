@@ -153,6 +153,12 @@
               name="attributes[promo_code]"
               :value="promoCodeContent"
             >
+            <input
+              hidden
+              form="cart"
+              name="attributes[related_chat_user_id]"
+              id="related-chat-user-id-input"
+            >
             <p
               x-show="isPromoCodeEnabled && isPromoCodeRequired && !isPromoCodeValid() "
               class="text-red-500 text-[12px] font-medium mt-1"
@@ -432,6 +438,21 @@
           })
       })
     }
+
+    // Set relatedChatUserId from localStorage to hidden input
+    document.addEventListener('DOMContentLoaded', function () {
+      const relatedChatUserIdInput = document.getElementById('related-chat-user-id-input')
+      if (relatedChatUserIdInput) {
+        try {
+          const relatedChatUserId = JSON.parse(localStorage.getItem('relatedChatUserId'))?.value || null
+          if (relatedChatUserId) {
+            relatedChatUserIdInput.value = relatedChatUserId
+          }
+        } catch (e) {
+          console.error('Error reading relatedChatUserId from localStorage:', e)
+        }
+      }
+    })
   })()
 </script>
 

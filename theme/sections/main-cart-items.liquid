@@ -10,7 +10,7 @@
 {%- endunless -%}
 <script src="{{ 'quantity-popover.js' | asset_url }}" defer="defer"></script>
 
-<cart-items class="z-[10] gradient color-{{ section.settings.color_scheme }} isolate{% if cart == empty %} is-empty{% else %} section-{{ section.id }}-padding{% endif %}">
+<cart-items class="z-[2] gradient color-{{ section.settings.color_scheme }} isolate{% if cart == empty %} is-empty{% else %} section-{{ section.id }}-padding{% endif %}">
   <div class="page-width">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-10">
       <div class="flex items-center gap-6 sm:flex-col justify-between">

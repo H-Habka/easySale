@@ -119,32 +119,24 @@
                 class="full-unstyled-link "
                 aria-labelledby="StandardCardNoMediaLink-{{ section_id }}-{{ card_product.id }} NoMediaStandardBadge-{{ section_id }}-{{ card_product.id }}"
               >
+                {%- assign product_brand = card_product.metafields.custom.brand.value
+                  | default: card_product.metafields.custom.brand
+                  | default: ''
+                  | strip
+                -%}
+                <p class="text-teal-600 text-[14px] font-semibold">
+                  {{ product_brand }}
+                </p>
                 <div
                   x-data="
                     {
                       raw: `{{ card_product.title | escape }}`,
                       get highlighted() {
-                        // All brands (unique, merged)
-                        const brands = ['A.P.C.','Alexander Mcqueen','Amina Muaddi','Bally','Balenciaga','Baume Et Mercier','Blancpain','Bonpoint','Bottega Veneta','Breitling','Bvlgari','Burberry','Cahu','Carl F. Bucherer','Cartier','Casablanca','Celine','Chanel','Chloé','Coach','Corum','Dior','Dolce & Gabbana','Ebel','Emporio Armani','Fendi','Ferragamo','Fossil','Franck Muller','Furla','Gevril','Girard Perregaux','Givenchy','Gucci','Gv2 By Gevril','Hamilton','Harry Winston','Hermes','Hublot','Inoui Editions','IWC','Isabel Marant','Jaeger LeCoultre','Jimmy Choo','JW Anderson','Kara','Kenzo','Kipling','La Double J','Le Sportsac','Locman','Loewe','Longchamp','Longines','Mach & Mach','Maria La Rosa','Marni','Matt & Nat','Maui Jim','MCM','Michele','Michel Jordi','Michael Kors','MM6','Moncler','Montblanc','Movado','Off-White','Omega','Paco Rabanne','Philipp Plein','Piaget','Prada','Prada Linea Rossa','Rado','Ray-Ban','Saint Laurent','See By Chloe','Stella McCartney','Tag Heuer','The Attico','Tom Ford','Tory Burch','Tudor','Tumi','Ulysse Nardin','Vacheron Constantin','Valentino Garavani','Van Cleef & Arpels','Versace','Wandler','Zenith','Adee Kaye','Akribos Xxiv','Alpina','Armand Nicolet','Audemars Piguet','Ball','Bedat','Bell And Ross','Bertha','Breguet','Brera Orologi','Briston','Bulova','Certina','Chopard','Christian Van Sant','Citizen','Concord','Dufa','Edox','Egard','Empress','Ferre Milano','Franck Dubarry','Frederique Constant','Gc By Guess','Giulio Romano','Glashutte Original','Grand Seiko','Guess','Haurex Italy','Invicta','Jaquet Droz','JBW','Johan Eric','Junghans','Just Cavalli','Le Vian','Louis Erard','Mathey-Tissot','Mido','Nomos','Oceanaut','Olivia Burton','Oniss','Orient','Oris','Panerai','Polanti','Porsamo Bleu','Raymond Weil','Rebel','Rene Mouris','Roberto Cavalli','Rolex','Rudiger','Salvatore Ferragamo','Seiko','Sevenfriday','Shinola','Sophie And Freda','Stuhrling Original','Swarovski','Technomarine','Tissot','Titoni','Torino Carrero','U-Boat','Victorinox'];
-                        // Escape for regex (spaces, dots, etc.)
-                        const escapeReg = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                        // Build regex: Brand, (with comma+space), case-insensitive
-                        const brandRegex = new RegExp(
-                          `(${brands.map(escapeReg).join('|')}),\\s`,
-                          'gi'
-                        );
-                        // Highlight and remove comma
-                        let processed = this.raw.replace(brandRegex, match => {
-                          // remove comma and space, just leave brand
-                          const brand = match.slice(0, -2);
-                          return `<br><span class='text-teal-600 text-[14px] font-semibold'>${brand}</span> `;
-                        });
-
                         // Regex for quantity/unit/x formats
                         const unitRegex = /(\d{1,5}(?:[.,]\d+)?\s?(?:pcs?|Pcs?|pkts?|pkt|bags?|bag|gm|kg|Kg|ltrs?|ltr|Ltr|ml|gallon|sheet|egg|Tray|cartoon|boxes?|pkt|Pack|bottle|box|sheet|bag|egg|pcs|pkt|gm|kg|ltr|ml|gallon|sheet|egg|tray|carton|sachet|tin|dozen)\b(?:\s*x\s*\d{1,5}(?:[.,]\d+)?\s?(?:pcs?|Pcs?|pkts?|pkt|bags?|bag|gm|kg|Kg|ltrs?|ltr|Ltr|ml|gallon|sheet|egg|Tray|cartoon|boxes?|pkt|Pack|bottle|box|sheet|bag|egg|pcs|pkt|gm|kg|ltr|ml|gallon|sheet|egg|tray|carton|sachet|tin|dozen)?)?)/gi;
 
                         // Highlight units as before
-                        return processed.replace(unitRegex, match =>
+                        return this.raw.replace(unitRegex, match =>
                           `<span class='text-teal-600 text-[14px] font-semibold'>${match}</span>`
                         );
                       }
@@ -201,32 +193,24 @@
               class="full-unstyled-link "
               aria-labelledby="CardLink-{{ section_id }}-{{ card_product.id }} Badge-{{ section_id }}-{{ card_product.id }}"
             >
+              {%- assign product_brand = card_product.metafields.custom.brand.value
+                | default: card_product.metafields.custom.brand
+                | default: ''
+                | strip
+              -%}
+              <p class="text-teal-600 text-[14px] font-semibold">
+                {{ product_brand }}
+              </p>
               <div
                 x-data="
                   {
                     raw: `{{ card_product.title | escape }}`,
                     get highlighted() {
-                      // All brands (unique, merged)
-                      const brands = ['A.P.C.','Alexander Mcqueen','Amina Muaddi','Bally','Balenciaga','Baume Et Mercier','Blancpain','Bonpoint','Bottega Veneta','Breitling','Bvlgari','Burberry','Cahu','Carl F. Bucherer','Cartier','Casablanca','Celine','Chanel','Chloé','Coach','Corum','Dior','Dolce & Gabbana','Ebel','Emporio Armani','Fendi','Ferragamo','Fossil','Franck Muller','Furla','Gevril','Girard Perregaux','Givenchy','Gucci','Gv2 By Gevril','Hamilton','Harry Winston','Hermes','Hublot','Inoui Editions','IWC','Isabel Marant','Jaeger LeCoultre','Jimmy Choo','JW Anderson','Kara','Kenzo','Kipling','La Double J','Le Sportsac','Locman','Loewe','Longchamp','Longines','Mach & Mach','Maria La Rosa','Marni','Matt & Nat','Maui Jim','MCM','Michele','Michel Jordi','Michael Kors','MM6','Moncler','Montblanc','Movado','Off-White','Omega','Paco Rabanne','Philipp Plein','Piaget','Prada','Prada Linea Rossa','Rado','Ray-Ban','Saint Laurent','See By Chloe','Stella McCartney','Tag Heuer','The Attico','Tom Ford','Tory Burch','Tudor','Tumi','Ulysse Nardin','Vacheron Constantin','Valentino Garavani','Van Cleef & Arpels','Versace','Wandler','Zenith','Adee Kaye','Akribos Xxiv','Alpina','Armand Nicolet','Audemars Piguet','Ball','Bedat','Bell And Ross','Bertha','Breguet','Brera Orologi','Briston','Bulova','Certina','Chopard','Christian Van Sant','Citizen','Concord','Dufa','Edox','Egard','Empress','Ferre Milano','Franck Dubarry','Frederique Constant','Gc By Guess','Giulio Romano','Glashutte Original','Grand Seiko','Guess','Haurex Italy','Invicta','Jaquet Droz','JBW','Johan Eric','Junghans','Just Cavalli','Le Vian','Louis Erard','Mathey-Tissot','Mido','Nomos','Oceanaut','Olivia Burton','Oniss','Orient','Oris','Panerai','Polanti','Porsamo Bleu','Raymond Weil','Rebel','Rene Mouris','Roberto Cavalli','Rolex','Rudiger','Salvatore Ferragamo','Seiko','Sevenfriday','Shinola','Sophie And Freda','Stuhrling Original','Swarovski','Technomarine','Tissot','Titoni','Torino Carrero','U-Boat','Victorinox'];
-                      // Escape for regex (spaces, dots, etc.)
-                      const escapeReg = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                      // Build regex: Brand, (with comma+space), case-insensitive
-                      const brandRegex = new RegExp(
-                        `(${brands.map(escapeReg).join('|')}),\\s`,
-                        'gi'
-                      );
-                      // Highlight and remove comma
-                      let processed = this.raw.replace(brandRegex, match => {
-                        // remove comma and space, just leave brand
-                        const brand = match.slice(0, -2);
-                        return `<br><span class='text-teal-600 text-[14px] font-semibold'>${brand}</span> `;
-                      });
-
                       // Regex for quantity/unit/x formats
                       const unitRegex = /(\d{1,5}(?:[.,]\d+)?\s?(?:pcs?|Pcs?|pkts?|pkt|bags?|bag|gm|kg|Kg|ltrs?|ltr|Ltr|ml|gallon|sheet|egg|Tray|cartoon|boxes?|pkt|Pack|bottle|box|sheet|bag|egg|pcs|pkt|gm|kg|ltr|ml|gallon|sheet|egg|tray|carton|sachet|tin|dozen)\b(?:\s*x\s*\d{1,5}(?:[.,]\d+)?\s?(?:pcs?|Pcs?|pkts?|pkt|bags?|bag|gm|kg|Kg|ltrs?|ltr|Ltr|ml|gallon|sheet|egg|Tray|cartoon|boxes?|pkt|Pack|bottle|box|sheet|bag|egg|pcs|pkt|gm|kg|ltr|ml|gallon|sheet|egg|tray|carton|sachet|tin|dozen)?)?)/gi;
 
                       // Highlight units as before
-                      return processed.replace(unitRegex, match =>
+                      return this.raw.replace(unitRegex, match =>
                         `<span class='text-teal-600 text-[14px] font-semibold'>${match}</span>`
                       );
                     }

@@ -48,7 +48,7 @@
                   const relatedChatUserId =
                     JSON.parse(localStorage.getItem('relatedChatUserId'))
                       ?.value || null
-                  if (relatedChatUserId) {
+                  if (Number.isFinite(relatedChatUserId)) {
                     document.getElementById(
                       'cart-drawer-login-item-1'
                     ).style.display = 'none'

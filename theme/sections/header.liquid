@@ -259,7 +259,7 @@
               const relatedChatUserId =
                 JSON.parse(localStorage.getItem('relatedChatUserId'))?.value ||
                 null
-              if (relatedChatUserId) {
+              if (Number.isFinite(relatedChatUserId)) {
                 document.getElementById('header-login-button').style.display =
                   'none'
               }

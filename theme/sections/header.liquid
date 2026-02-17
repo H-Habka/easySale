@@ -141,7 +141,16 @@
   endfor
 -%}
 
-<{% if section.settings.sticky_header_type != 'none' %}sticky-header data-sticky-type="{{ section.settings.sticky_header_type }}"{% else %}div{% endif %} class="header-wrapper color-{{ section.settings.color_scheme }} gradient{% if section.settings.show_line_separator %} header-wrapper--border-bottom{% endif %}">
+{%- if section.settings.sticky_header_type != 'none' -%}
+  <sticky-header
+    data-sticky-type="{{ section.settings.sticky_header_type }}"
+    class="header-wrapper color-{{ section.settings.color_scheme }} gradient{% if section.settings.show_line_separator %} header-wrapper--border-bottom{% endif %}"
+  >
+{%- else -%}
+  <div
+    class="header-wrapper color-{{ section.settings.color_scheme }} gradient{% if section.settings.show_line_separator %} header-wrapper--border-bottom{% endif %}"
+  >
+{%- endif -%}
   {%- liquid
     assign social_links = false
     assign localization_forms = false
@@ -376,7 +385,11 @@
       </a>
     </div>
   </header>
-</{% if section.settings.sticky_header_type != 'none' %}sticky-header{% else %}div{% endif %}>
+{%- if section.settings.sticky_header_type != 'none' -%}
+  </sticky-header>
+{%- else -%}
+  </div>
+{%- endif -%}
 
 {%- if settings.cart_type == "notification" -%}
   {%- render 'cart-notification', color_scheme: section.settings.color_scheme, desktop_menu_type: section.settings.menu_type_desktop -%}
@@ -849,6 +862,65 @@
           "type": "liquid",
           "id": "liquid_code_test",
           "label" : "Custom Liquid Code"
+        }
+      ]
+    },
+    {
+      "type" : "menu3",
+      "name" : "Menu3",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label" : "Title"
+        },
+        {
+          "type": "text",
+          "id": "order",
+          "label" : "order"
+        },
+        {
+          "type": "link_list",
+          "id": "extraLinklist",
+          "label" : "Extra Linklist"
+        },
+        {
+          "type": "richtext",
+          "id": "menu_title",
+          "label": "Menu Title",
+          "info": "Title to show under the list of collections"
+        }
+      ]
+    },
+    {
+      "type": "menu3_tab",
+      "name": "Menu3 tab",
+      "settings": [
+        {
+          "type": "text",
+          "id": "order",
+          "label": "Menu order (parent)"
+        },
+        {
+          "type": "text",
+          "id": "tab_title",
+          "label": "Tab title"
+        },
+        {
+          "type": "select",
+          "id": "image_priority",
+          "label": "Image priority",
+          "default": "collection_first",
+          "options": [
+            { "value": "collection_first", "label": "Collection image first, then first product image" },
+            { "value": "product_first", "label": "First product image first, then collection image" }
+          ]
+        },
+        {
+          "type": "collection_list",
+          "id": "collections",
+          "label": "Collections",
+          "limit": 30
         }
       ]
     }

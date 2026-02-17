@@ -14,67 +14,146 @@
 <div class="collection-hero{% if section.settings.show_collection_image and collection.image %} collection-hero--with-image{% endif %} color-{{ section.settings.color_scheme }} gradient">
   <div class="collection-hero__inner page-width {% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}">
     <div class="collection-hero__text-wrapper">
-      <h1
-        x-data="{title: `{{ collection.title }}`, splittedTitle : [], generatedURLs : [] }"
-        x-init="
-           const splittedTitleOrigin = title.split('/')
-           splittedTitle=splittedTitleOrigin
-           const splittedTitleFormatted = splittedTitleOrigin.map(item => item.trim().toLowerCase().split(' ').join('-'))
-           const originURL = window.location.origin
-           const pathname = window.location.pathname
-           const pathnameAfterRemoveLastPart = pathname.split('/').slice(0,-1).join('/')
+      {%- assign breadcrumb_titles_lines = section.settings.breadcrumb_titles
+        | default: ''
+        | replace: '</p><p>', '||LINE||'
+        | replace: '<br />', '||LINE||'
+        | replace: '<br>', '||LINE||'
+        | replace: '<p>', ''
+        | replace: '</p>', '||LINE||'
+        | strip_html
+        | split: '||LINE||'
+      -%}
+      {%- assign breadcrumb_urls_lines = section.settings.breadcrumb_urls
+        | default: ''
+        | replace: '</p><p>', '||LINE||'
+        | replace: '<br />', '||LINE||'
+        | replace: '<br>', '||LINE||'
+        | replace: '<p>', ''
+        | replace: '</p>', '||LINE||'
+        | strip_html
+        | split: '||LINE||'
+      -%}
 
-           function handleCreateURL(idx){
-             const newLastPartOfPathname = splittedTitleFormatted.slice(0, idx + 1).join('-')
-             const newPathname = `${pathnameAfterRemoveLastPart}/${newLastPartOfPathname}`
-             const newURL = `${originURL}${newPathname}`
-             return  newURL
+      {%- if section.settings.show_title -%}
+        {%- assign has_manual_breadcrumbs = false -%}
+        {%- for crumb_title_raw in breadcrumb_titles_lines -%}
+          {%- assign crumb_title = crumb_title_raw | strip -%}
+          {%- assign crumb_url = breadcrumb_urls_lines[forloop.index0]
+            | default: ''
+            | strip
+          -%}
+          {%- if crumb_title != blank and crumb_url != blank -%}
+            {%- assign has_manual_breadcrumbs = true -%}
+          {%- endif -%}
+        {%- endfor -%}
 
-           }
-           const generateURLs = () => {
-             return splittedTitleOrigin.map((item,idx) => handleCreateURL(idx))
-           }
+        {%- if has_manual_breadcrumbs -%}
+          <h1 class="collection-hero__title">
+            <span class="visually-hidden">
+              {{- 'sections.collection_template.title' | t }}:
+            </span>
+            <div class="flex items-center gap-3 flex-wrap">
+              {%- for crumb_title_raw in breadcrumb_titles_lines -%}
+                {%- assign crumb_title = crumb_title_raw | strip -%}
+                {%- assign crumb_url = breadcrumb_urls_lines[forloop.index0]
+                  | default: ''
+                  | strip
+                -%}
 
-          generatedURLs = generateURLs()
-        "
-        class="collection-hero__title"
-      >
-        <span class="visually-hidden">
-          {{- 'sections.collection_template.title' | t }}:
-        </span>
-        <div class="flex items-center gap-3 flex-wrap">
-          <template x-for="(item,index) in splittedTitle.slice(0,-1)">
-            <div class="flex items-center gap-2">
-              <a
-                x-show="!window.location.pathname.split('/').includes('ar')"
-                x-bind:href="generatedURLs[index]"
-                class="flex items-center"
-              >
-                <p
-                  x-text="item"
-                  class="
-                    text-nowrap !text-2xl cursor-pointer relative font-medium
-                    hover:text-primary-200 transition-all duration-150
-                    hover:scale-103 hover:-translate-y-[1px]
-                    before:top-full before:start-0 before:absolute before:w-0 before:h-px before:bg-primary-100/60 before:transition-all hover:before:w-full before:duration-200
-                    after:top-full after:end-0 after:absolute after:w-0 after:h-px after:bg-primary-100/60 after:transition-all hover:after:w-full after:duration-200
-                  "
-                ></p>
-              </a>
-              <p
-                x-text="item"
-                x-show="window.location.pathname.split('/').includes('ar')"
-                class="!text-xl font-medium"
-              ></p>
-              <span class="mx-1 text-gray-300 text-lg">/</span>
+                {%- if crumb_title != blank and crumb_url != blank -%}
+                  <div class="flex items-center gap-2">
+                    {%- if request.locale.iso_code == 'ar' -%}
+                      <p class="!text-xl font-semibold">{{ crumb_title }}</p>
+                    {%- else -%}
+                      <a href="{{ crumb_url }}" class="flex items-center">
+                        <p
+                          class="
+                            text-nowrap !text-2xl cursor-pointer relative font-semibold
+                            hover:text-primary-200 transition-all duration-150
+                            hover:scale-103 hover:-translate-y-[1px]
+                            before:top-full before:start-0 before:absolute before:w-0 before:h-px before:bg-primary-100/60 before:transition-all hover:before:w-full before:duration-200
+                            after:top-full after:end-0 after:absolute after:w-0 after:h-px after:bg-primary-100/60 after:transition-all hover:after:w-full after:duration-200
+                          "
+                        >
+                          {{ crumb_title }}
+                        </p>
+                      </a>
+                    {%- endif -%}
+                    <span class="mx-1 text-gray-300 text-lg">/</span>
+                  </div>
+                {%- endif -%}
+              {%- endfor -%}
+
+              <p class="!text-2xl">{{ collection.title }}</p>
             </div>
-          </template>
-          <p
-            x-text="splittedTitle.slice(-1)[0]"
-            class="!text-2xl"
-          ></p>
-        </div>
-      </h1>
+          </h1>
+        {%- else -%}
+          <h1
+            class="collection-hero__title"
+            x-data="{ title: `{{ collection.title | escape }}`, locale: `{{ request.locale.iso_code | escape }}`, splittedTitle: [], generatedURLs: [] }"
+            x-init="
+              const splittedTitleOrigin = title.split('/')
+              splittedTitle = splittedTitleOrigin
+
+              const splittedTitleFormatted = splittedTitleOrigin.map(item =>
+                item.trim().toLowerCase().split(' ').join('-')
+              )
+              const originURL = window.location.origin
+              const pathname = window.location.pathname
+              const pathnameAfterRemoveLastPart = pathname.split('/').slice(0, -1).join('/')
+
+              function handleCreateURL(idx) {
+                const newLastPartOfPathname = splittedTitleFormatted
+                  .slice(0, idx + 1)
+                  .join('-')
+                const newPathname = `${pathnameAfterRemoveLastPart}/${newLastPartOfPathname}`
+                const newURL = `${originURL}${newPathname}`
+                return newURL
+              }
+
+              const generateURLs = () => {
+                return splittedTitleOrigin.map((item, idx) => handleCreateURL(idx))
+              }
+
+              generatedURLs = generateURLs()
+            "
+          >
+            <span class="visually-hidden">
+              {{- 'sections.collection_template.title' | t }}:
+            </span>
+            <div class="flex items-center gap-3 flex-wrap">
+              <template x-for="(item, index) in splittedTitle.slice(0, -1)">
+                <div class="flex items-center gap-2">
+                  <a
+                    x-show="locale !== 'ar'"
+                    x-bind:href="generatedURLs[index]"
+                    class="flex items-center"
+                  >
+                    <p
+                      x-text="item"
+                      class="
+                        text-nowrap !text-2xl cursor-pointer relative font-semibold
+                        hover:text-primary-200 transition-all duration-150
+                        hover:scale-103 hover:-translate-y-[1px]
+                        before:top-full before:start-0 before:absolute before:w-0 before:h-px before:bg-primary-100/60 before:transition-all hover:before:w-full before:duration-200
+                        after:top-full after:end-0 after:absolute after:w-0 after:h-px after:bg-primary-100/60 after:transition-all hover:after:w-full after:duration-200
+                      "
+                    ></p>
+                  </a>
+                  <p
+                    x-text="item"
+                    x-show="locale === 'ar'"
+                    class="!text-xl font-semibold"
+                  ></p>
+                  <span class="mx-1 text-gray-300 text-lg">/</span>
+                </div>
+              </template>
+              <p x-text="splittedTitle.slice(-1)[0]" class="!text-2xl"></p>
+            </div>
+          </h1>
+        {%- endif -%}
+      {%- endif -%}
 
       {%- if section.settings.show_collection_description -%}
         <div class="collection-hero__description rte">
@@ -114,6 +193,24 @@
     {
       "type": "paragraph",
       "content": "t:sections.main-collection-banner.settings.paragraph.content"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_title",
+      "default": true,
+      "label": "Show title"
+    },
+    {
+      "type": "richtext",
+      "id": "breadcrumb_titles",
+      "label": "Breadcrumb titles (optional)",
+      "info": "One per line. Previous pages only."
+    },
+    {
+      "type": "richtext",
+      "id": "breadcrumb_urls",
+      "label": "Breadcrumb URLs (optional)",
+      "info": "One per line, same order as titles. Example: /collections/men"
     },
     {
       "type": "checkbox",

@@ -4,10 +4,11 @@
       {% assign mega_menu = false %}
       {% assign order = forloop.index | append: '' %}
       {% for block in section.blocks %}
-        {% assign block_order = block.settings.order | append: '' %}
-        {% if block_order == order %}
-          {% assign mega_menu = true %}
-          {% if block.type == 'menu1' %}
+        {% if block.type == 'menu1' or block.type == 'menu2' or block.type == 'menu3' %}
+          {% assign block_order = block.settings.order | append: '' %}
+          {% if block_order == order %}
+            {% assign mega_menu = true %}
+            {% if block.type == 'menu1' %}
             <li
               class="group menu-{{link.handle}} pb-2"
               x-data="{ activeChild : 1, timeoutIndecators : [] }"
@@ -319,6 +320,322 @@
                 </div>
               </div>
             </li>
+          {% elsif block.type == 'menu3' %}
+            <li
+              class="group menu-{{link.handle}} pb-2"
+              x-data="{ activeChild : 1, timeoutIndecators : [] }"
+              x-init="$el.addEventListener('mouseleave' , () =>  activeChild = 1)"
+            >
+              <p class="relative before:top-full before:start-0 before:absolute before:w-0 before:h-[3px] before:bg-primary-200 before:transition-all hover:before:w-full group-hover:before:w-full  duration-300 font-medium after:bottom-[-8px] after:start-0 after:absolute after:w-full after:h-3 after:bg-transparent after:transition-all pb-2 text-2xl  cursor-default">
+                {{ link.title }}
+              </p>
+              <div class="shadow-[0px_10px_10px_-10px_rgba(33,35,38,0.1)] px-4 py-4 z-[-1] absolute !start-0 opacity-0 -translate-y-full group-hover:opacity-100 group-hover:translate-y-0 !w-full top-full  transition-all hover:opacity-100 duration-300 bg-white ">
+                <div class="py-4 pt-8">
+                  <div class="mx-auto">
+                    <div class="flex items-center justify-center">
+                      <div class="relative justify-center flex px-[40px] !gap-[30px] border-b pb-1 border-gray-200 menu-{{link.handle}}">
+                        {% assign tab_index = 0 %}
+                        {% for tab_block in section.blocks -%}
+                          {% if tab_block.type == 'menu3_tab' %}
+                            {% assign tab_order = tab_block.settings.order | append: '' %}
+                            {% if tab_order == order %}
+                              {% assign tab_index = tab_index | plus: 1 %}
+                              <div class="">
+                                <div
+                                  x-on:mouseover="
+                                    (e) => {
+                                    const newTimeout = setTimeout(()=> {
+                                    activeChild = {{ tab_index }}
+                                    }, 250)
+                                    timeoutIndecators.push(newTimeout)
+                                    }
+                                  "
+                                  x-on:mouseleave="
+                                    e => {
+                                      timeoutIndecators.forEach(timeout => {
+                                      clearTimeout(timeout)})
+                                    }
+                                  "
+                                  x-on:click="
+                                    () => {
+                                    activeChild = {{ tab_index }}
+                                    }
+                                  "
+                                  x-bind:class="activeChild == {{ tab_index }} ? 'before:w-full' : '' "
+                                  class="relative before:top-full before:start-0 before:absolute before:w-0 before:h-[3px] before:bg-primary-200 before:transition-all duration-300 cursor-pointer !text-xl font-normal pb-2 group/menuTitle"
+                                >
+                                  <p class="opacity-0 ">{{ tab_block.settings.tab_title }}</p>
+                                  <p
+                                    x-bind:class="activeChild == {{ tab_index }} ? 'font-medium' : ''"
+                                    class="absolute start-0 top-0 whitespace-nowrap transition-all duration-200 group-hover/menuTitle:font-medium"
+                                  >
+                                    {{ tab_block.settings.tab_title }}
+                                  </p>
+                                </div>
+
+                                {% if tab_block.settings.collections != blank %}
+                                  <ul
+                                    x-show="activeChild == {{ tab_index }}"
+                                    x-transition:enter="transition transform duration-500"
+                                    x-transition:enter-start="opacity-0 -translate-y-2"
+                                    x-transition:enter-end="opacity-100 translate-y-0"
+                                    x-transition:leave="transition transform duration-500"
+                                    x-transition:leave-start="opacity-100 translate-y-0"
+                                    x-transition:leave-end="opacity-0 translate-y-2"
+                                    class="absolute start-1/2 rtl:translate-x-1/2 -translate-x-1/2 mt-7 transition-all flex gap-2"
+                                  >
+                                    <div
+                                      x-data="
+                                        {
+                                          scrollPosition: 'full',
+                                          scrollAmount: document.documentElement.dir === 'rtl' ? -200 : 200,
+                                          isLinkDragged: false
+                                        }
+                                      "
+                                      class="relative mx-auto  rounded-md p-2 sm:p-4"
+                                    >
+                                      <button
+                                        x-data="
+                                          {
+                                          isPreviousButtonHidden : true
+                                          }
+                                        "
+                                        x-init="
+                                          $watch('scrollPosition', value => {
+                                          isPreviousButtonHidden = value == 'start' || value == 'full'
+                                          })
+                                        "
+                                        @click="
+                                          $refs.slider.scrollBy({
+                                            left: -scrollAmount,
+                                            behavior: 'smooth',
+                                          })
+                                        "
+                                        x-bind:class="isPreviousButtonHidden ? 'opacity-0 pointer-events-none' : '' "
+                                        class="absolute -start-10 top-[75px] z-10 w-11 h-11 flex translate-y-1/2 items-center justify-center  hover:-translate-x-2  transition-all duration-300 rtl:hover:translate-x-2 hover:scale-125"
+                                      >
+                                        <svg
+                                          xmlns="http://www.w3.org/2000/svg"
+                                          viewBox="0 0 24 24"
+                                          fill="none"
+                                          stroke="currentColor"
+                                          stroke-width="2"
+                                          stroke-linecap="round"
+                                          stroke-linejoin="round"
+                                          class="feather feather-chevron-left rtl:rotate-180"
+                                        >
+                                          <polyline points="15 18 9 12 15 6"></polyline>
+                                        </svg>
+                                      </button>
+
+                                      <button
+                                        x-data="
+                                          {
+                                          isNextButtonHidden : true
+                                          }
+                                        "
+                                        x-init="
+                                          $watch('scrollPosition', value => {
+                                          isNextButtonHidden = value == 'end' || value == 'full'
+                                          })
+                                        "
+                                        @click="
+                                          $refs.slider.scrollBy({
+                                            left: scrollAmount,
+                                            behavior: 'smooth',
+                                          })
+                                        "
+                                        x-bind:class="isNextButtonHidden ? 'opacity-0 pointer-events-none' : '' "
+                                        class="absolute -end-10 top-[75px] z-10 w-11 h-11 flex translate-y-1/2 items-center justify-center  hover:translate-x-2  transition-all duration-300 rtl:hover:-translate-x-2 hover:scale-125"
+                                      >
+                                        <svg
+                                          xmlns="http://www.w3.org/2000/svg"
+                                          viewBox="0 0 24 24"
+                                          fill="none"
+                                          stroke="currentColor"
+                                          stroke-width="2"
+                                          stroke-linecap="round"
+                                          stroke-linejoin="round"
+                                          class="feather feather-chevron-right rtl:rotate-180"
+                                        >
+                                          <polyline points="9 18 15 12 9 6"></polyline>
+                                        </svg>
+                                      </button>
+                                      <div
+                                        class="overflow-hidden py-4 pb-8"
+                                      >
+                                        <div class="overflow-auto no-scrollbar ">
+                                          <div
+                                            x-ref="slider"
+                                            x-on:scroll="
+                                               (e) => {
+                                               const { scrollWidth, offsetWidth, scrollLeft } = e.target
+                                               const isInStartScrollPosition = Math.floor(Math.abs(scrollLeft)) === 0
+                                               const isInEndScrollPosition = generateRange(
+                                                 scrollWidth - 5,
+                                                 scrollWidth + 5,
+                                               ).includes(Math.floor(Math.abs(scrollLeft)) + Math.floor(offsetWidth))
+                                               if (isInStartScrollPosition && isInEndScrollPosition) {
+                                                 scrollPosition = 'full'
+                                               } else if (isInStartScrollPosition) {
+                                                 scrollPosition = 'start'
+                                               } else if (isInEndScrollPosition) {
+                                                 scrollPosition = 'end'
+                                               } else {
+                                                 scrollPosition = 'between'
+                                               }
+                                              }
+                                            "
+                                            class=" max-w-[800px] no-scrollbar overflow-x-auto flex gap-4 pb-3"
+                                            x-init="
+                                              let isDown = false;
+                                              let startX;
+                                              let scrollLeft;
+                                              $el.addEventListener('mousedown', (e) => {
+                                              isDown = true;
+                                              startX = e.pageX - $el.offsetLeft;
+                                              scrollLeft = $el.scrollLeft;
+                                              });
+                                              $el.addEventListener('mouseleave', () => {
+                                              isDown = false;
+                                              });
+                                              $el.addEventListener('mouseup', (e) => {
+                                              isDown = false;
+                                              });
+                                              $el.addEventListener('mousemove', (e) => {
+                                              if (!isDown) return;
+                                              e.preventDefault();
+                                              const x = e.pageX - $el.offsetLeft;
+                                              const walk = (x - startX) * 1;
+                                              $el.scrollLeft = scrollLeft - walk;
+                                              });
+                                              $watch('activeChild', value => {
+                                              setTimeout(() =>{
+                                              if($el.scrollWidth > $el.offsetWidth && scrollPosition == 'full'){
+                                                  scrollPosition='start'
+                                                }}, 300)
+                                              })
+                                              $nextTick(() => {
+                                                if($el.scrollWidth > $el.offsetWidth){
+                                                  scrollPosition='start'
+                                                }
+                                              })
+                                            "
+                                          >
+                                            {% for tab_collection in tab_block.settings.collections %}
+                                              <li class="">
+                                                <a
+                                                  draggable="false"
+                                                  href="{{ tab_collection.url }}"
+                                                  x-on:mousedown="
+                                                    e => {
+                                                      isLinkDragged = false
+                                                    }
+                                                  "
+                                                  x-on:mousemove="
+                                                    e => {
+                                                    isLinkDragged =true
+                                                    }
+                                                  "
+                                                  x-on:mouseup="
+                                                    e => {
+                                                      if(!isLinkDragged){
+                                                        switch (e.which) {
+                                                            case 1:
+                                                                window.location.href = $el.href
+                                                                break;
+                                                            default:
+                                                               undefined
+                                                        }
+                                                      }
+                                                    }
+                                                  "
+                                                  x-on:click="
+                                                    e => {
+                                                    e.stopPropagation()
+                                                    e.preventDefault()
+                                                    }
+                                                  "
+                                                >
+                                                  <div class="rounded-md hover:scale-110 transition-all hover:-translate-y-1 duration-300">
+                                                    {%- assign collection_image = tab_collection.featured_image
+                                                      | default: tab_collection.image
+                                                    -%}
+                                                    {%- assign product_image = blank -%}
+                                                    {%- if tab_collection.products_count > 0 -%}
+                                                      {%- assign product_image = tab_collection.products.first.featured_image -%}
+                                                    {%- endif -%}
+
+                                                    {%- assign preferred_image = blank -%}
+                                                    {%- if tab_block.settings.image_priority == 'product_first' -%}
+                                                      {%- assign preferred_image = product_image | default: collection_image -%}
+                                                    {%- else -%}
+                                                      {%- assign preferred_image = collection_image | default: product_image -%}
+                                                    {%- endif -%}
+
+                                                    {%- if preferred_image != blank -%}
+                                                      <img
+                                                        draggable="false"
+                                                        src="{{ preferred_image | image_url: width: 300 }}"
+                                                        alt="{{ tab_collection.title | escape }}"
+                                                        width="150px"
+                                                        height="150px"
+                                                        class="min-w-[150px] min-h-[150px] rounded-md object-cover"
+                                                      >
+                                                    {%- else -%}
+                                                      <div class="min-w-[150px] min-h-[150px] bg-gray-100 rounded-md"></div>
+                                                    {%- endif -%}
+                                                    <p class="text-center mt-2 text-xl px-2">
+                                                      {{ tab_collection.title }}
+                                                    </p>
+                                                  </div>
+                                                </a>
+                                              </li>
+                                            {% endfor %}
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </ul>
+                                {% endif %}
+                              </div>
+                            {% endif %}
+                          {% endif %}
+                        {% endfor %}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="w-full h-[270px] text-transparent">s</div>
+                  <div class="flex justify-center">
+                    <p class="text-center italic !text-4xl font-semibold">
+                      {{ block.settings.menu_title }}
+                    </p>
+                  </div>
+                  <div
+                    class="w-[30vw] mx-auto h-0 text-transparent border-b border-gray-700/15"
+                  >
+                    s
+                  </div>
+                  {% if block.settings.extraLinklist.links.size %}
+                    <div class="flex justify-center items-center flex-col gap-10 mt-6 pb-10">
+                      <div class="flex items-center gap-8">
+                        {% for child_link in block.settings.extraLinklist.links -%}
+                          <p
+                            class="
+                              relative font-medium hover:text-primary-200 transition-all duration-200 hover:scale-105 hover:-translate-y-[2px]  before:top-full before:start-0 before:absolute before:w-0 before:h-px before:bg-primary-100/50 before:transition-all hover:before:w-full before:duration-300
+                              after:top-full after:end-0 after:absolute after:w-0 after:h-px after:bg-primary-100/50 after:transition-all hover:after:w-full after:duration-300
+                            "
+                          >
+                            {{ child_link.title | link_to: child_link.url }}
+                          </p>
+                        {% endfor %}
+                      </div>
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+            </li>
           {% elsif block.type == 'menu2' %}
             <li
               class="group menu-{{link.handle}} pb-2"
@@ -379,6 +696,7 @@
             </li>
           {% else %}
             <div>tetsss</div>
+          {% endif %}
           {% endif %}
         {% endif %}
       {% endfor %}

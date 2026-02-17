@@ -53,54 +53,125 @@
       {%- endif -%}
 
       <div class="flex flex-wrap justify-center gap-4 md:gap-8">
-        {%- for block in section.blocks -%}
-          {%- assign collection = collections[block.settings.collection] -%}
-          <div
-            class="circle-collection-item flex flex-col items-center mx-2"
-            {{ block.shopify_attributes }}
-          >
-            <a href="{{ collection.url }}" class="block text-center">
-              <div class="circle-collection-image relative rounded-full overflow-hidden mb-3 transition-transform duration-300 hover:scale-105 flex items-center justify-center">
-                {%- if block.settings.image != blank -%}
-                  {{
-                    block.settings.image
-                    | image_url: width: 500
-                    | image_tag:
-                      loading: 'lazy',
-                      sizes: '(min-width: 750px) var(--desktop-size), var(--mobile-size)',
-                      widths: '165, 360, 535, 750, 1070, 1500',
-                      class: 'w-full h-full object-cover'
-                  }}
-                {%- elsif collection.featured_image -%}
-                  {{
-                    collection.featured_image
-                    | image_url: width: 500
-                    | image_tag:
-                      loading: 'lazy',
-                      sizes: '(min-width: 750px) var(--desktop-size), var(--mobile-size)',
-                      widths: '165, 360, 535, 750, 1070, 1500',
-                      class: 'w-full h-full object-cover'
-                  }}
-                {%- else -%}
-                  <div class="w-full h-full bg-gray-100 flex items-center justify-center">
+        {%- assign selected_collections = section.settings.collections -%}
+        {%- assign title_override_lines = section.settings.custom_titles_overrides
+          | default: ''
+          | replace: '</p><p>', '||LINE||'
+          | replace: '<br />', '||LINE||'
+          | replace: '<br>', '||LINE||'
+          | replace: '<p>', ''
+          | replace: '</p>', '||LINE||'
+          | strip_html
+          | split: '||LINE||'
+        -%}
+
+        {%- if selected_collections != blank -%}
+          {%- for collection in selected_collections -%}
+            {%- assign display_title = collection.title -%}
+            {%- assign index_str = forloop.index | append: '' -%}
+
+            {%- for line in title_override_lines -%}
+              {%- assign cleaned_line = line | strip -%}
+              {%- if cleaned_line == blank -%}
+                {%- continue -%}
+              {%- endif -%}
+
+              {%- assign override_index = cleaned_line | split: ':' | first | strip -%}
+              {%- if override_index == index_str -%}
+                {%- assign override_title = cleaned_line
+                  | remove_first: override_index
+                  | remove_first: ':'
+                  | strip
+                -%}
+                {%- if override_title != blank -%}
+                  {%- assign display_title = override_title -%}
+                {%- endif -%}
+              {%- endif -%}
+            {%- endfor -%}
+
+            <div class="circle-collection-item flex flex-col items-center mx-2">
+              <a href="{{ collection.url }}" class="block text-center">
+                <div class="circle-collection-image relative rounded-full overflow-hidden mb-3 transition-transform duration-300 hover:scale-105 flex items-center justify-center">
+                  {%- if collection.featured_image -%}
                     {{
-                      'collection-'
-                      | append: forloop.index
-                      | placeholder_svg_tag: 'w-1/2 h-1/2'
+                      collection.featured_image
+                      | image_url: width: 500
+                      | image_tag:
+                        loading: 'lazy',
+                        sizes: '(min-width: 750px) var(--desktop-size), var(--mobile-size)',
+                        widths: '165, 360, 535, 750, 1070, 1500',
+                        class: 'w-full h-full object-cover'
                     }}
-                  </div>
-                {%- endif -%}
-              </div>
-              <h3 class="font-[var(--title-weight)] mt-[var(--title-margin-top)] text-[length:var(--title-size-mobile)] md:text-[length:var(--title-size-desktop)] text-[var(--text-color)]">
-                {%- if block.settings.title != blank -%}
-                  {{ block.settings.title }}
-                {%- else -%}
-                  {{ collection.title }}
-                {%- endif -%}
-              </h3>
-            </a>
-          </div>
-        {%- endfor -%}
+                  {%- else -%}
+                    <div class="w-full h-full bg-gray-100 flex items-center justify-center">
+                      {{
+                        'collection-'
+                        | append: forloop.index
+                        | placeholder_svg_tag: 'w-1/2 h-1/2'
+                      }}
+                    </div>
+                  {%- endif -%}
+                </div>
+                <h3 class="font-[var(--title-weight)] mt-[var(--title-margin-top)] text-[length:var(--title-size-mobile)] md:text-[length:var(--title-size-desktop)] text-[var(--text-color)]">
+                  {{ display_title }}
+                </h3>
+              </a>
+            </div>
+          {%- endfor -%}
+        {%- else -%}
+          {%- for block in section.blocks -%}
+            {%- assign collection = collections[block.settings.collection] -%}
+            {%- if collection == blank -%}
+              {%- continue -%}
+            {%- endif -%}
+
+            <div
+              class="circle-collection-item flex flex-col items-center mx-2"
+              {{ block.shopify_attributes }}
+            >
+              <a href="{{ collection.url }}" class="block text-center">
+                <div class="circle-collection-image relative rounded-full overflow-hidden mb-3 transition-transform duration-300 hover:scale-105 flex items-center justify-center">
+                  {%- if block.settings.image != blank -%}
+                    {{
+                      block.settings.image
+                      | image_url: width: 500
+                      | image_tag:
+                        loading: 'lazy',
+                        sizes: '(min-width: 750px) var(--desktop-size), var(--mobile-size)',
+                        widths: '165, 360, 535, 750, 1070, 1500',
+                        class: 'w-full h-full object-cover'
+                    }}
+                  {%- elsif collection.featured_image -%}
+                    {{
+                      collection.featured_image
+                      | image_url: width: 500
+                      | image_tag:
+                        loading: 'lazy',
+                        sizes: '(min-width: 750px) var(--desktop-size), var(--mobile-size)',
+                        widths: '165, 360, 535, 750, 1070, 1500',
+                        class: 'w-full h-full object-cover'
+                    }}
+                  {%- else -%}
+                    <div class="w-full h-full bg-gray-100 flex items-center justify-center">
+                      {{
+                        'collection-'
+                        | append: forloop.index
+                        | placeholder_svg_tag: 'w-1/2 h-1/2'
+                      }}
+                    </div>
+                  {%- endif -%}
+                </div>
+                <h3 class="font-[var(--title-weight)] mt-[var(--title-margin-top)] text-[length:var(--title-size-mobile)] md:text-[length:var(--title-size-desktop)] text-[var(--text-color)]">
+                  {%- if block.settings.title != blank -%}
+                    {{ block.settings.title }}
+                  {%- else -%}
+                    {{ collection.title }}
+                  {%- endif -%}
+                </h3>
+              </a>
+            </div>
+          {%- endfor -%}
+        {%- endif -%}
       </div>
     </div>
   </div>
@@ -115,6 +186,18 @@
     "groups": ["header", "footer"]
   },
   "settings": [
+    {
+      "type": "collection_list",
+      "id": "collections",
+      "label": "Collections",
+      "limit": 20
+    },
+    {
+      "type": "richtext",
+      "id": "custom_titles_overrides",
+      "label": "Custom titles overrides (optional)",
+      "info": "One per line in the format: 4: My custom title. Number is the position in the Collections list (1-based). Leave empty to use the real collection title."
+    },
     {
       "type": "inline_richtext",
       "id": "title",

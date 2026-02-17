@@ -45,10 +45,18 @@
               </a>
               <script>
                 document.addEventListener('DOMContentLoaded', function () {
-                  const relatedChatUserId =
-                    JSON.parse(localStorage.getItem('relatedChatUserId'))
-                      ?.value || null
-                  if (Number.isFinite(relatedChatUserId)) {
+                  const rawRelatedChatUserId =
+                    localStorage.getItem('relatedChatUserId')
+                  const parsedRelatedChatUserId = (() => {
+                    try {
+                      return rawRelatedChatUserId
+                        ? JSON.parse(rawRelatedChatUserId)
+                        : null
+                    } catch (e) {
+                      return null
+                    }
+                  })()
+                  if (Number.isFinite(parseInt(relatedChatUserId, 10))) {
                     document.getElementById(
                       'cart-drawer-login-item-1'
                     ).style.display = 'none'

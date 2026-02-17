@@ -725,7 +725,10 @@
     class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]"
     onclick="if(event.target === this) closeCartNameModal()"
   >
-    <div class="bg-white rounded-2xl p-4 sm:p-8 shadow-2xl max-w-[420px] w-[calc(100%-2rem)] sm:w-[420px] mx-4 relative" onclick="event.stopPropagation()">
+    <div
+      class="bg-white rounded-2xl p-4 sm:p-8 shadow-2xl max-w-[420px] w-[calc(100%-2rem)] sm:w-[420px] mx-4 relative"
+      onclick="event.stopPropagation()"
+    >
       <button
         onclick="closeCartNameModal()"
         class="absolute top-3 right-4 text-gray-400 hover:text-gray-600 text-4xl leading-none transition-colors"
@@ -747,7 +750,7 @@
           placeholder="{{ 'extra_translations.cart_name_modal_input_placeholder' | t }}"
           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#01A89E] focus:border-transparent transition-all text-base"
           maxlength="100"
-        />
+        >
       </div>
       <div class="flex gap-3">
         <button
@@ -1185,8 +1188,19 @@ function showCartCopiedToast(message = cartLinkCopiedMsg ) {
       const promoCode = getPromoCode();
       // Parse 'createdBy' from URL query parameters and assign it as 'userId' in payload
 
-      const relatedChatUserId = JSON.parse(localStorage.getItem('relatedChatUserId'))?.value || null;
-      
+       const rawRelatedChatUserId =
+                localStorage.getItem('relatedChatUserId')
+              const parsedRelatedChatUserId = (() => {
+                try {
+                  return rawRelatedChatUserId
+                    ? JSON.parse(rawRelatedChatUserId)
+                    : null
+                } catch (e) {
+                  return null
+                }
+              })()
+              const relatedChatUserId = parsedRelatedChatUserId?.value ?? rawRelatedChatUserId ?? ''
+
       const requestBody = {
         customer_id,
         items,

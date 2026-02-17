@@ -441,10 +441,24 @@
 
     // Set relatedChatUserId from localStorage to hidden input
     document.addEventListener('DOMContentLoaded', function () {
-      const relatedChatUserIdInput = document.getElementById('related-chat-user-id-input')
+      const relatedChatUserIdInput = document.getElementById(
+        'related-chat-user-id-input'
+      )
       if (relatedChatUserIdInput) {
         try {
-          const relatedChatUserId = JSON.parse(localStorage.getItem('relatedChatUserId'))?.value || null
+          const rawRelatedChatUserId = localStorage.getItem('relatedChatUserId')
+          const parsedRelatedChatUserId = (() => {
+            try {
+              return rawRelatedChatUserId
+                ? JSON.parse(rawRelatedChatUserId)
+                : null
+            } catch (e) {
+              return null
+            }
+          })()
+          const relatedChatUserId =
+            parsedRelatedChatUserId?.value ?? rawRelatedChatUserId ?? ''
+
           if (relatedChatUserId) {
             relatedChatUserIdInput.value = relatedChatUserId
           }

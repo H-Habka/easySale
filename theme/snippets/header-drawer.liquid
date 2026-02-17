@@ -423,10 +423,21 @@
           </nav>
           <script>
             document.addEventListener('DOMContentLoaded', function () {
+              const rawRelatedChatUserId =
+                localStorage.getItem('relatedChatUserId')
+              const parsedRelatedChatUserId = (() => {
+                try {
+                  return rawRelatedChatUserId
+                    ? JSON.parse(rawRelatedChatUserId)
+                    : null
+                } catch (e) {
+                  return null
+                }
+              })()
               const relatedChatUserId =
-                JSON.parse(localStorage.getItem('relatedChatUserId'))?.value ||
-                null
-              if (Number.isFinite(relatedChatUserId)) {
+                parsedRelatedChatUserId?.value ?? rawRelatedChatUserId ?? ''
+
+              if (Number.isFinite(parseInt(relatedChatUserId, 10))) {
                 document.getElementById('menu-drawer-footer').style.display =
                   'none'
               }

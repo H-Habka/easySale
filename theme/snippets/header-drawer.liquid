@@ -421,7 +421,7 @@
               {%- endfor -%}
             </ul>
           </nav>
-          <script>
+          {% comment %} <script>
             document.addEventListener('DOMContentLoaded', function () {
               const rawRelatedChatUserId =
                 localStorage.getItem('relatedChatUserId')
@@ -442,7 +442,7 @@
                   'none'
               }
             })
-          </script>
+          </script> {% endcomment %}
           <div
             x-show="activeItem[0] === 0 && activeItem[1] === 0 "
             class="menu-drawer__utility-links"

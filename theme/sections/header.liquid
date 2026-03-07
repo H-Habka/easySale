@@ -318,7 +318,7 @@
     {%- endif -%}
   {%- endif -%}
 
-  <script>
+  {% comment %} <script>
     document.addEventListener('DOMContentLoaded', function () {
       const rawRelatedChatUserId = localStorage.getItem('relatedChatUserId')
       const parsedRelatedChatUserId = (() => {
@@ -335,7 +335,7 @@
         document.getElementById('header-login-button').style.display = 'none'
       }
     })
-  </script>
+  </script> {% endcomment %}
 
   <div class="header__icons{% if section.settings.enable_country_selector or section.settings.enable_language_selector %} header__icons--localization header-localization{% endif %}">
     <div class="desktop-localization-wrapper">
